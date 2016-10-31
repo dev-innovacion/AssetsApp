@@ -1,0 +1,113 @@
+﻿@using Newtonsoft.Json.Linq;
+@model  List<RivkaAreas.Movement.Models.Movement>
+@{Layout = null;}
+
+@if (ViewBag.canDelete)
+{
+
+    if (Model.Count > 0)
+    {
+        <h5 style="color: red">Los siguientes clientes dependen de este perfil, cambialos de perfil antes de borrarlo.</h5>
+        <div style="padding: 0 0 12px">
+            <span>Mover todos a </span>
+            <select onchange="changeProfiles(this.value)">
+                @{JArray profileMainList = ViewBag.profiles; }
+                @foreach (JObject profile in profileMainList)
+                {
+                    if (ViewBag.idProfile != profile["_id"].ToString())
+                    {
+                    <option value='@profile["_id"]'>@profile["name"]</option>
+                    }
+                }
+            </select>
+        </div>
+    
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Razón Social</th>
+                    <th>Mover a</th>
+                </tr>
+            </thead>
+            <tbody id="customersToChange">
+                @foreach (RivkaAreas.Movement.Models.Movement customer in Model)
+                {
+                    <tr data-customerid="@customer._id">
+                        <td>@customer.name</td>
+                        <td>@customer.dba</td>
+                        <td>
+                            <select class="moveTo">
+                                @{JArray profileList = ViewBag.profiles; }
+                                @foreach (JObject profile in profileList)
+                                {
+                                    if (ViewBag.idProfile != profile["_id"].ToString())
+                                    {
+                                        <option value='@profile["_id"]'>@profile["name"]</option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        <h5 style="text-align: center; color: red">¿Seguro que desea borrar este movimiento?</h5>
+    }
+}
+else
+{
+    <h5 style="text-align: center; color: red">El movimiento Básico no puede ser eliminado</h5>
+}
+<script>
+    function changeProfiles(idProfile) {
+        jQuery("select.moveTo").val(idProfile);
+    }
+    
+    function deleteProfile() {
+        var _idProfile = null;
+        var _customersToChange = {};
+        _customersToChange.customers = [];
+
+        @if(ViewBag.canDelete)
+        {
+            <text>_idProfile = "</text>@ViewBag.idProfile<text>";</text>
+        }
+        
+        if (_idProfile != null) {
+            customers = jQuery("#customersToChange");
+            if (customers.length) {
+                customers.find("tr").each(function () {
+                    customerObj = {};
+                    customerObj._id = jQuery(this).data("customerid");
+                    customerObj.profileId = jQuery(this).find("select").val();
+                    _customersToChange.customers.push(customerObj);
+                });
+            }
+
+            _customersToChange = JSON.stringify(_customersToChange);
+
+            jQuery.ajax({
+                url: "/Movement/MovementProfile/deleteProfile",
+                type: "POST",
+                data: { idProfile: _idProfile, customers: _customersToChange },
+                beforeSend: _loading(),
+                complete: _loading(),
+                success: function (data) {
+                    _alert("success","Eliminado Correctamente");
+                    window.location = "/Movement/MovementProfile";
+                },
+                error: function (errorThrown) {
+                    _alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+        return false;
+    } 
+</script>
+
+

@@ -1,0 +1,255 @@
+.RVOperationsContainer {
+    display:block;
+    float: left;
+    width:100%;
+}
+
+.page{
+    width:auto;
+    height:auto;  
+    overflow: hidden;
+    /*position: relative; */
+    display:block;
+    float:left;
+}
+  
+.line{
+    width:100%;
+    padding:5px;
+    height:auto;
+    display:table;     
+}
+
+.group_title
+{
+    clear: both;
+    padding: 20px 0 0 10px;
+}
+
+.tab-rivkaviewer .btn-group.columns-filter
+{
+    float: right;
+}
+
+/* Tile size */
+.thumb_tile
+{
+    width: 60px;
+    height: 60px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.tile{
+    height:100px;  
+    width:10%;
+    min-width:100px;
+    float:left;
+    margin:0 5px 5px 0;
+    cursor: pointer;
+    border: 1px solid gray;
+    background-size: 100% 100% !important;
+    position: relative;
+}
+
+    .tile .btn-group {
+        float:right;
+        opacity: 0.7;
+        display: none;
+    }
+
+    .tile ._RVCounter {
+        float:right;
+        background-color: blue;
+        padding: 0 6px;
+        color: white;
+    }
+
+    .tile:hover .tileName{
+        background: url("rv_tileNameSelected.png");
+    }
+
+    .tile:hover .btn-group {
+        display:block;
+    }
+
+    .tile .selectedTile
+    {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.5;
+        background-image: url();
+        z-index: 1;
+    }
+    .tile .selectedArrow
+    {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 2;
+        color: white;
+        font-size: 30px;
+        text-align: center;
+        padding-top: 26px;
+    }
+
+.tileFilter
+{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+    .tileFilter input
+    {
+        padding: 2px 5px;
+    }
+
+.page .tileName{
+	height:25px;
+	width:100%;
+	margin-top:75px;
+	background:url("rv_tileName.png");
+    text-align:center;
+    color: #333;
+    overflow:hidden;
+}
+
+/* Tile - Colors */  
+.orange{
+    background: #E95107;
+}
+  
+.blue{
+    background: #28677B;
+}
+
+.gray{
+	background:#666666;
+}
+
+.purple{
+    background: #47207B;
+}
+  
+.green{
+    background-color: #348C2B;
+}
+
+.red{
+    background-color: #BC1234;
+}
+
+.pink{
+    background-color: #F0028B;
+}
+
+
+/* SLIDERS */
+
+.tab-rivkaviewer{
+    overflow:auto;
+    position: relative;
+    min-height:250px;
+}
+
+.sliderContainer {
+    width:100%;
+}
+
+
+       .sliderContainer .sliderImage{
+        width: 100%;
+        height: 300px;
+        position: relative;
+        margin:0px;
+        float:left;
+	    background-color:white;
+        background-repeat:no-repeat;
+        background-position:center;
+          background-size: 50% 100% !important;
+    }
+
+        .sliderImage .sliderDescription {
+            height:50px;
+	        width:100%;
+	        margin-top:230px;
+	        background:url("rv_linea.png");
+            opacity:0.7;
+            text-align:left;
+            padding:10px;
+            color: blue;  
+            font-weight:bold;
+        }
+
+            .sliderImage .sliderDescription:hover {
+                opacity: 1;
+            }
+
+    .sliderContainer .line {
+        width:100%;
+        margin:0;
+        height:auto;
+        padding:0px;
+        display:table;  
+    }
+
+        .sliderContainer .line .tilesContainer {
+            width:95%;
+            float:left;
+            margin-bottom:1px;
+        }
+
+.sliderContainer .line .tile{
+    height:100px;  
+    width:12%;
+    min-width:100px;
+    float:left;
+    margin:0 0px 0px 0;
+    cursor: pointer;
+    background-size: 100% 100% ;
+}
+
+    .sliderContainer .line .tile .tileName {
+        height:25px;
+	    width:100%;
+	    margin-top:75px;
+	    background:url("rv_tileName.png");
+        text-align:center;
+        color: #333;
+        overflow:hidden;
+    }
+
+    .sliderContainer .line .tile.selected .tileName {
+        background: url("rv_tileNameSelected.png");
+    }
+
+.sliderContainer .prev{
+    background: url("rv_prevAzul.png") no-repeat;
+    background-position: 0 0;
+    margin:0 0px 0px 0;
+    cursor: pointer;
+    width:2.5%;
+    min-width:17px;
+    height:100px;
+    float:left;
+}
+.sliderContainer .prev:hover{
+    background-position: 0 1px;
+}
+
+.sliderContainer .next{
+    background:  url("rv_nextAzul.png") no-repeat;
+    background-position: 0 0;
+    margin:0 0px 0px 0;
+    cursor: pointer;
+    width: 2.5%;
+    min-width:17px;
+    height:100px;
+    float:left;
+}
+
+.sliderContainer .next:hover{
+    background-position: 0 1px;
+}

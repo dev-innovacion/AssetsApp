@@ -1,0 +1,51 @@
+﻿@{Layout = null;}
+
+
+@{
+    ViewBag.Title = "GenerateMapWidget";
+   
+    string ts = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+
+}
+<div class="well widgetid" data-idwidget="@ViewData["idwidget"].ToString()" >
+
+   
+    <div class="well-content no_padding" id="@ts">
+        <ul class="rows">
+            <li>
+                <span class="icon error"><i class="icon-bolt"></i></span>
+                <p>Se Agrego una Nueva Ubicacion En sonora</p>
+            </li>
+            <li>
+                <span class="icon info"><i class="icon-bell"></i></span>
+                <p>Se elimino Una Ubicacion De Guadalajara.</p>
+            </li>
+            <li>
+                <span class="icon success"><i class="icon-ok"></i></span>
+                <p>Se Agrego una nueva Ubicacion En Sinaloa</p>
+            </li>
+            <li>
+                <span class="icon warning"><i class="icon-bullhorn"></i></span>
+                <p>Conjunto Ubicaciones Eliminado.</p>
+            </li>
+            <li>
+                <span class="icon error"><i class="icon-bolt"></i></span>
+                <p>Nueva Ubicacion Creada. <a href="#">Expand</a> your limit!</p>
+            </li>
+            <li>
+                <span class="icon info"><i class="icon-bell"></i></span>
+                <p>Se Modificaron Ubicaciones!</p>
+            </li>
+            <li>
+                <span class="icon success"><i class="icon-ok"></i></span>
+                <p>Nueva Ubicacion en Monterrey <a href="#">rhoulettex</a>
+            </li>
+            <li>
+                <span class="icon warning"><i class="icon-bullhorn"></i></span>
+                <p>Ubicacion En Chihuahua Eliminada...</p>
+            </li>
+        </ul>
+    </div>
+
+</div>

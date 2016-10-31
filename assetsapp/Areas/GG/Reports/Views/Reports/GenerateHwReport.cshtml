@@ -1,0 +1,685 @@
+﻿@using MongoDB.Bson
+@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+@{
+
+    ViewBag.Title = "GenerateHwReport";
+  
+    Dictionary<string, string> cols = new Dictionary<string, string>();
+    Dictionary<string, int> graph = new Dictionary<string, int>();
+    Dictionary<int, string> headersgraph = new Dictionary<int, string>();
+    Dictionary<string, int[]> graphtime = new Dictionary<string, int[]>();
+    List<string> headsg = new List<string>();
+    int years = (int)ViewData["years"];
+    Dictionary<string, int[]> graphend = new Dictionary<string, int[]>();
+    int indexfor = 0;
+    foreach (var x in (List<string>)ViewData["headmult"])
+    {
+        headsg.Add(x);
+    }
+    foreach (var x in (Dictionary<string, int[]>)ViewData["bodygraph"])
+    {
+
+        graphend.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, string>)ViewData["cols"])
+    {
+        cols.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, int>)ViewData["graph"])
+    {
+        graph.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<int, string>)ViewData["th"])
+    {
+
+        headersgraph.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, int[]>)ViewData["graphtime"])
+    {
+
+        graphtime.Add(x.Key, x.Value);
+    }
+    string[] headarray = headsg.ToArray();
+    int count = 0;
+
+    int numusers = Convert.ToInt16(ViewData["numusers"].ToString());
+    string nametype = ViewData["smart"].ToString();
+    string[] datesarray = (string[])ViewData["dates"];
+
+
+
+}
+
+<div class="well">
+
+
+
+
+
+
+    
+    <div class="well-content no_padding row-fluid">
+        <center>
+            <div style="width:100%;align-content:center;">
+
+
+                <center>
+                    <div class="well">
+
+                        <div class="well-content no-search">
+                            <div class="navbar-inner">
+                                <ul class="nav nav-tabs" id="tabHeader2">
+                                    <li class="active" id="listaHeader"><a href="#lista" data-toggle="tab">Resumen</a></li>
+                                    <li id="autorizacionesHeader"><a href="#autorizaciones" data-toggle="tab">Tablas de Datos <span id="counterauthos" class="badge badge-important">@numusers</span></a></li>
+                                    <li id="grafic2"><a href="#grafica" data-toggle="tab">Graficas <span id="counterauthos1" class="badge badge-important"></span></a></li>
+
+                                </ul>
+                            </div>
+                            <div class="tab-content" id="tabContent2">
+                                <div class="tab-pane active lista listamargen" id="lista">
+
+                                    <div class="well">
+                                        <div class="well-header row-fluid   titleclient" style="background-color:white">
+
+
+                                            <h5 style="color:black">Reporte de Hardwares </h5>
+
+
+
+                                            <div class="btn-group">
+
+                                                <button type="button" class="btn btn-mini  fileinput-button" style="background-color:#06550a" id="exporttoexcelx" title="Exportar a Excel" rel="tooltip" data-placement="top">
+                                                    <i class="excelbtn"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-mini red " id="exporttopdfx" title="Exportar a Pdf" rel="tooltip" data-placement="top">
+                                                    <i class="pdfbtn"></i>
+                                                </button>
+
+
+
+
+                                            </div>
+
+                                        </div>
+                                        <div class="well-content no_padding row-fluid">
+                                            <br />
+                                            <div class="float_left" style="padding-left:1.5%;">
+                                               
+                                            </div>
+                                            <div class="float_margen">
+                                                <div id="tableuser">
+                                                    <table id="tab_tableuser" class="table table-striped table-hover">
+
+                                                        <thead>
+                                                            <tr class="success">
+
+                                                                <th class="table-fixed-medium getmail" style="background: #8793A0; color: white; font-weight: bold; text-align: center">#Perfiles</th>
+                                                                <th class="table-fixed-medium getmail" style="background: #8793A0; color: white; font-weight: bold; text-align: center">Tipo Hardware</th>
+                                                                <th class="table-fixed-medium getmail" style="background: #8793A0; color: white; font-weight: bold; text-align: center">Fecha Inicio</th>
+                                                                <th class="table-fixed-medium getmail" style="background: #8793A0; color: white; font-weight: bold; text-align: center">Fecha Fin</th>
+
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+
+                                                            <tr class="mailtr">
+
+
+                                                                <td class="table-fixed-medium getmail" style="text-align:center;">@numusers</td>
+                                                                <td class="table-fixed-medium getmail" style="text-align:center;">@nametype</td>
+
+                                                                <td class="table-fixed-medium getmail" style="text-align:center;">@datesarray[0]</td>
+                                                                <td class="table-fixed-medium getmail" style="text-align:center;">@datesarray[1]</td>
+
+
+                                                            </tr>
+
+
+
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    </div>
+
+
+                                <div class="tab-pane autorizaciones autorizacionmargen" id="autorizaciones">
+                                    <div class="well">
+
+
+
+                                        <!--   <div class="well-header">
+                <center> <h4 style="color:white;padding-top:10px;">Reporte de Usuarios</h4></center>
+            </div>-->
+                                        <div class="no_padding row-fluid">
+                                            <div class="float_left" style="padding-left:1.5%;">
+                                                
+                                            </div>
+
+
+                                            <div id="reports" class="float_margen">
+
+                                                <table id="mailtablex" class="table table-striped table-hover">
+
+                                                    <thead>
+                                                        <tr>
+                                                            @foreach (var x in cols)
+                                                            {
+                                                                <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">@x.Value.ToUpper()</th>
+                                                            }
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        @foreach (JObject item in Model)
+                                                        {
+                                                            <tr class="mailtr">
+
+                                                                @foreach (var x in cols)
+                                                                {
+
+                                                                    <td class="table-fixed-medium getmail" style="text-align:center;">
+                                                                        @try
+                                                                        {<Text>@item[x.Key].ToString()</Text>}
+                                                                        catch (Exception ex) { }
+                                                                </td>
+                                                                }
+
+
+
+                                                            </tr>
+                                                                count++;
+                                                        }
+
+                                                    </tbody>
+
+                                                </table>
+                                                @if (count == 0)
+                                                {
+                                                    <div>
+                                                        <br />
+                                                        <h4>  NO HAY HARDWARES CREADOS EN ESTE RANGO DE FECHAS</h4>
+                                                        <br />
+                                                    </div>
+
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+
+                                <div class="tab-pane autorizaciones autorizacionmargen" id="grafica">
+                                    div class="well-content no_padding row-fluid">
+
+
+
+                                    <div class="well-header" style="background: #8793A0">
+                                        <h5 style="color:white;">GRAFICAS</h5>
+                                    </div>
+                                    <div class="well-content no_padding row-fluid">
+
+                                        <div class="span4 container" style="padding:7% 0px 0px 7%;">
+                                            <p>
+                                                <strong> Tipo De Grafica:</strong>
+                                                <select id="selectgraph" class="chosen">
+
+
+                                                    <option value="piegoo">Circular</option>
+
+
+                                                    <option value="goobar">Barras</option>
+                                                    <option value="tablebar">Area Escalonada</option>
+
+
+                                                    @if (years < 10)
+                                                    {
+                                                        <option value="custom">Custom</option>
+                                                        <option value="linegoo">Linea</option>
+                                                        <option value="barhor">Barras(Horizontal)</option>
+                                                        <option value="gooarea">Areas</option>
+                                                        <option value="bargroup">Grupo Barras</option>
+                                                    }
+
+                                                </select>
+                                            </p>
+                                            <br />
+
+
+
+                                        </div>
+                                        <div class="span8 container" style="padding-right: 30%;  border-color: blue; padding-bottom: 5%;border-left:1px solid #0072c6">
+
+                                            <div id="chart"></div>
+
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                    </div>
+
+                                </div>
+                        </div>
+</center>
+
+
+            </div>
+        </center>
+
+    </div>
+
+</div>
+<
+<div class="float_right">
+
+   
+</div>
+
+<div class="hidden">
+    <canvas id="canvas1" height="0" width="0"></canvas>
+</div>
+<link href="~/Content/Scripts/library/graph/charting/css/visualize.css" rel="stylesheet" />
+<link href="~/Content/Scripts/library/graph/charting/css/visualize-dark.css" rel="stylesheet" />
+<script src="~/Content/Scripts/library/graph/charting/js/example-filtering.js"></script>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+
+
+
+    jQuery(document).ready(function ($) {
+
+        // graph api google
+        var valuegen = 'line';
+        try {
+            jQuery("#mailtablex").dataTable({
+                "sPaginationType": "full_numbers",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+                aLengthMenu: [
+                [10, 50, 100, -1],
+                [10, 50, 100, "Todos"]
+                ],
+                "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Filtro",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Ultimo",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+
+                    },
+                    "sEmptyTable": "Tabla Sin Datos"
+                }
+            });
+        } catch (e) { }
+       function drawtable() {
+
+            $('.visualize').remove();
+            $('#chart').html("");
+            var value = $("#selectgraph").val();
+
+            // Create and populate the data table.
+
+
+
+            var data = google.visualization.arrayToDataTable([
+                 ['Tipos', '#Hardwares']
+                 @foreach(var x in graph){
+
+                @(new HtmlString(",['"+x.Key+"',"))
+
+
+                @(new HtmlString(""+x.Value+"]"))
+                 }
+
+
+
+            ]);
+
+
+            var options = {
+                width: 600, height: 400,
+                title: 'Hardwares Por Tipo',
+                vAxis: { title: 'Acumulado' },
+                isStacked: true
+            };
+            if (value == 'piegoo' || valuegen == 'line') {
+                valuegen = ''
+                var chart = new google.visualization.PieChart(document.getElementById('chart'));
+                chart.draw(data, options);
+            } else
+                if (value == 'tablebar') {
+
+                    var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart'));
+                    chart.draw(data, options);
+                }
+
+            $('#chart').removeClass("loading-custom");
+        }
+
+        function drawbar() {
+
+
+            var heads = new Array();
+            heads.push('Perfil');
+            debugger;
+            var rows = new Array();
+            rows.push('#Usuarios');
+            $('.visualize').remove();
+            $('#chart').html("");
+            @foreach(var x in graph){
+        @(new HtmlString("heads.push('"+x.Key+"');"))
+        @(new HtmlString("rows.push("+x.Value+");"))
+        }
+            var wrapper = new google.visualization.ChartWrapper({
+                chartType: 'ColumnChart',
+                dataTable:[heads,rows],
+                /*  dataTable: [['', 'Germany', 'USA', 'Brazil', 'Canada', 'France', 'RU'],
+                              ['', 700, 300, 400, 500, 600, 800]],*/
+                options: { 'title': 'Usuarios Por Perfil' , 'width': 600,
+                    'height': 400 },
+                containerId: 'chart'
+            });
+            wrapper.draw();
+            $('#chart').removeClass("loading-custom");
+        }
+        function drawVisualization() {
+            // Some raw data (not necessarily accurate)
+
+            var heads = new Array();
+            $('.visualize').remove();
+            $('#chart').html("");
+            @foreach(var x in headsg){
+            @(new HtmlString("heads.push('"+x+"');"))
+            }
+            var data = new google.visualization.DataTable();
+            debugger;
+            var length = heads.length;
+            for (var i = 0;i<length; i++) {
+                if (i == 0) {
+                    data.addColumn('string',heads[i]);
+                } else {
+                    data.addColumn('number', heads[i]);
+                }
+            }
+            @foreach(var x in graphend){
+                if (indexfor == 0) {
+                @(new HtmlString("data.addRows([['"+x.Key+"'"))
+                    indexfor++;
+                }
+                else
+                {
+                   @(new HtmlString(",['"+x.Key+"'"))
+
+                }
+                for (int i = 0; i < x.Value.Length; i++)
+                {
+                    @(new HtmlString("," + x.Value[i] + ""))
+                }
+                 @(new HtmlString("]"))
+            }
+            @if (indexfor > 0) {
+         @(new HtmlString("]);"))
+        }
+            /* data.addRows([
+             ['enero', 165, 938, 522, 998, 450],
+             ['feb', 135, 1120, 599, 1268, 288],
+             ['marzo', 157, 1167, 587, 807, 397],
+             ['abril', 139, 1110, 615, 968, 215],
+             ['mayo', 136, 691, 629, 1026, 366]
+             ]);*/
+
+
+
+            // Create and draw the visualization.
+            var value = $("#selectgraph").val();
+
+            if (value == 'gooarea') {
+                var ac = new google.visualization.AreaChart(document.getElementById('chart'));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Hardwares',
+                    isStacked: true,
+                    width: 600,
+                    height: 400,
+                    vAxis: { title: "Num Hardwares" },
+                    hAxis: { title: heads[0] }
+                });
+            } else if (value == 'bargroup') {
+                var ac = new google.visualization.ColumnChart(document.getElementById('chart'));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Hardwares',
+                    isStacked: true,
+                    width: 600,
+                    height: 400,
+                    vAxis: { title: "Num Usuarios" },
+                    hAxis: { title: heads[0] }
+                });
+
+            } else if (value == 'linegoo') {
+                var ac = new google.visualization.LineChart(document.getElementById('chart'));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Hardwares',
+                    isStacked: true,
+                    width: 600,
+                    height: 400,
+                    vAxis: { title: "Num Usuarios" },
+                    hAxis: { title: heads[0] }
+                });
+
+            } else if (value == 'custom') {
+
+                var motionchart = new google.visualization.MotionChart(document.getElementById('chart'));
+                motionchart.draw(data, { 'width': 600, 'height': 400 });
+
+            } else if (value == 'barhor') {
+
+                var chart = new google.visualization.BarChart(document.getElementById('chart'));
+                chart.draw(data, {
+                    title: 'Historial De Creacion De Usuarios',
+                    isStacked: true,
+                    width: 600,
+                    height: 400,
+                    vAxis: { title: heads[0] },
+                    hAxis: { title: "#Usuarios" }
+                });
+
+            }
+            $('#chart').removeClass("loading-custom");
+        }
+
+
+        //
+
+
+
+
+        enhance({
+            loadScripts: [
+                { src: 'js/excanvas.js', iecondition: 'all' },
+
+
+            ],
+            loadStyles: [
+
+            ]
+        });
+
+        $('#example')
+        .visualize({
+            rowFilter: ':not()',
+            colFilter: ':not()',
+            type: 'bar', height: '300px', width: '420px'
+        });
+        $("#selectgraph").on('change', function () {
+            var value = $("#selectgraph").val();
+            jQuery('#selectformat').val('none');
+            if (value != 0) {
+
+
+                $('.visualize').remove();
+                $('#chart').html("");
+                if (value == 'area' || value == 'line') {
+                    $('#example2').visualize({
+                        rowFilter: ':not()',
+                        colFilter: ':not()',
+                        type: value, height: '300px', width: '520px'
+                    });
+                } else if (value == 'goobar') {
+                    $('#chart').addClass("loading-custom");
+
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawbar, 'packages': ['corechart'] }) }, 20);
+
+                } else if (value == 'gooarea' || value == 'bargroup' || value == 'linegoo' || value == 'custom' || value == 'barhor') {
+                    $('#chart').addClass("loading-custom");
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawVisualization, 'packages': ['corechart', 'motionchart'] }) }, 20);
+
+
+                } else if (value == 'tablebar' || value == 'piegoo') {
+                    $('#chart').addClass("loading-custom");
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawtable, 'packages': ['corechart', 'imageareachart'] }) }, 20);
+
+
+                } else {
+                    $('#example').visualize({
+                        rowFilter: ':not()',
+                        colFilter: ':not()',
+                        type: value, height: '300px', width: '420px'
+                    });
+                }
+
+                $("html, body").animate({ scrollTop: $(document).height() }, "fast");
+            }
+        });
+        $("#exporttoexcelx").on('click', function () {
+
+            exportReports("goexcel");
+        });
+        $("#exporttopdfx").on('click', function () {
+
+            exportReports("gopdf");
+        });
+        function exportReports(type) {
+
+            var data = "";
+            var result = "";
+            var namefilter = "";
+            // var value = $("#selectformat").val();
+            var value = type;
+
+            @(new HtmlString("result="+Model+";"))
+            @(new HtmlString("namefilter='"+nametype+"';"))
+            var jsonresult = JSON.stringify(result);
+
+            var arraycols = new Array();
+            var numtotal = "";
+            var arraydates = {};
+            var namereport = "Hardwares";
+            var typefilter = "Tipo(s)";
+
+
+            @foreach (var x in cols)
+            {
+                   @(new HtmlString("var datacols = {};"))
+                  @(new HtmlString("datacols.key='"+x.Key+"';"))
+                  @(new HtmlString("datacols.value='"+x.Value+"';"))
+                  @(new HtmlString("arraycols.push(datacols);"))
+             }
+            var jsoncols = JSON.stringify(arraycols);
+            @(new HtmlString("numtotal="+numusers.ToString()+";"))
+
+
+            @(new HtmlString("arraydates.start='"+datesarray[0]+"';"))
+            @(new HtmlString("arraydates.end='"+datesarray[1]+"';"))
+            var jsondates = JSON.stringify(arraydates);
+
+            //   window.open('/Uploads/Reports/' + data, '_blank');
+
+            //  var table = $("#customers").html();
+            //  demoFromHTML();
+            // demotablepdf();
+            /* doc.text(20, 20, 'Hello world!');
+             doc.text(20, 30, 'This is client-side Javascript, pumping out a PDF.');
+             doc.addPage();
+             doc.text(20, 20, 'Do you like that?');
+             doc.save('sample-file.pdf');*/
+
+
+            var filename = "";
+            var heads = new Array();
+            svg = $('svg').parent().html();
+            canvg('canvas1', svg);
+            canvas = document.getElementById("canvas");
+            // img_PNG = "<img src='#{canvas.toDataURL()}' />";
+            canvas1 = document.getElementById("canvas1");
+            var imgjpeg = canvas1.toDataURL("image/jpeg");
+
+            //  $('#pngimg').html(img_PNG);
+           
+            if (value == "gopdf") {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/exp1",
+                    data: { result: jsonresult, namefilter: namefilter, numtot: numtotal, datacols: jsoncols, datesarray: jsondates, namereports: namereport, typefilters: typefilter, graph: imgjpeg },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+                        window.open('/Uploads/Reports/' + data, '_blank');
+
+                        _loading();
+
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un Error, Intente Mas tarde");
+                        _loading();
+                    }
+
+
+                });
+            }
+            if (value == "goexcel") {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/ExportDataSet",
+                    data: { result: jsonresult, namefilter: namefilter, numtot: numtotal, datacols: jsoncols, datesarray: jsondates, namereports: namereport, typefilters: typefilter, graph: imgjpeg },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+                        window.location.href = '/Uploads/Reports/' + data;
+
+                        _loading();
+
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un Error, Intente Mas tarde");
+                        _loading();
+                    }
+
+
+                });
+
+            }
+
+        }
+        $('#chart').addClass("loading-custom");
+
+        setTimeout(function () { google.load('visualization', '1', { 'callback': drawtable, 'packages': ['corechart', 'imageareachart'] }) }, 10);
+
+    });
+
+
+</script>
+

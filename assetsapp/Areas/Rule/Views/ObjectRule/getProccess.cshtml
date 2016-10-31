@@ -1,0 +1,185 @@
+﻿@{Layout = null;}
+
+
+@model Dictionary<string, string>
+@{
+    ViewBag.Title = "Proccess";
+    int count = 0;
+    int aux = 0;
+    bool check = false;
+
+}
+<!--<div class="well blue">-->
+  <!--  <div class="well-header">
+        <center> <h4 style="color:white;padding-top:10px;">Lista De procesos</h4></center>
+    </div>-->
+    <div class="well-content no_padding row-fluid">
+        <div class="float_margen">
+            <div class="accordion" id="accordion2">
+
+
+                @foreach (var item in Model)
+{
+    string toggle = item.Key + "box";
+    aux = 0;
+    <div class="accordion-group" style="border: 0px solid #dedede;">
+
+        <div class="well light_blue">
+
+            <div class="well-header">
+                <div style="padding:10px 0px 0px 60px;" class="">
+                    <span class="checked"><input type="checkbox" name="proccess1[]" id="@item.Key" value="@item.Key" checked />@item.Value</span>
+                    <a href="#@toggle" class="accordion-toggle" data-parent="#accordion2" data-toggle="collapse"><i class="icon-plus" style="color:white;"></i></a>
+
+
+                </div>
+            </div>
+
+            <div id="@toggle" class="accordion-body collapse in">
+                <div class="well-content accordion-inner">
+                    <div class="message_center" id="@item.Value">
+
+                        <div class="marsub2 row-fluid" style="height: auto !important; padding: 5px 20px 5px 50px;">
+
+                            @foreach (var locationsA in (List<Dictionary<string, string>>)ViewData["locations"])
+                            {
+
+                                if (aux == count)
+                                {
+                                    foreach (var locations in locationsA)
+                                    {
+                                        check = false;
+                                        foreach (var getchecklocationA in (List<Dictionary<string, string>>)ViewData["checks"])
+                                        {
+                                            foreach (var checks in getchecklocationA)
+                                            {
+                                                if (item.Key == checks.Value && locations.Key == checks.Key)
+                                                {
+                                                    check = true;
+                                                }
+                                            }
+                                        }
+
+                                        <label class="checkbox span12">
+                                            <div class="">
+                                                <span>
+                                                    <div class="">
+                                                        @if (check == true)
+                                                        {
+                                                            <input type="checkbox" class="uniform" value="@locations.Key" name="@item.Key" checked>
+                                                            @locations.Value
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" class="uniform" value="@locations.Key" name="@item.Key">
+                                                            @locations.Value
+                                                        }
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </label>
+                                    }
+                                }
+                                aux++;
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+                            count++;
+}
+
+            </div>
+
+        </div>
+                    </div>
+@if (count > 0) { 
+                 <div class="float_right">
+
+                     <input type="submit" class="btn blue"  id="saverules2" value="Guardar" />
+                  </div>
+}
+else
+{
+    <div class="well-content no_padding row-fluid">
+        <center>
+            <div class="float_margen">
+                <div class="accordion" id="accordion2">
+                    <h3>No Hay Procesos Asociados Con este Hardware!!</h3>
+                </div>
+            </div>
+            </center>
+</div>
+}
+                    <!--</div> -->
+                    <script>
+                      //  var checkboxValues = new Array();
+
+
+                        var idlocation = "";
+
+                        var array = new Array();
+                        jQuery(document).ready(function ($) {
+                            $('#saverules2').on('click', function () {
+                               
+                                array.length = 0;
+                                idHw = $('#selectx').val();
+
+                                $('input[name="proccess1[]"]:checked').each(function () {
+
+                                    var objdata = new Object();
+                                    //$(this).val() es el valor del checkbox correspondiente
+
+                                    //  alert($(this).val());
+                                    objdata.idproccess = $(this).val();
+                                    var checkboxValues = new Array();
+                                    $('input[name=' + objdata.idproccess + ']:checked').each(function () {
+
+                                        checkboxValues.push($(this).val());
+                                      
+                                    });
+                                    objdata.locations = checkboxValues;
+
+                                    array.push(objdata);
+                                });
+
+                                var jsondata = JSON.stringify(array);
+                                jQuery.ajax({
+                                
+                                    url: "/Rule/ObjectRule/saveHwRules",
+                                    data: { id: idHw, data: jsondata },
+                                    beforeSend: _loading(),
+                                    type: "POST",
+                                    success: function (data) {
+                                        $('#proccessTable').html("");
+                                        $('#getType').html("");
+                                        $("#selectType option[value=0]").attr("selected", true);
+                                        jQuery('#selectType > option[value="0"]').attr('selected', 'selected');
+                                        jQuery('#selectType').val('0');
+
+                                        _alert("success", "Guardado Correctamente");
+
+                                        array.length = 0;
+                                        _loading();
+
+                                    }
+                                });
+
+                            });
+                            $(".collapse").collapse();
+                        });
+                    </script>
+                    <!-- <center>
+                 <ul class="rows">
+                     foreach (var item in Model)
+                     {
+                         <li> <input type="checkbox" name="proccess[]" id="item.Key" value="item.Key" /> item.Value</li>
+
+                     }
+                 </ul>
+             </center>-->

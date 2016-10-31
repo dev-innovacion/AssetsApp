@@ -1,0 +1,77 @@
+﻿@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+
+@{
+    var datos = "";
+    try
+    {
+        datos = Session["Permissions"].ToString();
+    }
+    catch (Exception ex)
+    {
+        Response.Redirect("~/Home");
+    }
+
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["custom_fields"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+
+    }
+}
+@Html.Hidden("TableName", ViewData["TableName"])
+<div class="well-content no-search">
+    <table class="table table-striped table-bordered table-hover datatable" id="customFieldTable" style="max-height:400px;">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Nombre</th>
+                <th>Etiqueta</th>
+                <th>Tipo de Campo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (JObject doc in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="checker" name=@doc["_id"].ToString() />
+                    </td>
+                    <td>@doc["name"]</td>
+                    <td>@doc["label"]</td>
+                    <td>@doc["type"]</td>
+                    <td>
+
+                        <div class='btn-group'>
+                            @if (upd == "u")
+                            {
+                                <a class='btn' data-original-title="Editar" rel="tooltip" data-placement="top">
+                                    <i class='icon-edit'></i>
+                                </a>
+
+                            }
+                            @if (del == "d")
+                            {
+                                <a class='btn' data-original-title="Borrar" rel="tooltip" data-placement="top">
+                                    <i class='icon-trash'></i>
+                                </a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

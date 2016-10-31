@@ -1,0 +1,441 @@
+@using MongoDB.Bson
+@model List<BsonDocument>
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Index";
+
+
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["profiles"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["profiles"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Administrar Puestos</h3>
+                </div>
+                <div class="span4">
+                    <div class="search" style="display:none">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Perfiles</h5>
+                        <div class="btn-group">
+                            @if (add == "c" && addc=="c")
+                            {
+                                <button class="btn btn-mini dark_green fileinput-button" onclick="window.location.href='/User/UserProfile/newProfile'" data-original-title="Agregar Perfil" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                            }
+                            <!--Tipe of Views-->
+                            <button class="btn btn-mini dark_green" id="toTileViewButton" data-original-title="Mosaicos" rel="tooltip" data-placement="top">
+                                <i class=" icon-th-large icon-white"></i>
+                                <span></span>
+                            </button>
+                            <button class="btn btn-mini orange" id="toSliderViewButton" data-original-title="Slider" rel="tooltip" data-placement="top">
+                                <i class=" icon-resize-horizontal icon-white"></i>
+                                <span></span>
+                            </button>
+                            <button class="btn btn-mini light_blue" id="toTableViewButton" data-original-title="Tabla" rel="tooltip" data-placement="top">
+                                <i class=" icon-th-list icon-white"></i>
+                                <span></span>
+                            </button>
+                        </div>
+                    </div>
+                    @if (del == "d" && delc=="d")
+                    { 
+                        <div id="deleteProfile" class="modal hide fade" data-backdrop="static">
+                            <div class="modal-header">
+                                <h3 class="modal-header-text">Borrar Perfil</h3>
+                            </div>
+                            <div class="modal-body">
+                            </div>
+                            <div class="modal-footer">
+                                <input value="Borrar" class="btn red" type="submit" id="delete_button">
+                                <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+                            </div>
+                        </div>
+                    }
+
+                    <div class="well-content no-search" id="profilesTable">
+                        @*<table class="table table-striped table-bordered table-hover datatable">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th># Usuarios</th>
+                                    <th>Creador</th>
+                                    <th>Última modificación</th>
+                                    <th>Fecha de Creación</th>
+                                    <th>Funciones</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (BsonDocument profiles in Model)
+                                {
+                                    <tr data-name="@profiles.GetElement("name").Value" data-id="@profiles.GetElement("_id").Value">
+                                        <td>@profiles.GetElement("name").Value</td>
+                                        <!--TODO: advanced search using Agregation-->
+                                        <td>@ViewBag.userTable.get("profileId", profiles.GetElement("_id").Value.ToString()).Count</td>
+                                        <td>@{try
+                                              {
+                                                  String userRow = ViewBag.userTable.GetRow(profiles["Creator"].ToString());
+                                                  JObject creatorSrting = JsonConvert.DeserializeObject<JObject>(userRow);  
+                                            @creatorSrting["user"].ToString()
+                                              }
+                                              catch (Exception e) { }
+                                        }
+                                        </td>
+                                        <td>@profiles.GetElement("LastmodDate").Value
+                                        <td>@profiles.GetElement("CreatedDate").Value
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                @if (upd == "u")
+                                                { 
+                                                    <a class="btn" href="/User/UserProfile/newProfile?idProfile=@profiles.GetElement("_id").Value"><i class="icon-edit"></i></a>
+                                                }
+                                                @if (del == "d")
+                                                {                                                                                                                            
+                                                    <a class="btn" href="#" onclick="getUsersProfile(this)"><i class="icon-trash"></i></a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>*@
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+<script>
+
+    $("document").ready(function () {
+        var upd = "";
+        var del = "";
+        var updc = "";
+        var delc = "";
+        var viewer = new RivkaViewer("profilesTable");
+
+        var model = {
+
+            usersData: null,
+
+            init: function () {
+                jQuery.ajax({
+                    url: "/User/UserProfile/GetProfilesTable",
+                    type: "POST",
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        model.usersData = data;
+                        var dataOptions = { id: "_id", name: "name", image: "image", permissions: [upd, del] };
+                        viewer.setData(model.usersData, dataOptions);
+                        table.print();
+                    },
+                    complete: _loading()
+                });
+            },
+
+            restart: function () {
+                selectedId = null;
+                selectedName = null;
+                selectedProfile = null;
+                userError = null;
+                emailError = null;
+                editingProfile = null;
+                editingUserData = null;
+                selectedMail = null;
+            }
+        };
+
+        var table = {
+
+            display: "table",
+
+            init: function () {
+                table.bindAll();
+            },
+
+            print: function () {
+                switch (table.display) {
+                    case "table":
+                        table.printTable();
+                        break;
+                    case "tile":
+                        table.printTiles();
+                        break
+                    case "slider":
+                        table.printSlider();
+                        break;
+                }
+            },
+
+            printTable: function () {
+                table.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "Nombre", "numUsers": "#Usuarios", "Creator": "Creador", "CreatedDate": "Fecha de Creación", "LastmodDate": "Última Modificación" },
+                    showSelecters: true,
+                    onEditRowAction: function () {
+                        var id = jQuery(this).closest("tr").data("id");
+                        window.location = "/User/UserProfile/newProfile?idProfile=" + id ;
+                    },
+                    onDeleteRowAction: getUsersProfile,
+                    onSelectRowAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.usersData);
+                for (i = 0; i < users.length; i++) {
+                    jQuery("table tr[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                }
+
+                jQuery("[rel=tooltip]").closest("a").tooltip();
+
+                //Add pagination functions
+                try {
+                    jQuery(".table").dataTable({
+                        "sPaginationType": "bootstrap",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 10,
+                        "sScrollY": "400px",
+                        "aoColumnDefs": [{
+                            'bSortable': false,
+                            'aTargets': [0]
+                        }],
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Buscar"
+                        }
+                    });
+                    jQuery('.dataTables_length select').chosen();
+                } catch (Exception) { console.log(); }
+
+            },
+
+            printTiles: function () {
+                table.display = "tile";
+
+                var tileOptions = {
+                    onEditTileAction: function () {
+                        var id = jQuery(this).closest("div.tile").data("id");
+                        window.location = "/User/UserProfile/newProfile?idProfile=" + id;
+                    },
+                    onDeleteTileAction: getUsersProfile,
+                    onSelectTileAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.TILE, tileOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.usersData);
+                for (i = 0; i < users.length; i++) {
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-email", users[i].email);
+                }
+
+                jQuery("[rel=tooltip]").closest("a").tooltip();
+            },
+
+            printSlider: function () {
+                table.display = "slider";
+                var sliderOptions = {
+                    onEditTileAction: function () {
+                        var id = jQuery(this).closest("div.tile").data("id");
+                        window.location = "/User/UserProfile/newProfile?idProfile=" + id;;
+                    },
+                    onDeleteTileAction: getUsersProfile,
+                    onSelectTileAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.SLIDER, sliderOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.usersData);
+                for (i = 0; i < users.length; i++) {
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-email", users[i].email);
+                }
+
+                jQuery("[rel=tooltip]").closest("a").tooltip();
+            },
+
+            bindAll: function () {
+
+                jQuery("#toSliderViewButton").unbind("click.toSliderView");
+                jQuery("#toSliderViewButton").bind("click.toSliderView", table.printSlider);
+
+                jQuery("#toTableViewButton").unbind("click.toTableView");
+                jQuery("#toTableViewButton").bind("click.toTableView", table.printTable);
+
+                jQuery("#toTileViewButton").unbind("click.toTileView");
+                jQuery("#toTileViewButton").bind("click.toTileView", table.printTiles);
+
+                jQuery("#globalSearchButton").bind("click.search");
+                jQuery("#globalSearchButton").bind("click.search", table.onSearchAction);
+
+                jQuery("#globalSearch").bind("keypress.checkSend", function (e) {
+                    if (e.which == 13) {
+                        jQuery("#globalSearchButton").click();
+                    }
+                });
+
+                
+            }
+
+            //onSearchAction: function () {
+            //    var stringToSearch = jQuery("#globalSearch").val();
+            //    if (stringToSearch.trim() == "") {
+            //        model.init();
+            //    } else {
+            //        jQuery.ajax({
+            //            url: "/User/User/globalSearch",
+            //            type: "POST",
+            //            data: { data: stringToSearch },
+            //            beforeSend: _loading,
+            //            success: function (data) {
+            //                model.usersData = data;
+            //                var dataOptions = { id: "_id", name: "user", image: "image", permissions: [upd, del] };
+            //                viewer.setData(model.usersData, dataOptions);
+            //                table.print();
+            //                _loading();
+            //            },
+            //            error: function (errorThrown) {
+            //                _alert("error", "Ha ocurrido un error");
+            //                _loading();
+            //            }
+            //        });
+            //    }
+            //}
+        };
+
+        // Set the permissions variables
+        @if (upd != null && upd != "")
+        {
+               @(new HtmlString("upd = '" + upd + "';"))
+        }
+        @if (del != null && del != "")
+        {
+
+        @(new HtmlString("del ='" + del + "';"))
+        }
+         @if (updc != null && updc != "") { 
+            @(new HtmlString("updc = '" + updc + "';"))
+         }
+            @if (delc != null && delc != "") { 
+           
+            @(new HtmlString("delc ='" + delc+ "';"))
+            }
+            
+        if (updc == "" || upd == "") {
+            upd = "";
+        }
+
+        if (delc == "" || del == "") {
+
+            del = "";
+        }
+       
+        // Initialize the models
+        model.init();
+        table.bindAll();
+
+
+        function getUsersProfile() {
+            var idProfile = null;
+            var profileName = null;
+            if (table.display == "table") {
+                idProfile = jQuery(this).closest("tr").data("id");
+                profileName = jQuery("table tr[data-id=" + idProfile + "] .name").text();
+            } else {
+                idProfile = jQuery(this).closest("div.tile").data("id");
+                profileName = jQuery(".line .tile[data-id=" + idProfile + "] .tileName").text();
+            }
+            modalTitle = "Borrar Perfil - ";
+            modalTitle += profileName;
+            jQuery("#deleteProfile").find("h3").html(modalTitle);
+
+            jQuery.ajax({
+                url: '/User/UserProfile/getUserByProfile',
+                data: { idProfile: idProfile },
+                beforeSend: _loading(),
+                type: "POST",
+                success: function (data) {
+                    jQuery("#deleteProfile").find(".modal-body").html(data);
+                    jQuery("#deleteProfile").modal("show");
+                    _loading();
+                },
+                error: function (errorThrown) {
+                    console.log(errorThrown.statusText);
+                }
+            });
+        }
+
+    });
+
+
+   
+
+    $("#delete_button").click(function () {
+        deleteProfile();
+    });
+
+    $("#cancel_button").click(function () {
+        jQuery("#deleteProfile").modal("hide");
+    });
+
+</script>

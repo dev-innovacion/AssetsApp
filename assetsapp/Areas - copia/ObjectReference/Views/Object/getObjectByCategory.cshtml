@@ -1,0 +1,117 @@
+﻿@using MongoDB.Driver
+@using MongoDB.Bson
+@*model  List<BsonDocument>*@
+@{Layout = null;}
+
+@*@if (ViewBag.canDelete)
+{
+
+    if (Model.Count > 0)
+    {
+        <h5 style="color: red">Los siguientes usuarios dependen de este perfil, cambialos de perfil antes de borrarlo.</h5>
+        <div style="padding: 0 0 12px">
+            <span>Mover todos a </span>
+            <select onchange="changeProfiles(this.value)">
+                @{List<BsonDocument> profileMainList = ViewBag.profiles; }
+                @foreach (BsonDocument profile in profileMainList)
+                {
+                    if (ViewBag.idProfile != profile.GetElement("_id").Value.ToString())
+                    {
+                    <option value='@profile.GetElement("_id").Value'>@profile.GetElement("name").Value</option>
+                    }
+                }
+            </select>
+        </div>
+    
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Mover a</th>
+                </tr>
+            </thead>
+            <tbody id="usersToChange">
+                @foreach (BsonDocument users in Model)
+                {
+                    <tr data-userId="@users.GetElement("_id").Value">
+                        <td>@users.GetElement("user").Value</td>
+                        <td>@users.GetElement("name").Value</td>
+                        <td>
+                            <select class="moveTo">
+                                @{List<BsonDocument> profileList = ViewBag.profiles; }
+                                @foreach (BsonDocument profile in profileList)
+                                {
+                                    if (ViewBag.idProfile != profile.GetElement("_id").Value.ToString())
+                                    {
+                                        <option value='@profile.GetElement("_id").Value'>@profile.GetElement("name").Value</option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+    else
+    {
+        *@<h5 style="text-align: center; color: red">¿Seguro que desea borrar este tipo de activo?</h5>
+    @*}
+}
+else
+{
+    <h5 style="text-align: center; color: red">El perfil Básico no puede ser eliminado</h5>
+}*@
+<script>
+    function changeProfiles(idProfile) {
+        jQuery("select.moveTo").val(idProfile);
+    }
+    
+    function deleteProfile() {
+        var _idProfile = null;
+        var _usersToChange = {};
+        _usersToChange.users = [];
+
+        @if(ViewBag.canDelete)
+        {
+            <text>_idProfile = "</text>@ViewBag.idProfile<text>";</text>
+        }
+        
+        if (_idProfile != null) {
+            users = jQuery("#usersToChange");
+            if (users.length) {
+                users.find("tr").each(function () {
+                    userObj = {};
+                    userObj.userId = jQuery(this).data("userid");
+                    userObj.profileId = jQuery(this).find("select").val();
+                    _usersToChange.users.push(userObj);
+                });
+            }
+
+            _usersToChange = JSON.stringify(_usersToChange);
+
+            jQuery.ajax({
+                url: "/ObjectReference/Object/deleteCategory",
+                type: "POST",
+                data: { idProfile: _idProfile, users: _usersToChange },
+                beforeSend: _loading(),
+                complete: _loading(),
+                success: function (data) {
+                    _alert("success", "Eliminado Correctamente");
+                    model.parentCategory = "null";
+                    model.init();
+                    tree.init({ id: "null", name: "Home" });
+                    jQuery("#deleteCategory").modal("hide");
+                },
+                error: function (errorThrown) {
+                    _alert("error","Ha ocurrio un error");
+                }
+            });
+        }
+        return false;
+    } 
+</script>
+
+

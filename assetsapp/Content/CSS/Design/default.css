@@ -1,0 +1,5 @@
+.topbarclient {background:#000000 !important;}
+.titleclient{color:#ffffff !important;}
+.widgetclient{background:#ABABAB !important;}
+#main_navigation.blue ul.main > li > a:active,#main_navigation.blue ul.main > li.active > a,#main_navigation.blue ul.main > li > a.subOpened {background: #000000 !important; -webkit-box-shadow: none;-moz-box-shadow: none; box-shadow: none;font-weight: normal; color: #fff;border: 1px solid #000000!important; }
+.logoclient {width: 129px;display: block;height: 44px; float: left;line-height: 44px; padding-left: 80px; font-size: 16px; color: #fff; font-weight: 300; text-transform: uppercase; background: url(/Uploads/Images/Design/Logo/52e95ab907719e0d40637d96635703276076029244.jpg) no-repeat left center; margin-left: 10px !important;background-size: contain;}

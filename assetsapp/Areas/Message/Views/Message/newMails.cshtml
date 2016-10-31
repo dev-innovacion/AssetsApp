@@ -1,0 +1,66 @@
+﻿@using MongoDB.Bson
+@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+@{
+    ViewBag.Title = "center";
+   List<string> url=new List<string> ();
+    if (ViewData["Picture"] != null)
+    {
+        foreach (string x in (List<string>)ViewData["Picture"]) { 
+        url.Add( x); 
+        }
+    }
+    int count = 0;
+   
+
+}
+<a href="/Message/Message" class="btn btn-block grey align_left"><span>Centro de Mensajes</span></a>
+
+@if (Model != null)
+{
+    foreach (JObject mails in Model)
+    {
+        <li>
+            <a href="@mails["url"]" target="_blank">
+                @if (url[count] == "avatar") { 
+                <img src="~/Content/Images/imgPerfil/avatar_06.png" alt="">
+                }
+                else
+                {
+                   <img src="@url[count]" alt="">
+                
+                  
+                }
+                @{
+                string folio="";
+                folio = mails["url"].ToString().Split('=')[1];
+                folio = folio.Split('&').First();
+                 if (folio.Length > 10)
+                 {
+                     folio = "";
+                 }
+                 else
+                 {
+                     folio = "Folio #" + folio;
+                     
+                 }
+                }
+                <div class="details" style="width:380px !important;max-width:280px !important">
+                    <div class="name">@mails["userName"] - @folio</div>
+                    <marquee scrollamount="5" scrolldelay="10">
+                        <div style="min-width:80px;max-width:80px;font-size:12px;" class="message">
+                            @mails["subject"]
+                        </div>
+                    </marquee>
+                </div>
+            </a>
+        </li>
+        if (count == 5)
+        {
+            break;
+        }
+        count++;
+    }
+}

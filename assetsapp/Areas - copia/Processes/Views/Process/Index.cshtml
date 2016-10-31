@@ -1,0 +1,743 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.Processes.Models;
+@{
+    ViewBag.Title = "Index";
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["processes"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["processes"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Administrar Procesos</h3>
+            </div>
+            <div class="span4">
+                <div class="search" style="display:none">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="light_blue set_color">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Administrar Procesos</h5>
+                    <div class="btn-group">
+                        @if (add == "c" && addc=="c")
+                        {
+                            <button class="btn btn-mini dark_green fileinput-button" id="addUserButton" data-original-title="Agregar Proceso" rel="tooltip" data-placement="top">
+                                <i class="icon-plus icon-white"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div id="processesTable">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if ((add == "c" && addc=="c") || (upd == "u" && updc=="u"))
+{ 
+@*Processes Modal *@
+    <div id="process_panel" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button id="cancel_buttonX" type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+            <h3 class="modal-header-text">Agregar Proceso</h3>
+        </div>
+        <form id="processForm" method="post" enctype="multipart/form-data" autocomplete="off">
+            <div class="modal-header">
+                <div class="profileSelector">
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <label>Nombre del Proceso: </label>
+                            <input id="name" name="name" type="text" required />
+
+                            <div class="row-fluid">
+                                <label class="lanelMargen">Estatus: </label>
+                                <input id="status" name="status" type="text" required />
+                            </div>
+
+                        </div>
+                        <div class="span6">
+
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <label class="lanelMargen">Duración Mínima: </label>
+                                    <div class="span12">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input id="min_lenght" name="min_length" type="text" placeholder="Mínima" size="10" required />
+                                                    </td>
+                                                    <td></td>
+                                                    <td>
+                                                        <select id="min_length_type" name="min_length_type" class="input-small" data-type="time">
+                                                            <option value="sec">segundo(s)</option>
+                                                            <option value="min">minuto(s)</option>
+                                                            <option value="hour" selected>hora(s)</option>
+                                                            <option value="day">día(s)</option>
+                                                            <option value="mon">mes(es)</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <label class="lanelMargen">Duración Máxima: </label>
+                                    <div class="span12">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input name="max_length" type="text" id="max_lenght" placeholder="Máxima" size="10" required />
+                                                    </td>
+                                                    <td></td>
+                                                    <td>
+                                                        <select id="max_length_type" name="max_length_type" class="input-small" data-type="time">
+                                                            <option value="sec">segundo(s)</option>
+                                                            <option value="min">minuto(s)</option>
+                                                            <option value="hour" selected>hora(s)</option>
+                                                            <option value="day">día(s)</option>
+                                                            <option value="mon">mes(es)</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Guardar" class="btn blue" type="submit" id="save_button">
+                <input value="Cancelar" class="btn grey" type="button" id="cancel_buttonProcess">
+            </div>
+        </form>
+    </div>
+    
+@* Hardware/Location Modal *@
+    <div id="hardware_modal" class="modal hide fade" data-backdrop="static" style="width: 300px">
+        <div class="modal-header">
+            <h3 class="modal-header-text">Hardware / Ubicación</h3>
+            <h5 class="modal-header-text" id="processNameHeader"></h5>
+            <button class="btn dark_green" id="addNewRule" title="Nueva Regla" rel="tooltip" data-placement="top">
+                <i class="icon-plus icon-white"></i>
+            </button>
+        </div>
+        <div class="modal-body setHeight">
+            <div class="row-fluid hardware_rule" id="rule_1">
+                <div class="span1"></div>
+                <div class="span5">
+                    <label class="hardwareLabel">Hardware: </label>
+                    <select class="selectHardware" name="hardware">
+                        <option value="" data-smart="">Seleccione Hardware</option>
+                        @foreach (JObject hardware in ViewBag.Hardware)
+                        {
+                            <option value="@hardware["_id"]" data-smart="@hardware["smart"]">@hardware["name"]</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="span6">
+                    <label class="locationLabel">Ubicación: </label>
+                    <div class="row-fluid location_list">
+                        <div class="span10">
+                            <p>Selecciona una Ubicación</p>
+                            <ul>
+                            </ul>
+                        </div>
+                        <div class="span2">
+                            <div class="hardware_tools">
+                                <button class="btn btn-mini blue" onclick="hardware_modal.newLocation(this)" title="Agregar Ubicación" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rulesContent"></div>
+
+        </div>
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <button class="btn blue" type="submit" id="save_hardware">Guardar</button>
+            <button class="btn" type="submit" data-dismiss="modal" id="cancel_buttonHardware">Cancelar</button>
+        </div>
+    </div>
+}
+
+@*Location Modal *@
+<div id="location_modal_process" class="modal hide fade modal-dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>*@
+        <h5 class="modal-header-text">Agregar Ubicación</h5>
+    </div>
+    <div class="modal-header">
+        <div class="divTreeSmall">
+            @*<div class="well-content no-search">*@
+                <div class="portlet-body fuelux">
+                    <ul class="tree" id="category_tree">
+                    </ul>
+                </div>
+            @*</div>*@
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" id="final_msglocation" class="error_msg"></span>
+        <button class="btn blue" type="submit" id="save_location">Guardar</button>
+            <button class="btn" type="submit" data-dismiss="modal">Cancelar</button>
+    </div>
+</div>
+
+<script src="~/Content/Scripts/jquery.maskMoney.min.js"></script>
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+<script>
+    var upd = "";
+    var add = "";
+    var del = "";
+    var updc="";
+    var addc="";
+    var delc="";
+    idProcess = null;
+
+    @if (upd != null && upd != "")
+    { 
+     @(new HtmlString("upd = '" + upd + "';"))
+    }
+    @if (add != null && add != "")
+    { 
+            @(new HtmlString("add = '" + add + "';"))
+    }
+     @if (del != null && del != "")
+     { 
+            @(new HtmlString("del = '" + del + "';"))
+     }
+      @if (addc != null && addc != "")
+      { 
+            @(new HtmlString("addc = '" + addc + "';"))
+      }
+     @if (updc != null && updc != "") { 
+            @(new HtmlString("updc = '" + updc + "';"))
+     }
+            @if (delc != null && delc != "") { 
+           
+            @(new HtmlString("delc ='" + delc+ "';"))
+            }
+            
+        if (updc == "" || upd == "") {
+            upd = "";
+        }
+
+        if (delc == "" || del == "") {
+
+            del = "";
+        }
+        if (addc == "" || addc == "") {
+
+            add = "";
+        }
+    var tree = new RivkaTree("category_tree", {
+        method: RivkaTree.METHODS.AJAX,
+        url: "/Processes/Process/getNodeContent",
+        idKey: "_id",
+        nameKey: "name",
+        onNodeSelectAction: function () {
+            var id = jQuery(this).closest("li").data("idcategory");
+        }
+    });
+
+    function loadProcessTable() {
+        jQuery.ajax({
+            url: "/Processes/Process/getProcessesTable",
+            type: "POST",
+            success: function (data) {
+                jQuery("#processesTable").html(data);            
+            }
+        });
+    }
+
+    function clearForm() {
+        jQuery("#processForm input:not(.btn) , #processForm textarea").each(function () {
+            jQuery(this).val("");
+        });
+        jQuery('select[data-type="hardware"]').val("selectOption");
+        jQuery('select[data-type="time"]').val("hour");
+
+        idProcess = null;
+    }
+
+    jQuery(document).ready(function ($) {
+
+        jQuery("#min_lenght").maskMoney({ allowNegative: false, precision: 0 });
+        jQuery("#max_lenght").maskMoney({ allowNegative: false, precision: 0 });
+
+        $("#addUserButton").on("click", function () {
+            if (add == "c") {
+                //$(".modal-header-text").text("Agregar Proceso");
+                $("#process_panel").modal("show");
+            }
+        });
+
+        $("#processForm").submit(function () {
+
+            minTimeVal = jQuery("#min_lenght").val();
+            minTimeVal = minTimeVal.replace(/,/g, '');
+            if(jQuery("#min_length_type").val().toString() != "sec"){
+                minTimeVal *= 60;
+                if(jQuery("#min_length_type").val().toString() != "min"){
+                    minTimeVal *= 60;
+                    if(jQuery("#min_length_type").val().toString() != "hour"){
+                        minTimeVal *= 24;
+                        if(jQuery("#min_length_type").val().toString() != "day")
+                            minTimeVal *= 30;
+                    }
+                }
+            }
+
+            maxTimeVal = jQuery("#max_lenght").val();
+            maxTimeVal = maxTimeVal.replace(/,/g, '');
+            if(jQuery("#max_length_type").val().toString() != "sec"){
+                maxTimeVal *= 60;
+                if(jQuery("#max_length_type").val().toString() != "min"){
+                    maxTimeVal *= 60;
+                    if(jQuery("#max_length_type").val().toString() != "hour"){
+                        maxTimeVal *= 24;
+                        if(jQuery("#max_length_type").val().toString() != "day")
+                            maxTimeVal *= 30;
+                    }
+                }
+            }
+
+            if(minTimeVal >= maxTimeVal){
+                _alert("error", "Verifica el rango de duración!");
+                return false;
+            }
+
+            processData = "{'name':'"+ $('#name').val() + " '," +
+            "'status':'" + $('#status').val() + "'," +
+            "'min_length':'" + $('#min_lenght').val() + "'," +
+            "'min_length_type':'" + $('#min_length_type').val() + "'," +
+            "'max_length':'" + $('#max_lenght').val() + "'," +
+            "'max_length_type':'" + $('#max_length_type').val() + "'}";
+
+            $.ajax({
+                url: "/Processes/Process/saveProcess",
+                type: "POST",
+                data: { process: processData, id_process : idProcess },
+                beforeSend: _loading(),
+                success: function (data) {
+                    _loading();
+                    if (data == "false") {
+                        _alert("error", "El nombre ya existe!");
+                        return false;
+                    }
+                    $("#process_panel").modal("hide");
+                    loadProcessTable();
+                    _alert("success", "Guardado Correctamente");
+                    clearForm();
+                },
+                error: function (errorThrown) {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+
+            return false;
+        });
+
+        $("#cancel_buttonProcess").on("click", function () {
+            $("#process_panel").modal("hide");
+            clearForm();
+        });
+
+        $("#cancel_buttonX").on("click", function () {
+            $("#process_panel").modal("hide");
+            clearForm();
+        });
+
+        //Defining the Hardware-Location configuration modal
+        hardware_modal = {
+            body: $("#hardware_modal"),
+            location: $("#location_modal_process"),
+            hardwareList: @(new HtmlString(ViewBag.Hardware.ToString())),
+            init: function(){
+                tree.init({ id: "null", name: "Home" });
+                $("#rulesContent").html("");
+                jQuery("select[name='hardware']").val("");
+                jQuery("div[class='row-fluid location_list']").find("p").show();
+                jQuery("div[class='row-fluid location_list']").find("li").remove();
+                jQuery(jQuery("label[class='locationLabel'] label")).remove();
+                jQuery(jQuery("label[class='hardwareLabel'] label")).remove();
+                jQuery("div[class='row-fluid location_list']").find('button[class="btn btn-mini blue"]').removeAttr("disabled","disabled");
+                jQuery(jQuery('div[class="row-fluid hardware_rule"]')).removeData();
+
+            },
+            newRule: function(){
+                list = "";
+                for(i = 0; i<hardware_modal.hardwareList.length;i++){
+                    list += '<option value="' + hardware_modal.hardwareList[i]["_id"] + '" data-smart="'+ hardware_modal.hardwareList[i]["smart"]+'">'+
+                        hardware_modal.hardwareList[i]["name"] + '</option>} ';
+                }
+
+                $("#rulesContent").append(
+                    '<div class="row-fluid hardware_rule">'+
+                        '<div class="span1">'+
+                            '<button class="btn red" id="removeRule" onClick="hardware_modal.deleteRule(this)" title="Eliminar Regla" rel="tooltip" data-placement="top">'+
+                                '<i class="icon-remove icon-white"></i>'+
+                            '</button>'+
+                        '</div>'+
+                        '<div class="span5">'+
+                            '<label class="hardwareLabel">Hardware: </label>'+
+                            '<select class="selectHardware" name="hardware">' +
+                                '<option value="" data-smart="">Seleccione Hardware</option>'+ 
+                                list +
+                            '</select>'+
+                        '</div>'+
+                        '<div class="span6">'+
+                            '<label class="locationLabel">Ubicación: </label>'+
+                            '<div class="row-fluid location_list">'+
+                                '<div class="span10">'+
+                                    '<p>Selecciona una Ubicación</p>'+
+                                    '<ul>'+
+                                    '</ul>'+
+                                '</div>'+
+                            '<div class="span2">'+
+                                '<div class="hardware_tools">'+
+                                    '<button class="btn btn-mini blue" onclick="hardware_modal.newLocation(this)" id="addNewLocation" title="Agregar Ubicación" rel="tooltip" data-placement="top">'+
+                                        '<i class="icon-plus icon-white"></i>'+
+                                    '</button>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                    '</div>'+
+                '</div>'
+                );
+
+                hardware_modal.unbinding();
+            },
+            saveRules: function(){
+
+                //Validate information
+                errorValidate = 0;
+                for(i=0 ; i < jQuery("select[name='hardware']").length ; i++){        
+                    //reset Values
+                    jQuery(jQuery("label[class='locationLabel']")[i]).find('label').remove();
+                    jQuery(jQuery("label[class='hardwareLabel']")[i]).find('label').remove();
+
+                    if(jQuery(jQuery("select[name='hardware']")[i]).val().toString()==""){
+                        $($("label[class='hardwareLabel']")[i]).append($("<label>").text("¡Verifica!").css("color","red").css("padding-left", "10px"));
+                        errorValidate++;
+                    }
+                    if(jQuery(jQuery("div[class='row-fluid location_list']")[i]).find("li").length == 0){
+                        $($("label[class='locationLabel']")[i]).append($("<label>").text("¡Verifica!").css("color","red").css("padding-left", "10px"));
+                        errorValidate++;
+                    }
+                }
+                if(errorValidate > 0){ 
+                    _alert("error","Verifique la información!");
+                    return false;
+                }
+
+
+                //Send information
+                result = "";
+                for(i = 0 ; i < jQuery("div[class='row-fluid hardware_rule']").length ; i++){ 
+                    hardwareRow = "{'Hardware':'"
+                    hardwareRow += jQuery(jQuery("div[class='row-fluid hardware_rule']")[i]).find("option:selected").val().toString() + "' ,";
+
+                    hardwareRow += "'ruleId' : '";
+                    if(jQuery(jQuery("div[class='row-fluid hardware_rule']")[i]).data("id") == null){
+                        hardwareRow += "null',";
+                    }else{
+                        hardwareRow += jQuery(jQuery("div[class='row-fluid hardware_rule']")[i]).data("id") + "' ,";
+                    }
+
+                    hardwareRow += " 'Locations':[";
+                    
+                    for(x = 0 ; x < jQuery(jQuery("div[class='row-fluid hardware_rule']")[i]).find('li').length ; x++){
+                        hardwareRow += "'" + jQuery(jQuery(jQuery("div[class='row-fluid hardware_rule']")[i]).find('li')[x]).data("id").toString() + "',";
+                    }
+                    hardwareRow +="]},";  
+                    
+                    result += hardwareRow;
+                }
+
+                $.ajax({
+                    url: "/Processes/Process/SaveRules",
+                    data: {rulesString : result ,id_process : this.idProcess },
+                    beforeSend: _loading(),
+                    type:"POST",
+                    success: function (data) {
+                        _loading();
+                        _alert("success","Guardado Correctamente");
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+
+                });
+
+                this.body.modal("hide");
+                hardware_modal.init();
+            },
+            deleteRule: function(thisRule){
+                _confirm({
+                    title: "Eliminar Hardware/Ubicación",
+                    message: "¿Seguro que desea eliminarlo?",
+                    action: function () {
+                        $(thisRule).closest('div[class="row-fluid hardware_rule"]').remove();
+                    }
+                });
+            },
+            validateHardare: function(thisSelect){
+
+                idHardware = $(thisSelect).find('option:selected').val();
+               
+                $(thisSelect).closest('div[class="row-fluid hardware_rule"]').find('p').show();
+                $(thisSelect).closest('div[class="row-fluid hardware_rule"]').find("li").remove();
+                $(thisSelect).closest('div[class="row-fluid hardware_rule"]').find('button[class="btn btn-mini blue"]').removeAttr("disabled","disabled");
+                    
+                cant = 0;
+                for(i=0 ; i < jQuery("select[name='hardware']").length ; i++){        
+                    if(jQuery(jQuery("select[name='hardware']")[i]).val().toString() == idHardware.toString() && idHardware.toString() != ""){
+                        cant++;
+                    }
+                }
+
+                if(cant > 1){
+                    $(thisSelect).val("");
+                    _alert("error", "Hardware ya seleccionado!");
+                }
+            },
+            newLocation: function(thishardware){
+                tree.init({ id: "null", name: "Home" });
+                this.thisHardware = thishardware;                
+                this.location.modal("show");
+            },
+
+            saveLocation: function(){
+                if($(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('select').val()==""){
+                    _alert("error", "Selecciona un hardware primero!");
+                    return false;
+                }
+                if(jQuery('#category_tree label[class="selected"]').closest("li").data("idcategory")==null){
+                    _alert("error","Seleccione una ubicación!");
+                    return false;
+                }
+                //check no repit locations
+                if($(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('li').length > 0){
+                    for(i=0 ; i < $(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('li').length ; i++){
+                        if($($(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('li')[i]).data("id").toString() == 
+                            jQuery('#category_tree label[class="selected"]').closest("li").data("idcategory").toString()){
+                            _alert("error","La ubicación ya existe!");
+                            return false;
+                        }
+                    }
+                }
+                this.location.modal("hide");
+
+                $(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('p').hide();
+                $(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('ul').append(
+                    $("<li />").text(jQuery('#category_tree label[class="selected"]').closest("label").text()).attr(
+                    "data-id",jQuery('#category_tree label[class="selected"]').closest("li").data("idcategory")).append(
+                        $("<button />").addClass("btn btn-mini red removeLocation").attr("title","Remover Ubicación").attr("rel","tooltip").attr("data-placement","top").append(
+                    $("<i />").addClass("icon-remove icon-white").attr("onClick","hardware_modal.deleteLocation(this)")))
+                  );  
+
+                //check if it is a smart hardware /disable the button of adding locations
+                if($(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('option:selected').data("smart")==false ||
+                    $(this.thisHardware).closest('div[class="row-fluid hardware_rule"]').find('option:selected').data("smart")=="False" ){
+                    $(this.thisHardware).closest('button[class="btn btn-mini blue"]').attr("disabled","disabled");
+                }
+
+                tree.init({ id: "null", name: "Home" });
+            },    
+            deleteLocation: function(thisLocation){
+                _confirm({
+                    title: "Eliminar Ubicación",
+                    message: "¿Seguro que desea eliminarlo?",
+                    action: function () {
+                        if($(thisLocation).closest('div').find("li").length == 1){
+                            $(thisLocation).closest('div').find('p').show();
+                            $(thisLocation).closest('div[class="row-fluid hardware_rule"]').find('button[class="btn btn-mini blue"]').removeAttr("disabled","disabled");
+                        }
+                        $(thisLocation).closest("li").remove();
+                    }
+                });
+            },
+            getList: function () {
+                $.ajax({
+                    url: "/Processes/Process/getRules",
+                    type: "POST",
+                    data: {id_process : this.idProcess },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        if(data == null || data == "") { _loading(); return; }
+                        data = JSON.parse(data);
+
+                        //Rule 0
+                        nameLocation = data[0]["nameLocations"];
+                        nameLocation = nameLocation.split(",");
+                        $($('div[class="row-fluid hardware_rule"]')[0]).find("select").val(data[0]["Hardware"]);
+                        if(data[0]["Locations"].length > 0 )  $($('div[class="row-fluid hardware_rule"]')[0]).find("p").hide();
+                        if( $($('div[class="row-fluid hardware_rule"]')[0]).find("option:selected").data("smart") == false || 
+                            $($('div[class="row-fluid hardware_rule"]')[0]).find("option:selected").data("smart") == "False" ){
+                            $($('div[class="row-fluid hardware_rule"]')[0]).find('button[class="btn btn-mini blue"]').attr("disabled","disabled");
+                        }
+
+                        jQuery(jQuery('div[class="row-fluid hardware_rule"]')[0]).data("id",data[0]["rule"]);
+
+                        for(iz = 0 ; iz < data[0]["Locations"].length ; iz++){
+                            $($('div[class="row-fluid hardware_rule"]')[0]).find("ul").append($("<li />").data("id",data[0]["Locations"][iz]).text(nameLocation[iz]).append(
+                            $("<button />").addClass("btn btn-mini red removeLocation").attr("title","Remover Ubicación").attr("rel","tooltip").data("placement","top").append(
+                            $("<i />").addClass("icon-remove icon-white").attr("onClick","hardware_modal.deleteLocation(this)"))));
+                        }
+
+                        //Rule x>0
+                        for(ix = 1 ; ix < data.length ; ix++){
+                            hardware_modal.newRule();
+
+                            nameLocation = data[ix]["nameLocations"];
+                            nameLocation = nameLocation.split(",");
+                            $($('div[class="row-fluid hardware_rule"]')[ix]).find("select").val(data[ix]["Hardware"]);
+                            if(data[ix]["Locations"].length > 0 )  $($('div[class="row-fluid hardware_rule"]')[ix]).find("p").hide();
+                            if( $($('div[class="row-fluid hardware_rule"]')[ix]).find("option:selected").data("smart") == false || 
+                            $($('div[class="row-fluid hardware_rule"]')[ix]).find("option:selected").data("smart") == "False" ){
+                                $($('div[class="row-fluid hardware_rule"]')[ix]).find('button[class="btn btn-mini blue"]').attr("disabled","disabled");
+                            }
+
+                            jQuery(jQuery('div[class="row-fluid hardware_rule"]')[ix]).data("id",data[ix]["rule"]);
+
+                            for(iz = 0 ; iz < data[ix]["Locations"].length ; iz++){
+                                $($('div[class="row-fluid hardware_rule"]')[ix]).find("ul").append($("<li />").data("id",data[ix]["Locations"][iz]).text(nameLocation[iz]).append(
+                                $("<button />").addClass("btn btn-mini red removeLocation").attr("title","Remover Ubicación").attr("rel","tooltip").data("placement","top").append(
+                                $("<i />").addClass("icon-remove icon-white").attr("onClick","hardware_modal.deleteLocation(this)"))));
+
+                            }
+                        }
+
+                        _loading();
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ocurrio un error, intente más tarde");
+                    }
+                });
+            },
+
+            open: function (thisProcess) {
+                $("#processNameHeader").html("Proceso: "+ jQuery(thisProcess).closest("tr").find('.name').text());
+                this.idProcess = jQuery(thisProcess).closest("tr").data("id");
+                this.getList();
+                this.body.modal("show");
+                
+            },
+
+            close: function () {
+                this.body.modal("hide");
+            },
+
+            binding: (function () {
+                $("#config_hw").bind("click",function () {
+                    hardware_modal.open();
+                    return false;
+                });
+                $("#addNewLocation").bind("click",function(){
+                    hardware_modal.newLocation(this);
+                });
+                $("#addNewRule").bind("click",function(){
+                    hardware_modal.newRule();
+                });
+                $("#save_location").bind("click",function(){
+                    hardware_modal.saveLocation(this);
+                });
+                $("#save_hardware").bind("click",function(){
+                    hardware_modal.saveRules(this);
+                });
+                $("#cancel_buttonHardware").bind("click",function(){
+                    hardware_modal.init();
+                });
+                $( "#hardware_modal select" ).bind( "change", function() {
+                    hardware_modal.validateHardare(this);
+                });
+            }),
+            unbinding:(function(){
+                $( "#hardware_modal select" ).unbind();
+                $( "#hardware_modal select" ).bind( "change", function() {
+                    hardware_modal.validateHardare(this);
+                });
+                $("#addNewLocation").bind("click",function(){
+                    hardware_modal.newLocation(this);
+                });
+            })
+
+        };
+
+       
+
+        loadProcessTable();     
+        hardware_modal.binding();
+        
+    });
+
+    
+    
+</script>

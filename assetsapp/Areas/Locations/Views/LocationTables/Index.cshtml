@@ -1,0 +1,2447 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["location"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["location"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Regiones/Oficinas/Ubicaciones/Sub-Ubicaciones</h3>
+                </div>
+                <div class="span4">
+                    <div class="search" style="display:none">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Ubicaciones</h5>
+                        @if (add == "c" && addc == "c")
+                        {
+                            <div class="btn-group">
+                                <button class="btn btn-mini dark_green fileinput-button" id="addLocationButton" data-original-title="Agregar nueva" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                                <button id="importbtn" class="btn btn-mini purple  fileinput-button" data-idcat="0">
+                                    <i class="icon-cloud-upload icon-white"></i>
+                                    <span>Importar</span>
+                                    <input type="file" id="T9" />
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="well-content no-search">
+                        <div class="navbar-inner">
+                            <ul class="nav nav-tabs" id="tabHeader2">
+                                <li class="active" id="RegionHeader"><a href="#RegionSection" data-toggle="tab">Lista de Regiones</a></li>
+                                <li id="ConjuntoHeader"><a href="#ConjuntoSection" data-toggle="tab">Lista de Oficinas</a></li>
+                                <li id="LocationHeader"><a href="#LocationSection" data-toggle="tab">Lista de Ubicaciones</a></li>
+                                <li id="SubLocationHeader"><a href="#SubLocationSection" data-toggle="tab">Lista de Sub-Ubicaciones</a></li>
+                                <li id="TreeLocationHeader"><a href="#TreeLocationSection" data-toggle="tab">Arbol de Ubicaciones</a></li>
+
+                            </ul>
+                        </div>
+                        <div class="tab-content" id="tabContent2">
+                            <div class="tab-pane active " id="RegionSection">
+                                <div class="span12 form-row">
+                                    <br />
+                                    <div class="" id="regionsTable"></div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="ConjuntoSection">
+                                <div class="span12 form-row">
+                                    <table class="table table-striped table-hover" cellpadding="10">
+                                        <tbody>
+                                            <tr></tr>
+
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                    <div class="" id="conjuntosTable"></div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="LocationSection">
+                                <div class="span12 form-row">
+                                    <table class="table table-striped table-hover" cellpadding="10">
+                                        <tbody>
+                                            <tr></tr>
+
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                    <div class="" id="locationsTable"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="SubLocationSection">
+                                <div class="span12 form-row">
+                                    <table class="table table-striped table-hover" cellpadding="10">
+                                        <tbody>
+                                            <tr></tr>
+
+                                        </tbody>
+                                    </table>
+                                    <br />
+                                    <div class="" id="SublocationsTable"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="TreeLocationSection">
+                               <div class="span12 form-row">
+                                    <div class="span3">
+                                        <div class="light_blue set_color ">
+                                            <div class="well-header widgetclient">
+                                                <h5>Elige una Ubicacion:</h5>
+                                            </div>
+                                            <div class="well-content no-search overOn" style="overflow: hidden; position: relative;  padding: 0px 20px 25px 0px; max-height: 800px;">
+                                                <div class="portlet-body fuelux">
+                                                    <ul class="tree" id="category_tree"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                    </div>
+                              
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="excelTable" class="modal hide fade" data-backdrop="static" style="min-width: 1000px; left: 35%; display: block;">
+</div>
+
+<div id="admin_panel_location" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar en Ubicación
+            <label id="namelocation"></label>
+        </h3>
+    </div>
+    <div id="locationForm">
+        <div class="modal-body">
+            <select id="profileSelect" name="profileSelect" style="visibility: hidden; height: 0px;">
+                @ViewData["profileList"]
+            </select>
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="tabHeader1">
+                    <li class="active" id="staticFormHeader"><a href="#staticFieldsSection" data-toggle="tab">Inf. General</a></li>
+                    
+                     <li class="" id="subtab"><a href="#subSection" data-toggle="tab" style="display:none">Sub Ubicaciones</a></li>
+
+                     <!--<li id="Configuration"><a href="#Configuration" data-toggle="tab">Configuración</a></li>-->
+                </ul>
+            </div>
+            <div class="tab-content" id="tabContent1">
+                <div class="tab-pane active staticFieldsSection perfilMargen" id="staticFieldsSection">
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <table width=" 100%">
+                                <tr>
+                                    <td>
+                                        <label id="numTitle"></label>
+                                        <div class="staticField">
+                                            <input type="text" id="num" name="number" placeholder="Introduce un número" data-original-title="un número" rel="tooltip" data-placement="right" />
+                                        </div>
+                                        <label id="labelName">Nombre: </label>
+                                        <div class="staticField">
+                                            <input type="text" id="name" name="name" required="required" placeholder="Nombre" data-original-title="El nombre sólo puede contener caracteres alfabéticos (Máximo 3 nombres)." rel="tooltip" data-placement="right" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td width="50%"></td>
+                                </tr>
+                                <tr id="trRegion">
+                                    <td colspan="2">
+                                        <div>
+                                            <div id="InfoRegionPersonas">
+                                                <h10 id="gerenteRegionalLabel">Gerente Regional: </h10>
+                                                <br />
+                                                <label id="gerenteRegionalContent" style="width: 215px;"></label>
+                                                <label id="gerenteRegionalContentEmail"></label>
+                                                <br />
+                                                <h10 id="gerenteSistemLabel">Gerente de Sistemas: </h10>
+                                                <br />
+                                                <label id="gerenteSistemaContent" style="width: 215px;"></label>
+                                                <label id="gerenteSistemaContentEmail"></label>
+                                                <br />
+                                                <h10 id="gerentePSLabel">Gerente de Proyección y Sonido: </h10>
+                                                <br />
+                                                <label id="gerentePSContent" style="width: 215px;"></label>
+                                                <label id="gerentePSContentEmail"></label>
+                                                <br />
+                                                <h10 id="responsableLabel">Supervisor Regional de Mantenimiento: </h10>
+                                                <br />
+                                                <label id="responsableContent" style="width: 215px;"></label>
+                                                <label id="responsableContentEmail"></label>
+                                                <br />
+                                                <br />
+                                            </div>
+                                            <label>Descripción: </label>
+                                            <div class="staticField">
+                                                <textarea id="descripcion" style="width: 203px;"></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="trConjunto">
+                                    <td colspan="2">
+                                        <div>
+                                            <label id="gerenteConjuntoLabel">Región asignada: </label>
+                                            <label id="gerenteConjuntoContent"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="trUbicacion">
+                                    <td colspan="2">
+                                        <div>
+                                            <label>Descripción: </label>
+                                            <div class="staticField">
+                                                <textarea id="descripcion1"></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <!--<br />
+                                <img style="max-height: 100px; max-width: 100px;" id="img_pre" src="~/Content/Images/planos/No-Imagen-Disponible.png">
+                                <span class="btn btn-file">
+                                    <span class="fileupload-new">Seleccione una Foto</span>
+                                    <input type="file" id="file" name="file" value="Default" />
+                                </span>-->
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="span6" id="tablecontent">
+                            <div id="conjuntosTableInfo">
+                                <label>Oficina: </label>
+                                <div class="staticField">
+                                    <select id="selectConjunto" style="max-width: 220px;"></select>
+                                    <button id="addConjunto" class="btn dark_green" style="margin-bottom: 3px;"><i class="icon-plus"></i></button>
+                                    <button id="deleteAllConjunto" class="btn grey-light" style="margin-bottom: 3px;" data-original-title="Borrar Todo" rel="tooltip" data-placement="top"><i class="icon-trash"></i></button>
+                                </div>
+
+                                <br />
+                                <label>Oficinas: </label>
+                                <table id="tlocations" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Unidad de Explotación</th>
+                                            <th>Opción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <div id="ubicationTableInfo">
+                                <label>Ubicación: </label>
+                                <div class="staticField">
+                                    <select id="selectLocations" style="max-width: 220px;"></select>
+                                    <button id="addLocation" class="btn dark_green" style="margin-bottom: 3px;"><i class="icon-plus"></i></button>
+                                    <button id="deleteAllLocation" class="btn grey-light" style="margin-bottom: 3px;" data-original-title="Borrar Todo" rel="tooltip" data-placement="top"><i class="icon-trash"></i></button>
+                                </div>
+                                <br />
+                                <label>Ubicaciones: </label>
+                                <table id="tlocations2" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>ID Ubicación</th>
+                                            <th>Opción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                           <!--here subinfo-->
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane active  perfilMargen" id="subSection">
+                    <div class="row-fluid">
+                        <div class="span6" id="tablelocationselect">
+                           
+                        </div>
+                        <div class="span6" id="sublocationscontent">
+                            <div id="SububicationTableInfo">
+                                <label>Sub-Ubicación: </label>
+                                <div class="staticField">
+                                    <select id="selectSubLocations" style="max-width: 220px;"></select>
+                                    <button id="addSubLocation" class="btn dark_green" style="margin-bottom: 3px;"><i class="icon-plus"></i></button>
+                                    <button id="deleteAllSubLocation" class="btn grey-light" style="margin-bottom: 3px;" data-original-title="Borrar Todo" rel="tooltip" data-placement="top"><i class="icon-trash"></i></button>
+                                </div>
+                                <br />
+                                <label>Sub-Ubicaciones: </label>
+                                <table id="tSublocations2" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>ID Sub-Ubicación</th>
+                                            <th>Opción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span width="80%" id="final_msg" class="error_msg"></span>
+                    <input value="Guardar" class="btn blue" type="button" id="save_button">
+                    <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+                </div>
+            </div>
+</div>
+
+    <script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+    <script>
+        function headers1(element) {
+            setTimeout(function () {
+                var table = element.dataTable();
+                table.fnAdjustColumnSizing();
+
+            }, 500);
+
+
+        }
+        var idselectlocation = "";
+        var idlocation = "";
+        var tree = new RivkaTree("category_tree", {
+            method: RivkaTree.METHODS.AJAX,
+            url: "/Inventory/Inventory/getNodeContent",
+            idKey: "_id",
+            nameKey: "name",
+            onNodeSelectAction: function () {
+                var id = jQuery(this).closest("li").data("idcategory");
+                idlocation = id;
+                setTree(id);
+
+            }
+        });
+        function setRoute(id) {
+            jQuery.ajax({
+                url: "/Inventory/Inventory/getRoute",
+                data: { parentCategory: id },
+                type: "POST",
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    tree.openRoute(data["route"]);
+                    try {
+                        jQuery('#modalSdfs .overOn').animate({
+                            scrollTop: jQuery("[data-idcategory=" + id + "]").offset().top
+                        }, 1000);
+                    } catch (ex) {
+                        console.log(ex.toString());
+                    }
+                }, error: function () { _alert("error", "Ha ocurrido un error"); }
+            });
+        }
+        function search(id) {
+            var rootdata = { id: "null", name: "Home" }
+            tree.init(rootdata)
+            setRoute(id);
+        }
+        function setTree(id) {
+            jQuery.ajax({
+                url: "/Inventory/Inventory/getNodeContent",
+                data: { parentCategory: id },
+                type: "POST",
+                async: false,
+                beforeSend: _loading(),
+                success: function (data) {
+                    try {
+                        var data = JSON.parse(data);
+                        tree.openRoute(data["route"]);
+                        _loading();
+                    } catch (ex) { _loading(); }
+
+                }, error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+        var viewer = new RivkaViewer("regionsTable");
+        var viewer1 = new RivkaViewer("conjuntosTable");
+        var viewer2 = new RivkaViewer("locationsTable");
+        var viewer3 = new RivkaViewer("SublocationsTable");
+
+        var selectedId = null;
+        var selectedName = null;
+        var selectedProfile = null;
+        var basicProfile = null;
+        var editingProfile = null;
+        var editingData = null;
+        var locationError = null;
+        function resetData() {
+            selectedId = null;
+            selectedName = null;
+            selectedProfile = null;
+            basicProfile = null;
+            editingProfile = null;
+            editingData = null;
+            locationError = null;
+            jQuery("#descripcion").val("");
+            jQuery("#name").val("");
+            jQuery("#num").val("");
+            jQuery("#tlocations").find("tbody").html("");
+            jQuery("#tlocations2").find("tbody").html("");
+            jQuery("#tSublocations").find("tbody").html("");
+            jQuery("#tSublocations2").find("tbody").html("");
+            jQuery("#gerenteConjuntoContent").html("");
+        }
+
+        function cleanMessages() {
+            jQuery("#final_msg").text("");
+        }
+
+        /*Get's Table Info ************************************************************/
+        function LoadLocationsRegions() {
+            var iduser = "@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadLocationsRegion",
+                type: "POST",
+                data: { userid: iduser },
+                success: function (data) {
+                    jQuery("#selectRegion").html(data);
+                }
+            });
+        }
+
+        function LoadLocationsConjuntos() {
+            var iduser = "@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadLocationsConjunto",
+                type: "POST",
+                data: { userid: iduser },
+                success: function (data) {
+                    jQuery("#selectConjunto").html(data);
+                }
+            });
+        }
+
+        function getGerenteConjunto(idlocation) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/GetGerenteConjunto",
+                type: "POST",
+                data: { location: idlocation },
+                success: function (data) {
+                    jQuery("#gerenteConjunto").text(data);
+                }
+            });
+        }
+
+        function getGerenteRegion(idlocation) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/GetGerenteRegional",
+                type: "POST",
+                async: false,
+                data: { location: idlocation },
+                success: function (data) {
+                    jQuery("#gerenteRegional").text(data);
+                }
+            });
+        }
+
+        function LoadLocationsConjuntosAll(editingProfile, selectedId) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadLocationsConjuntoAlls",
+                type: "POST",
+                success: function (data) {
+                    jQuery("#selectConjunto").html(data);
+                    if (editingProfile != null && selectedId != null) {
+                        loadProfileFieldsTitles(editingProfile, selectedId);
+                    }
+                }
+            });
+        }
+
+        function LoadLocationsAll(editingProfile, selectedId) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadLocationsAlls",
+                type: "POST",
+                success: function (data) {
+                    jQuery("#selectLocations").html(data);
+                    if (editingProfile != null && selectedId != null) {
+                        loadProfileFieldsTitles(editingProfile, selectedId);
+                    }
+                }
+            });
+        }
+        function LoadSubLocationsAll(editingProfile, selectedId) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadSubLocationsAlls",
+                type: "POST",
+                success: function (data) {
+                    jQuery("#selectSubLocations").html(data);
+                    if (editingProfile != null && selectedId != null) {
+                        loadProfileFieldsTitles(editingProfile, selectedId);
+                    }
+                }
+            });
+        }
+        /*Get's Table Info ************************************************************/
+
+        function cargarProfiles() {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadprofiles",
+                type: "POST",
+                async: false,
+                success: function (data) {
+                    jQuery("#profileSelect").html(data);
+                },
+                error: function () {
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+        var model = {
+
+            locationData: null,
+            locationData1: null,
+            locationData2: null,
+
+            init: function (type) {
+                var iduser = "@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/Locations/LocationTables/getLocationTableAdmin",
+                type: "POST",
+                data: { type: type },
+                beforeSend: _loading(),
+                success: function (data) {
+                    model.locationData = data;
+                    var dataOptions = { id: "_id", name: "Nombre", permissions: ["@upd", "@del"] };
+                        if (type == "Region") {
+                            viewer.setData(model.locationData, dataOptions);
+                        }
+                        table.print();
+                    }, error: function () {
+                        _loading();
+                        _alert("error", "Error al cargar la informacion de las Regiones");
+                    }
+                });
+        },
+
+        restart: function () {
+            selectedId = null;
+            selectedName = null;
+            selectedProfile = null;
+            basicProfile = null;
+            editingProfile = null;
+            editingData = null;
+        }
+    };
+        function fillProfileFields() {
+            if (editingData != null) {
+                var obj = JSON.parse(editingData);
+
+                for (field in obj) {
+                    if (field == "ImgUrl") {
+                        var picurl = obj.ImgUrl;
+                        //jQuery("#img_pre").attr("src", picurl)
+                    }
+                    if (field == "ImgUrl2") {
+                        var picurl2 = obj.ImgUrl2;
+                        //jQuery("#img_pre2").attr("src", picurl2)
+                    }
+                    if (field == "profileFields") {
+                        jQuery("#name").val(obj["name"]);
+                        for (key in obj["profileFields"]) {
+                            if (jQuery("#" + key).attr("type") == "checkbox") {
+                                jQuery("#" + key).attr("checked", "checked");
+                            }
+                            else if (jQuery("#" + key).attr("type") == "radio") {
+                                jQuery("[name=" + key + "][value = " + obj["profileFields"][key].toString() + "]").attr("checked", "checked");
+                            }
+                            else if (jQuery("#" + key).prop("tagName") == "SELECT" && jQuery("#" + key).prop("multiple")) {
+                                var values = obj["profileFields"][key].toString().split(",");
+                                for (value in values) {
+                                    jQuery("#" + key + " option[value = " + values[value] + "]").attr("selected", "selected");
+                                }
+                            }
+                            else if (jQuery("#" + key).prop("type") == "file") {
+                                locationModal.imageArray["" + key] = obj["profileFields"][key].toString();
+                                jQuery("#" + key + "Preview").attr("src", "/Uploads/Images/Locations/CustomImages/" + obj["profileFields"][key].toString());
+                            }
+                            else {
+                                jQuery("#" + key).val(obj["profileFields"][key].toString());
+                            }
+                        }
+                    } else {
+                        jQuery("#" + field).val(obj[field]);
+                    }
+                }
+            }
+        }
+        function loadProfileFields(profileID, selectID) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/getFormView",
+                type: "POST",
+                data: { profile: profileID },
+                success: function (data) {
+                    var clone = jQuery("#subtab").clone(true);
+                    var clone1 = jQuery("#subSection").clone(true);
+                    jQuery(clone1).removeClass("active");
+                    jQuery("#staticFieldsSection").nextAll().remove();
+                    jQuery("#staticFormHeader").closest("ul").find("#subtab").remove();
+
+                    jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+
+                    jQuery("#tabContent1").append(data);
+                    jQuery("#tabContent1").append(clone1);
+                    selectedProfile = profileID;
+                    if (selectID != null) {
+                        setInfoEdit(selectID)
+                    } else {
+                        _loading();
+                        jQuery("#admin_panel_location").modal("show");
+                    }
+                },
+                error: function (data) {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+      
+        function loadProfileFieldsTitles(profileID, selectID) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/getFormTitlesView",
+                type: "POST",
+                data: { profile: profileID },
+                success: function (data) {
+                    var clone = jQuery("#subtab").clone(true);
+                    jQuery("#staticFormHeader").nextAll().remove();
+                    jQuery("#staticFormHeader").closest("ul").find("#subtab").remove();
+
+                    jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+                    jQuery("#tabHeader1").append(data);
+                    jQuery("#staticFormHeader a").click();
+                    if (selectID != null) {
+                        loadProfileFields(profileID, selectID);
+                    }
+                },
+                error: function (data) {
+                    _alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+
+        var model1 = {
+
+            locationData: null,
+
+            init: function (type) {
+                var iduser = "@Session["_id"].ToString()";
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/getLocationTableAdmin",
+                    type: "POST",
+                    data: { type: type },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        model1.locationData = data;
+                        var dataOptions = { id: "_id", name: "Nombre", permissions: ["@upd", "@del"] };
+
+                        if (type == "Conjunto") {
+                            viewer1.setData(model1.locationData, dataOptions);
+                        }
+                        table1.print();
+                    }, error: function () {
+                        _loading();
+                        _alert("error", "Error al cargar los datos de los Oficinas");
+                    }
+                });
+            },
+
+            restart: function () {
+                selectedId = null;
+                selectedName = null;
+                selectedProfile = null;
+                basicProfile = null;
+                editingProfile = null;
+                editingData = null;
+            }
+        };
+
+        var model2 = {
+
+            locationData: null,
+
+            init: function (type) {
+                var iduser = "@Session["_id"].ToString()";
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/getLocationTableAdmin",
+                    type: "POST",
+                    data: { type: type },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        model2.locationData = data;
+                        var dataOptions = { id: "_id", name: "Nombre", permissions: ["@upd", "@del"] };
+                              viewer2.setData(model2.locationData, dataOptions);
+                        
+                    
+
+                        table2.print();
+                        _loading();
+                    }, error: function () {
+                        _loading();
+                        _alert("error", "Error al cargar los datos de las ubicaciones");
+                    }
+                });
+            },
+
+            restart: function () {
+                selectedId = null;
+                selectedName = null;
+                selectedProfile = null;
+                basicProfile = null;
+                editingProfile = null;
+                editingData = null;
+            }
+        };
+        var model3 = {
+
+            locationData: null,
+
+            init: function (type) {
+                var iduser = "@Session["_id"].ToString()";
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/getLocationTableAdmin",
+                    type: "POST",
+                    data: { type: type },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        model3.locationData = data;
+                        var dataOptions = { id: "_id", name: "Nombre", permissions: ["@upd", "@del"] };
+                        if (type == "SubLocations") {
+                            viewer3.setData(model3.locationData, dataOptions);
+                        }
+                      
+
+                        table3.print();
+                        _loading();
+                    }, error: function () {
+                        _loading();
+                        _alert("error", "Error al cargar los datos de las sub ubicaciones");
+                    }
+                });
+            },
+
+            restart: function () {
+                selectedId = null;
+                selectedName = null;
+                selectedProfile = null;
+                basicProfile = null;
+                editingProfile = null;
+                editingData = null;
+            }
+        };
+        var content = {
+            onClientClickAction: function () {
+                var demandId = null;
+                if (table.display == "table") {
+                    demandId = jQuery(this).closest("tr").data("id");
+                }
+                selectedId = demandId;
+
+            },
+
+            onDeleteRowAction: function () {
+                model.restart();
+                var id = null;
+                var name = null;
+                if (table.display == "table") {
+                    id = jQuery(this).closest("tr").data("id");
+                    name = jQuery("table tr[data-id=" + id + "] .name").text();
+                }
+                _confirm(
+                        {
+                            title: "Eliminar Ubicación  " + jQuery("#titulo").text(),
+                            message: "¿Seguro que desea eliminar la ubicación " + jQuery("#titulo").text() + "?",
+                            action: function () {
+                                selectedID = id;
+                                _loading();
+                                jQuery.ajax({
+                                    url: "/Locations/LocationTables/deleteNode",
+                                    type: "POST",
+                                    data: { selectedID: selectedID },
+                                    traditional: true,
+                                    success: function (data) {
+                                        model.init("Region");
+                                        model1.init("Conjunto");
+                                        model2.init("");
+                                        model3.init("SubLocations");
+                                        _loading();
+                                        _alert("success", "Eliminado Correctamente");
+                                        resetData();
+
+                                    },
+                                    error: function () {
+                                        _loading();
+                                        _alert("error", "Ha ocurrido un error");
+                                    }
+                                });
+
+                            }
+                        });
+
+            },
+
+            onEditRowAction: function (tr) {
+                _loading();
+                jQuery("#tlocations2 tbody,#tlocations tbody").html("");
+                cleanMessages();
+                cargarProfiles();
+                selectedId = jQuery(tr).data("id");
+
+                editingProfile = jQuery(tr).data("idprofile");
+                jQuery("#profileSelect").val(editingProfile);
+
+                titleCreteNew = "";
+                if (jQuery("#RegionHeader").attr("class") == "active") {
+                    titleCreteNew = "Editar Región";
+                    jQuery("#numTitle").html("ID Región");
+                    jQuery("#profileSelect option:contains(Region)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la región");
+                    jQuery("#InfoRegionPersonas, #conjuntosTableInfo").show();
+                    jQuery("#ubicationTableInfo").hide();
+                    LoadLocationsConjuntosAll(editingProfile, selectedId);
+                    jQuery("#subtab").hide();
+                     
+                }
+                else if (jQuery("#ConjuntoHeader").attr("class") == "active") {
+                    titleCreteNew = "Editar Oficina";
+                    jQuery("#numTitle").html("Numero de Explotación");
+                    jQuery("#profileSelect option:contains(Conjunto)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la oficina");
+                    jQuery("#conjuntosTableInfo").hide();
+                    jQuery("#ubicationTableInfo,#gerenteConjuntoContent,#gerenteConjuntoLabel").show();
+                    jQuery("#gerenteConjuntoContent").html("");
+                    jQuery("#subtab").show();
+                    jQuery("#subtab a").show();
+                    LoadLocationsAll(editingProfile, selectedId);
+                    LoadSubLocationsAll();
+                }
+                else if (jQuery("#LocationHeader").attr("class") == "active") {
+                    LoadSubLocationsAll(editingProfile, selectedId)
+                    titleCreteNew = "Editar Ubicación";
+                    jQuery("#numTitle").html("ID Ubicación");
+                    jQuery("#profileSelect option:contains(Ubicacion)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la ubicación");
+                    jQuery("#conjuntosTableInfo").hide();
+                    jQuery("#ubicationTableInfo").hide();
+                    jQuery("#subtab").hide();
+                    loadProfileFieldsTitles(editingProfile, selectedId);
+                }
+                else if (jQuery("#SubLocationHeader").attr("class") == "active") {
+                    titleCreteNew = "Editar Ubicación";
+                    jQuery("#numTitle").html("ID Sub-Ubicación");
+                    jQuery("#profileSelect option:contains(SubU)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la Sub-ubicación");
+                    jQuery("#conjuntosTableInfo").hide();
+                    jQuery("#ubicationTableInfo").hide();
+                    jQuery("#subtab").hide();
+                    loadProfileFieldsTitles(editingProfile, selectedId);
+                }
+                jQuery(".modal-header-text").text(titleCreteNew);
+
+                if (jQuery("#profileSelect option:selected").text().trim() == "Region") {
+                    jQuery("#trRegion").show();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab").hide();
+                    getGerenteRegion(selectedId);
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Conjunto") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").show();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    getGerenteConjunto(selectedId);
+                }
+                else if(jQuery("#profileSelect option:selected").text().trim() == "Sub-Ubicaciones"){
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").show();
+                }
+                else {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").show();
+                    jQuery("#trSubUbicacion").hide();
+                    _loading();
+                }
+                selectedParent = null;
+              
+            },
+
+        };
+
+        function setInfoEdit(selectedId) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/getLocation",
+                data: { locationID: selectedId },
+                type: "POST",
+                success: function (data) {
+                    if (data != "") {
+                        editingData = data;
+                        //fillProfileFields();
+                        var data = JSON.parse(data);
+                        selectedParent = data["parent"];
+                        jQuery("#name").val(data["name"]);
+                        jQuery("#num").val(data["number"]);
+                        jQuery("#descripcion").val(data["description"]);
+
+                        if (data["case"] == "region") {
+                            jQuery("#gerenteRegionalContent").html(data["Gerente"]);
+                            jQuery("#gerenteRegionalContentEmail").html(data["GerenteEmail"]);
+                            jQuery("#gerenteSistemaContent").html(data["GerenteSystem"]);
+                            jQuery("#gerenteSistemaContentEmail").html(data["GerenteSystemEmail"]);
+                            jQuery("#gerentePSContent").html(data["GerenteSound"]);
+                            jQuery("#gerentePSContentEmail").html(data["GerenteSoundEmail"]);
+                            jQuery("#responsableContent").html(data["GerenteResponsable"]);
+                            jQuery("#responsableContentEmail").html(data["GerenteResponsableEmail"]);
+
+                            var location = data["location"];
+                            location = JSON.parse(location);
+                            for (var i = 0; i < location.length; i++) {
+                                var IDLoc = location[i]["_id"];
+                                var nameLoc = location[i]["name"];
+                                var idNum = location[i]["number"];
+                                jQuery("#tlocations tbody").append(
+                                jQuery("<tr>", { "data-id": IDLoc, class: "sub" }).append(
+                                    jQuery("<td>").html(nameLoc)
+                                ).append(jQuery("<td>").html(idNum)).append(
+                                    jQuery("<td>").append(
+                                      '<div class="btn-group-select"><a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a></div>'
+                                    )
+                                )
+
+                                );
+                            }
+                            //Set delete action button
+                            jQuery(".btn-group-select").unbind("click");
+                            jQuery(".btn-group-select").bind("click", function () {
+                                var idTable = jQuery(this).closest("tr").data("id");
+                                if (idTable == "all") { //show all values
+                                    jQuery('#selectConjunto option').show();
+                                } else {
+                                    var nameCreate = jQuery(this).closest("tr").children('td:first').text();
+                                    var idCreate = jQuery(this).closest("tr").find("td").next().text();
+                                    if (jQuery('#selectConjunto option[value="' + idTable + '"]').val() == null) {
+                                        jQuery("#selectConjunto").append('<option value="' + idTable + '" data-num="' + idCreate + '">' + nameCreate + '</option>');
+                                    } else {
+                                        jQuery('#selectConjunto option[value="' + idTable + '"]').show();
+                                    }
+                                }
+                                jQuery(this).closest("tr").remove();
+                            });
+                        } else if (data["case"] == "conjunto") {
+                            jQuery("#gerenteConjuntoContent").html(data["ParentName"]);
+                            var location = data["location"];
+                            location = JSON.parse(location);
+                            for (var i = 0; i < location.length; i++) {
+                                var IDLoc = location[i]["_id"];
+                                var nameLoc = location[i]["name"];
+                                var idNum = location[i]["number"];
+                                jQuery("#tlocations2 tbody").append(
+                                jQuery("<tr>", { "data-id": IDLoc, class: "sub" }).append(
+                                    jQuery("<td>").html(nameLoc)
+                                ).append(jQuery("<td>").html(idNum)).append(
+                                    jQuery("<td>").append(
+                                      '<div class="btn-group-select"><a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a></div>'
+                                    )
+                                )
+
+                                );
+                                jQuery('#selectLocations option:contains(' + nameLoc + ')').hide();
+                            }
+                            //Set delete action button
+                            jQuery(".btn-group-select").unbind("click");
+                            jQuery(".btn-group-select").bind("click", function () {
+                                var idTable = jQuery(this).closest("tr").data("id");
+                                checkRealObject(idTable, this);
+                            });
+
+                            //Info Address
+                            var addressInfo = data["address"];
+                            try {
+                                jQuery("#_HTKFielddescripcion").val(data["description"]);
+                                addressInfo = JSON.parse(addressInfo);
+                                jQuery("#_HTKFieldcalle").val(addressInfo["HTKFieldcalle"]);
+                                jQuery("#_HTKFieldcolonia").val(addressInfo["HTKFieldcolonia"]);
+                                jQuery("#_HTKFieldMunicipio").val(addressInfo["HTKFieldMunicipio"]);
+                                jQuery("#_HTKFieldciudad").val(addressInfo["HTKFieldciudad"]);
+                                jQuery("#_HTKFieldzipcode").val(addressInfo["HTKFieldzipcode"]);
+                                jQuery("#_HTKFieldestado").val(addressInfo["HTKFieldestado"]);
+                                jQuery("#_HTKFieldpais").val(addressInfo["HTKFieldpais"]);
+                            } catch (Exeption) { }
+
+                            //personal
+                            var personalinfo = data["personal"];
+                            personalinfo = JSON.parse(personalinfo);
+                            for (var p = 0; p < personalinfo.length ; p++) {
+                                var personalDetail = personalinfo[p];
+                                personalDetail = JSON.parse(personalDetail);
+                                jQuery("#_" + personalDetail["label"]).append("<option value='select'>" + personalDetail["name"] + "</option>");
+                                jQuery("#_" + personalDetail["label"]).val("select");
+                                jQuery("#_" + personalDetail["label"]).prop("disabled", true);
+                                jQuery("#_" + personalDetail["label"]).parent().append(" - Correo: " + personalDetail["email"]);
+                            }
+                        }
+
+                    }
+                    jQuery("#admin_panel_location").modal("show");
+                    _loading();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+        var content1 = {
+            onClientClickAction: function () {
+                var demandId = null;
+                if (table.display == "table") {
+                    demandId = jQuery(this).closest("tr").data("id");
+                }
+                selectedId = demandId;
+
+            },
+
+            onDeleteRowAction: function () {
+                model.restart();
+                var id = null;
+                var name = null;
+                if (table.display == "table") {
+                    id = jQuery(this).closest("tr").data("id");
+                    name = jQuery("table tr[data-id=" + id + "] .name").text();
+                }
+                //else {
+                //    id = jQuery(this).closest("div.tile").data("id");
+                //    name = jQuery(".line .tile[data-id=" + id + "] .tileName").text();
+                //}
+
+                _confirm(
+                        {
+                            title: "Eliminar Ubicación  " + jQuery("#titulo").text(),
+                            message: "¿Seguro que desea eliminar la ubicación " + jQuery("#titulo").text() + "?",
+                            action: function () {
+                                selectedID = id;
+                                jQuery.ajax({
+                                    url: "/Locations/LocationTables/deleteNode",
+                                    type: "POST",
+                                    data: { selectedID: selectedID },
+                                    traditional: true,
+                                    success: function (data) {
+                                        model.init("Region");
+                                        model1.init("Conjunto");
+                                        model2.init("");
+                                        model3.init("SubLocations");
+                                        _alert("success", "Eliminado Correctamente");
+                                        resetData();
+
+                                    },
+                                    error: function () {
+                                        _alert("error", "Ha ocurrido un error");
+                                    }
+                                });
+
+                            }
+                        });
+
+            },
+
+            onEditRowAction: function (tr) {
+                //  jQuery("#locationForm")[0].reset();
+                var clone = jQuery("#subtab").clone(true);
+                jQuery("#staticFormHeader").nextAll().remove();
+                jQuery("#staticFormHeader").closest("ul").find("#subtab").remove();
+
+                jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+                cargarProfiles();
+                selectedId = jQuery(tr).data("id");
+                editingProfile = jQuery(tr).data("idprofile");
+                jQuery("#profileSelect").val(editingProfile);
+
+                titleCreteNew = "";
+                if (jQuery("#RegionHeader").attr("class") == "active") { titleCreteNew = "Editar Región"; jQuery("#profileSelect option:contains(Region)").attr('selected', true); jQuery("#labelName").html("Nombre de la región"); jQuery("#responsableLabel").show(); jQuery("#responsableLabelContent").show(); jQuery("#gerenteRegionalLabel").show(); jQuery("#gerenteRegionalContent").show(); jQuery("#subtab").hide(); }
+                else if (jQuery("#ConjuntoHeader").attr("class") == "active") { titleCreteNew = "Editar Conjunto"; jQuery("#profileSelect option:contains(Conjunto)").attr('selected', true); jQuery("#labelName").html("Nombre del conjunto"); jQuery("#subtab").show(); jQuery("#subtab a").show(); }
+                else if (jQuery("#LocationHeader").attr("class") == "active") { titleCreteNew = "Editar Ubicación"; jQuery("#profileSelect option:contains(Ubicacion)").attr('selected', true); jQuery("#labelName").html("Nombre de la ubicación"); jQuery("#subtab").hide(); }
+                else if (jQuery("#SubLocationHeader").attr("class") == "active") { titleCreteNew = "Editar Sub-Ubicación"; jQuery("#profileSelect option:contains(Sub)").attr('selected', true); jQuery("#labelName").html("Nombre de la Sub-ubicación"); jQuery("#subtab").hide(); }
+
+                if (jQuery("#profileSelect option:selected").text().trim() == "Region") {
+                    jQuery("#trRegion").show();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").hide();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Conjunto") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").show();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").show();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Sub-Ubicaciones"){
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").show();
+                    jQuery("#subtab a").hide();
+                }
+                else  {
+                    
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").show();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").hide();
+                }
+                loadProfileFields(editingProfile);
+                loadProfileFieldsTitles(editingProfile);
+                cleanMessages();
+                jQuery(".modal-header-text").text(titleCreteNew);
+                selectedParent = null;
+                jQuery("#admin_panel_location").modal("show");
+                _loading();
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/getLocation",
+                    data: { locationID: selectedId },
+                    type: "POST",
+                    success: function (data) {
+                        _loading();
+                        editingData = data;
+                        //fillProfileFields();
+                        var data = JSON.parse(data);
+                        selectedParent = data["parent"];
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                jQuery("#admin_panel_location").modal("show");
+
+            },
+
+        };
+
+        var content2 = {
+            onClientClickAction: function () {
+                var demandId = null;
+                if (table.display == "table") {
+                    demandId = jQuery(this).closest("tr").data("id");
+                }
+                selectedId = demandId;
+
+            },
+
+            onDeleteRowAction: function () {
+                model.restart();
+                var id = null;
+                var name = null;
+                if (table.display == "table") {
+                    id = jQuery(this).closest("tr").data("id");
+                    name = jQuery("table tr[data-id=" + id + "] .name").text();
+                }
+                //else {
+                //    id = jQuery(this).closest("div.tile").data("id");
+                //    name = jQuery(".line .tile[data-id=" + id + "] .tileName").text();
+                //}
+
+                _confirm(
+                        {
+                            title: "Eliminar Ubicación  " + jQuery("#titulo").text(),
+                            message: "¿Seguro que desea eliminar la ubicación " + jQuery("#titulo").text() + "?",
+                            action: function () {
+                                selectedID = id;
+                                _loading();
+                                jQuery.ajax({
+                                    url: "/Locations/LocationTables/deleteNode",
+                                    type: "POST",
+                                    data: { selectedID: selectedID },
+                                    traditional: true,
+                                    success: function (data) {
+                                        model.init("Region");
+                                        model1.init("Conjunto");
+                                        model2.init("");
+                                        _loading();
+                                        _alert("success", "Eliminado Correctamente");
+                                        resetData();
+
+                                    },
+                                    error: function () {
+                                        _loading();
+                                        _alert("error", "Ha ocurrido un error");
+                                    }
+                                });
+
+                            }
+                        });
+            },
+
+            onEditRowAction: function (tr) {
+                //   jQuery("#locationForm")[0].reset();
+                var clone = jQuery("#subtab").clone(true);
+                jQuery("#staticFormHeader").nextAll().remove();
+                jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+                cargarProfiles();
+                selectedId = jQuery(tr).data("id");
+                editingProfile = jQuery(tr).data("idprofile");
+                jQuery("#profileSelect").val(editingProfile);
+
+                titleCreteNew = "";
+                if (jQuery("#RegionHeader").attr("class") == "active") { titleCreteNew = "Editar Región"; jQuery("#numTitle").html("ID Región"); jQuery("#profileSelect option:contains(Region)").attr('selected', true); jQuery("#labelName").html("Nombre de la región"); jQuery("#responsableLabel").show(); jQuery("#responsableLabelContent").show(); jQuery("#gerenteRegionalLabel").show(); jQuery("#gerenteRegionalContent").show(); jQuery("#subtab a").hide(); }
+                else if (jQuery("#ConjuntoHeader").attr("class") == "active") { titleCreteNew = "Editar Conjunto"; jQuery("#numTitle").html("Unidad de Explotación"); jQuery("#profileSelect option:contains(Conjunto)").attr('selected', true); jQuery("#labelName").html("Nombre del conjunto"); jQuery("#subtab a").show(); }
+                else if (jQuery("#LocationHeader").attr("class") == "active") { titleCreteNew = "Editar Ubicación"; jQuery("#numTitle").html("ID Ubicación"); jQuery("#profileSelect option:contains(Ubicacion)").attr('selected', true); jQuery("#labelName").html("Nombre de la ubicación"); jQuery("#subtab a").hide(); }
+                else if (jQuery("#SubLocationHeader").attr("class") == "active") { titleCreteNew = "Editar Sub Ubicación"; jQuery("#numTitle").html("ID Ubicación"); jQuery("#profileSelect option:contains(Sub)").attr('selected', true); jQuery("#labelName").html("Nombre de la Sub ubicación"); jQuery("#subtab a").hide(); }
+
+                if (jQuery("#profileSelect option:selected").text().trim() == "Region") {
+                    jQuery("#trRegion").show();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").hide();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Conjunto") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").show();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").show();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Sub-Ubicaciones") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").show();
+                    jQuery("#subtab a").hide();
+                }
+                else {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").show();
+                    jQuery("#trSubUbicacion").hide();
+                    jQuery("#subtab a").hide();
+
+                }
+
+                loadProfileFields(editingProfile);
+                loadProfileFieldsTitles(editingProfile);
+                cleanMessages();
+                jQuery(".modal-header-text").text(titleCreteNew);
+                selectedParent = null;
+                jQuery("#admin_panel_location").modal("show");
+                _loading();
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/getLocation",
+                    data: { locationID: selectedId },
+                    type: "POST",
+                    success: function (data) {
+                        _loading();
+                        editingData = data;
+                        //fillProfileFields();
+                        var data = JSON.parse(data);
+                        selectedParent = data["parent"];
+                    },
+                    error: function () {
+                        //_loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                $("#admin_panel_location").modal("show");
+
+            },
+
+        };
+
+        function loadparentSelect(objectid) {
+            jQuery.ajax({
+                url: "/Locations/LocationTables/loadParents",
+                data: { nodeid: objectid },
+                success: function (data) {
+                    jQuery("#parentSelect").html(data);
+                },
+                error: function () {
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+        //ImagePreview----------------------------------------------------
+
+        var input = document.getElementById("file"),
+            formdata = false;
+
+        function showUploadedItem(source) {
+            //jQuery('#img_pre').attr('src', source);
+        }
+
+        function addPhoto(source) {
+            if (window.FileReader) {
+                reader = new FileReader();
+                reader.onloadend = function (e) {
+                    showUploadedItem(e.target.result);
+                };
+                reader.readAsDataURL(source);
+            }
+        }
+
+        if (window.FormData) {
+            formdata = new FormData();
+        }
+
+        /*input.addEventListener('change', function (evt) {
+            var file = this.files[0];
+
+            if (!!file.type.match(/image.*//*)) {
+                addPhoto(file);
+            }
+
+        }, false);*/
+        //EndImagePreview-------------------------------------
+
+        var table = {
+
+            display: "table",
+
+            init: function () {
+                table.bindAll();
+            },
+
+            print: function () {
+                switch (table.display) {
+                    case "table":
+                        table.printTable();
+                        break;
+                }
+            },
+
+            printTable: function () {
+                table.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "Región", "number": "ID Región", "description": "Descripción", "Creator": "Creador", "CreatedDate": "Fecha de Creación" },
+                    //showSelecters: true,
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteRowAction: content.onDeleteRowAction,
+                    onSelectRowAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer.print();
+                var regiones = JSON.parse(model.locationData);
+                // if (regiones.length>0)
+                for (i = 0; i < regiones.length; i++) {
+                    jQuery("table tr[data-id=" + regiones[i]._id + "]").attr("data-idprofile", regiones[i].profileId);
+                }
+
+                try {
+                   
+                    jQuery("#regionsTable_rvtable").dataTable({
+                        "sPaginationType": "full_numbers",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 50,
+                        "sScrollY": "400px",
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Filtro",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Ultimo",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+
+                            },
+                            "sEmptyTable": "Tabla Sin Datos"
+                        }
+                    });
+                    headers1(jQuery("#regionsTable_rvtable"))
+                } catch (e) { }
+                //jQuery("[rel=tooltip]").closest("a").tooltip();
+
+            },
+
+
+
+            //printTiles: function () {
+            //    table.display = "tile";
+
+            //    var tileOptions = {
+            //        onEditTileAction: function () {
+            //            var tr = jQuery(this).closest("div.tile");
+            //            content.onEditRowAction(tr);
+            //        },
+            //        onDeleteTileAction: content.onDeleteRowAction,
+            //        onSelectTileAction: null
+            //    };
+            //    viewer.setDisplayMethod(RivkaViewer.METHODS.TILE, tileOptions);
+            //    viewer.print();
+
+            //    var demands = JSON.parse(model.demandData);
+            //    for (i = 0; i < demands.length; i++) {
+            //        jQuery(" .tile[data-id=" + demands[i]._id + "]").attr("data-idprofile", demands[i].profileId);
+            //    }
+
+            //    jQuery("[rel=tooltip]").closest("a").tooltip();
+            //},
+
+            //printSlider: function () {
+            //    table.display = "slider";
+            //    var sliderOptions = {
+            //        onEditTileAction: function () {
+            //            var tr = jQuery(this).closest("div.tile");
+            //            content.onEditRowAction(tr);
+            //        },
+            //        onDeleteTileAction: content.onDeleteRowAction,
+            //        onSelectTileAction: null
+            //    };
+            //    viewer.setDisplayMethod(RivkaViewer.METHODS.SLIDER, sliderOptions);
+            //    viewer.print();
+
+            //    var demands = JSON.parse(model.demandData);
+            //    for (i = 0; i < users.length; i++) {
+            //        jQuery(" .tile[data-id=" + demands[i]._id + "]").attr("data-idprofile", demands[i].profileId);
+            //    }
+
+            //    jQuery("[rel=tooltip]").closest("a").tooltip();
+            //},
+
+            bindAll: function () {
+
+            @*jQuery("#save_location").unbind("click");
+            jQuery("#save_location").bind("click", function () {
+                if (jQuery('#location_tree3 label[class="selected"]').closest("li").data("idcategory") == null) {
+                    _alert("error", "Seleccione una ubicación!");
+                    return false;
+                }
+
+                var id = jQuery('#location_tree3 label[class="selected"]').closest("li").data("idcategory");
+                var name = jQuery('#location_tree3 label[class="selected"]').text();
+
+                if (selectedIdObj == "all") {
+                    jQuery("#lblocation2").text(name);
+                    jQuery("#lblocation2").data("locationid", id);
+
+                    if (jQuery("#todos").prop("checked")) {
+                        jQuery(".uniform").each(function () {
+                            if (jQuery(this).prop("checked")) {
+                                var idsel = jQuery(this).attr("name").substring(7);
+                                jQuery("#label" + idsel).text(name);
+                                jQuery("#label" + idsel).data("locationid", id);
+                            }
+                        });
+
+                    }
+                }
+                else {
+                    jQuery("#label" + selectedIdObj).text(name);
+                    jQuery("#label" + selectedIdObj).data("locationid", id);
+                }
+
+
+
+                tree4.init({ id: "null", name: "Home" });
+                jQuery("#location_modal_process").modal("hide");
+
+            });
+
+            jQuery("#passyes_button").unbind("click");
+            jQuery("#passyes_button").bind("click", function () {
+                var username = "@Session["Username"].ToString()";
+                var txtmotivo = jQuery("#txtmotivo").val().trim();
+                accion = jQuery("#passyes_button").data("tipo");
+                if (txtmotivo == "" && accion == "Denegar") {
+                    jQuery("#pass_msg").text("Debe escribir un motivo");
+                }
+                else {
+                    var iddemand = jQuery("#passyes_button").data("iddemand");
+                    denegarSolicitud(iddemand, txtmotivo);
+                }
+            });
+
+            jQuery("#passnon_button").unbind("click");
+            jQuery("#passnon_button").bind("click", function () {
+                jQuery("#passname").val("");
+                jQuery("#passyes_button").data("iddemand", "");
+                jQuery("#pass_msg").text("");
+                jQuery("#passconfirmmodal").modal("hide");
+
+            });*@
+            }
+        @*,
+
+        onSearchAction: function () {
+            var stringToSearch = jQuery("#globalSearch").val();
+            if (stringToSearch.trim() == "") {
+                model.init();
+            } else {
+                jQuery.ajax({
+                    url: "/User/User/globalSearch",
+                    type: "POST",
+                    data: { data: stringToSearch },
+                    beforeSend: _loading,
+                    success: function (data) {
+                        model.usersData = data;
+                        var dataOptions = { id: "_id", name: "user", image: "image", permissions: ["@upd", "@del"] };
+                        viewer.setData(model.usersData, dataOptions);
+                        table.print();
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        _alert("error", "Ha ocurrido un error");
+                        _loading();
+                    }
+                });
+            }
+        }*@
+        };
+
+
+        var table1 = {
+
+            display: "table",
+
+            init: function () {
+                table1.bindAll();
+            },
+
+            print: function () {
+                switch (table1.display) {
+                    case "table":
+                        table1.printTable();
+                        break;
+                        //case "tile":
+                        //    table.printTiles();
+                        //    break
+                        //case "slider":
+                        //    table.printSlider();
+                        //    break;
+                }
+            },
+            printTable: function () {
+                table1.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "Conjunto", "number": "Unidad de Explotación", "region": "Región", "Creator": "Creador", "CreatedDate": "Fecha de Creación" },
+                    //showSelecters: true,
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteRowAction: content.onDeleteRowAction,
+                    onSelectRowAction: null
+                };
+                viewer1.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer1.print();
+                var conjuntos = JSON.parse(model1.locationData);
+                for (i = 0; i < conjuntos.length; i++) {
+                    jQuery("table tr[data-id=" + conjuntos[i]._id + "]").attr("data-idprofile", conjuntos[i].profileId);
+                }
+
+                try {
+                 
+                    jQuery("#conjuntosTable_rvtable").dataTable({
+                        "sPaginationType": "full_numbers",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 50,
+                        "sScrollY": "400px",
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Filtro",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Ultimo",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+
+                            },
+                            "sEmptyTable": "Tabla Sin Datos"
+                        }
+                    });
+
+                    headers1(jQuery("#conjuntosTable_rvtable"))
+                } catch (e) { }
+                //jQuery("[rel=tooltip]").closest("a").tooltip();
+
+            },
+
+            bindAll: function () {
+
+            }
+
+        };
+
+        var table2 = {
+
+            display: "table",
+
+            init: function () {
+                table2.bindAll();
+            },
+
+            print: function () {
+                switch (table2.display) {
+                    case "table":
+                        table2.printTable();
+                        break;
+                        //case "tile":
+                        //    table.printTiles();
+                        //    break
+                        //case "slider":
+                        //    table.printSlider();
+                        //    break;
+                }
+            },
+
+            printTable: function () {
+                table2.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "nombre Ubicación", "number": "ID Ubicación", "Creator": "Creador", "CreatedDate": "Fecha de Creación" },
+                    //showSelecters: true,
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteRowAction: content.onDeleteRowAction,
+                    onSelectRowAction: null
+                };
+                viewer2.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer2.print();
+                var locations = JSON.parse(model2.locationData);
+                for (i = 0; i < locations.length; i++) {
+                    jQuery("table tr[data-id=" + locations[i]._id + "]").attr("data-idprofile", locations[i].profileId);
+                }
+
+                try {
+                   
+                    jQuery("#locationsTable_rvtable").dataTable({
+                        "sPaginationType": "full_numbers",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 50,
+                        "sScrollY": "400px",
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Filtro",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Ultimo",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+
+                            },
+                            "sEmptyTable": "Tabla Sin Datos"
+                        }
+                    });
+
+                    headers1(jQuery("#locationsTable_rvtable"))
+                } catch (e) { }
+                //jQuery("[rel=tooltip]").closest("a").tooltip();
+
+            },
+
+            bindAll: function () {
+
+            }
+
+        };
+        var table3 = {
+
+            display: "table",
+
+            init: function () {
+                table3.bindAll();
+            },
+
+            print: function () {
+                switch (table3.display) {
+                    case "table":
+                        table3.printTable();
+                        break;
+                        //case "tile":
+                        //    table.printTiles();
+                        //    break
+                        //case "slider":
+                        //    table.printSlider();
+                        //    break;
+                }
+            },
+
+            printTable: function () {
+                table3.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "nombre Sub-Ubicación", "number": "ID Sub Ubicación", "Creator": "Creador", "CreatedDate": "Fecha de Creación" },
+                    //showSelecters: true,
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteRowAction: content.onDeleteRowAction,
+                    onSelectRowAction: null
+                };
+                viewer3.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer3.print();
+                var locations = JSON.parse(model3.locationData);
+                for (i = 0; i < locations.length; i++) {
+                    jQuery("table tr[data-id=" + locations[i]._id + "]").attr("data-idprofile", locations[i].profileId);
+                }
+
+                try {
+                    jQuery("#SublocationsTable_rvtable").dataTable({
+                        "sPaginationType": "full_numbers",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 50,
+                        "sScrollY": "400px",
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Filtro",
+                            "oPaginate": {
+                                "sFirst": "Primero",
+                                "sLast": "Ultimo",
+                                "sNext": "Siguiente",
+                                "sPrevious": "Anterior"
+
+                            },
+                            "sEmptyTable": "Tabla Sin Datos"
+                        }
+                    });
+
+                    headers1(jQuery("#SublocationsTable_rvtable"))
+                } catch (e) { }
+                //jQuery("[rel=tooltip]").closest("a").tooltip();
+
+            },
+
+            bindAll: function () {
+
+            }
+
+        };
+        jQuery("[href=#ConjuntoSection]").on("click.conj")
+        jQuery("[href=#ConjuntoSection]").on("click.conj", function () {
+            headers1(jQuery("#conjuntosTable_rvtable"))
+           
+        })
+        jQuery("[href=#LocationSection]").on("click.conj")
+        jQuery("[href=#LocationSection]").on("click.conj", function () {
+            
+            headers1(jQuery("#locationsTable_rvtable"))
+          
+        })
+        jQuery("[href=#SubLocationSection]").on("click.conj")
+        jQuery("[href=#SubLocationSection]").on("click.conj", function () {
+            
+            headers1(jQuery("#SublocationsTable_rvtable"))
+        })
+        jQuery(document).ready(function ($) {
+
+            // viewer.addOption({ name: "details", description: "Ver Detalles", icon: "icon-info-sign", action: content.onClientClickAction });
+            $("#addLocationButton").on("click", function () {
+                _loading();
+                cleanMessages();
+                cargarProfiles();
+
+                //var hlp = editingProfile;
+                //jQuery("#profileSelect").val(editingProfile);
+
+                //loadProfileFieldsTitles(editingProfile);
+
+                jQuery("#tlocations2 tbody,#tlocations tbody").html("");
+                jQuery("#trRegion").hide();
+                jQuery("#trConjunto").hide();
+                jQuery("#trUbicacion").hide();
+                jQuery("#trSubUbicacion").hide();
+                resetData();
+                var clone = jQuery("#subtab").clone(true);
+                jQuery("#staticFormHeader").nextAll().remove();
+               
+                jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+                selectedParent = null;
+
+                //Set Titles and values need
+                titleCreteNew = "";
+                if (jQuery("#RegionHeader").attr("class") == "active") {
+                    LoadLocationsConjuntosAll();
+                    titleCreteNew = "Agregar Región";
+                    jQuery("#numTitle").html("ID Región");
+                    jQuery("#profileSelect option:contains(Region)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la región");
+                    jQuery("#InfoRegionPersonas,#ubicationTableInfo").hide();
+                    jQuery("#conjuntosTableInfo").show();
+                    jQuery("#subtab").hide()
+                    jQuery("#staticFieldsSection").addClass("active");
+                }
+                else if (jQuery("#ConjuntoHeader").attr("class") == "active") {
+                    LoadLocationsAll();
+                    LoadSubLocationsAll();
+                    titleCreteNew = "Agregar Conjunto";
+                    jQuery("#numTitle").html("Unidad de Explotación");
+                    jQuery("#profileSelect option:contains(Conjunto)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre del conjunto");
+                    jQuery("#InfoRegionPersonas,#conjuntosTableInfo,#gerenteConjuntoLabel").hide();
+                    jQuery("#ubicationTableInfo").show();
+                    jQuery("#SububicationTableInfo").show();
+                    jQuery("#staticFieldsSection").addClass("active");
+                    jQuery("#subtab").show();
+                    jQuery("#subtab a").show();
+                }
+                else if (jQuery("#LocationHeader").attr("class") == "active") {
+                    titleCreteNew = "Agregar Ubicación";
+                   // LoadSubLocationsAll();
+                    jQuery("#numTitle").html("ID Ubicación");
+                    jQuery("#profileSelect option:contains(Ubicacion)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la ubicación");
+                    jQuery("#InfoRegionPersonas,#conjuntosTableInfo,#ubicationTableInfo").hide();
+                    jQuery("#subtab").hide()
+                    jQuery("#staticFieldsSection").addClass("active");
+                   // jQuery("#SububicationTableInfo").show();
+                }
+                else if (jQuery("#SubLocationHeader").attr("class") == "active") {
+                    titleCreteNew = "Agregar Sub Ubicación";
+                    jQuery("#numTitle").html("ID Sub Ubicación");
+                    jQuery("#profileSelect option:contains(Sub)").attr('selected', true);
+                    jQuery("#labelName").html("Nombre de la Sub ubicación");
+                    jQuery("#InfoRegionPersonas,#conjuntosTableInfo,#ubicationTableInfo,#SububicationTableInfo").hide();
+                    jQuery("#subtab").hide()
+                    jQuery("#staticFieldsSection").addClass("active");
+                }
+                jQuery("#profileSelect").change();
+                $(".modal-header-text").text(titleCreteNew);
+            });
+
+            $("#editLocationButton").on("click", function () {
+                //   $("#locationForm")[0].reset();
+                debugger
+                var clone = jQuery("#subtab").clone(true);
+                jQuery("#staticFormHeader").nextAll().remove();
+                jQuery("#staticFormHeader").closest("ul").find("#subtab").remove();
+                jQuery("#staticFormHeader").closest("ul").append(jQuery(clone))
+                cargarProfiles();
+                selectedId = jQuery(jQuery(this).closest("tr")).data("id");
+                editingProfile = jQuery(jQuery(this).closest("tr")).data("idprofile");
+                $("#profileSelect").val(editingProfile);
+
+                titleCreteNew = "";
+                if (jQuery("#RegionHeader").attr("class") == "active") { titleCreteNew = "Agregar Región"; jQuery("#numTitle").html("ID Región"); jQuery("#profileSelect option:contains(Region)").attr('selected', true); jQuery("#labelName").html("Nombre de la región"); jQuery("#subtab").hide() }
+                else if (jQuery("#ConjuntoHeader").attr("class") == "active") { titleCreteNew = "Agregar Oficina"; jQuery("#numTitle").html("Unidad de Explotación"); jQuery("#profileSelect option:contains(Conjunto)").attr('selected', true); jQuery("#labelName").html("Nombre de la oficina"); jQuery("#subtab").show(); jQuery("#subtab a").show(); }
+                else if (jQuery("#LocationHeader").attr("class") == "active") { titleCreteNew = "Agregar Ubicación"; jQuery("#numTitle").html("ID Ubicación"); jQuery("#profileSelect option:contains(Ubicacion)").attr('selected', true); jQuery("#labelName").html("Nombre de la ubicación"); jQuery("#subtab").hide() }
+                else if (jQuery("#SubLocationHeader").attr("class") == "active") { titleCreteNew = "Agregar Sub Ubicación"; jQuery("#numTitle").html("ID Sub Ubicación"); jQuery("#profileSelect option:contains(Sub)").attr('selected', true); jQuery("#labelName").html("Nombre de la Sub ubicación"); jQuery("#subtab").hide() }
+
+                loadProfileFields(editingProfile);
+                loadProfileFieldsTitles(editingProfile);
+                cleanMessages();
+                $(".modal-header-text").text(titleCreteNew);
+                selectedParent = null;
+                $("#admin_panel_location").modal("show");
+                _loading();
+                $.ajax({
+                    url: "/Locations/LocationTables/getLocation",
+                    data: { locationID: selectedId },
+                    type: "POST",
+                    success: function (data) {
+                        _loading();
+                        editingData = data;
+                        //fillProfileFields();
+                        var data = JSON.parse(data);
+                        selectedParent = data["parent"];
+                    },
+                    error: function () {
+                        //_loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                $("#admin_panel_location").modal("show");
+            });
+            $("#profileSelect").change(function () {
+                selectedProfile = $(this).val();
+
+                if (jQuery("#profileSelect option:selected").text().trim() == "Region") {
+                    jQuery("#trRegion").show();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Conjunto") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").show();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").hide();
+                }
+                else if (jQuery("#profileSelect option:selected").text().trim() == "Sub-Ubicaciones") {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").hide();
+                    jQuery("#trSubUbicacion").show();
+                }
+                else {
+                    jQuery("#trRegion").hide();
+                    jQuery("#trConjunto").hide();
+                    jQuery("#trUbicacion").show();
+                    jQuery("#trSubUbicacion").hide();
+
+                }
+                loadProfileFields(selectedProfile);
+                loadProfileFieldsTitles(selectedProfile);
+            });
+
+            //$("#setupSelect").on("change", function () {
+            //    selectedsetup = $(this).val();
+            //});
+
+            $("#cancel_button").on("click", function () {
+                $("#admin_panel_location").modal("hide");
+                //$("#img_pre").attr("src", "/Content/Images/planos/No-Imagen-Disponible.png");
+                resetData();
+            });
+
+            $("#save_button").click(function () {
+
+                if (locationError != null) {
+                    $("#final_msg").text(locationError);
+                }
+                else {
+                    guardar();
+                }
+
+                return false;
+            });
+
+            $("#addConjunto").click(function () {
+                var iditem = jQuery("#selectConjunto").val();
+                var textitem = jQuery("#selectConjunto").find("option:selected").text();
+                var idNum = jQuery("#selectConjunto [value='" + iditem + "']").data("num");
+
+                if (textitem != "") {
+                    if (iditem == "all") { //hide all values
+                        jQuery("#tlocations tbody").html("");
+                        jQuery('#selectConjunto option').hide();
+                        jQuery('#selectConjunto').val("");
+                    } else {
+                        jQuery('#selectConjunto option[value="' + iditem + '"]').hide();
+                        jQuery('#selectConjunto').val("");
+                    }
+
+                    jQuery("#tlocations tbody").append(
+                         jQuery("<tr>", { "data-id": iditem, class: "sub" })
+                        .append($("<td>").html(textitem))
+                        .append($("<td>").html(idNum))
+                        .append($("<td>")
+                            .append('<div class="btn-group-select"><a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a></div>'))
+                        );
+
+                    //Set delete action button
+                    jQuery(".btn-group-select").unbind("click");
+                    jQuery(".btn-group-select").bind("click", function () {
+                        var idTable = jQuery(this).closest("tr").data("id");
+                        if (idTable == "all") { //show all values
+                            jQuery('#selectConjunto option').show();
+                        } else {
+                            var nameCreate = jQuery(this).closest("tr").children('td:first').text();
+                            var idCreate = jQuery(this).closest("tr").find("td").next().text();
+                            if (jQuery('#selectConjunto option[value="' + idTable + '"]').val() == null) {
+                                jQuery("#selectConjunto").append('<option value="' + idTable + '" data-num="' + idCreate + '">' + nameCreate + '</option>');
+                            } else {
+                                jQuery('#selectConjunto option[value="' + idTable + '"]').show();
+                            }
+                        }
+                        jQuery(this).closest("tr").remove();
+                    });
+                }
+
+            });
+
+            $("#addSubLocation").bind('click.add',function () {
+                var iditem = jQuery("#selectSubLocations").val();
+                var textitem = jQuery("#selectSubLocations").find("option:selected").text();
+                var idNum = jQuery("#selectSubLocations [value='" + iditem + "']").data("num");
+
+                if (textitem != "") {
+                    if (iditem == "all") { //hide all values
+                        jQuery("#tSublocations2 tbody").html("");
+                        jQuery('#selectSubLocations option').hide();
+                        jQuery('#selectSubLocations').val("");
+                    } else {
+                        jQuery('#selectSubLocations option[value="' + iditem + '"]').hide();
+                        jQuery('#selectSubLocations').val("");
+                    }
+
+                    jQuery("#tSublocations2 tbody").append(
+                         jQuery("<tr>", { "data-id": iditem, class: "sub" })
+                        .append($("<td>").html(textitem))
+                        .append($("<td>").html(idNum))
+                        .append($("<td>")
+                            .append('<div class="btn-group-select"><a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a></div>'))
+                        );
+
+                    //Set delete action button
+                    jQuery(".btn-group-select").unbind("click");
+                    jQuery(".btn-group-select").bind("click", function () {
+                        var idTable = jQuery(this).closest("tr").data("id");
+                        checkRealObject(idTable, this);
+                    });
+                }
+
+            });
+            $("#addLocation").click(function () {
+                var iditem = jQuery("#selectLocations").val();
+                var textitem = jQuery("#selectLocations").find("option:selected").text();
+                var idNum = jQuery("#selectLocations [value='" + iditem + "']").data("num");
+
+                if (textitem != "") {
+                    if (iditem == "all") { //hide all values
+                        jQuery("#tlocations2 tbody").html("");
+                        jQuery('#selectLocations option').hide();
+                        jQuery('#selectLocations').val("");
+                    } else {
+                        jQuery('#selectLocations option[value="' + iditem + '"]').hide();
+                        jQuery('#selectLocations').val("");
+                    }
+
+                    jQuery("#tlocations2 tbody").append(
+                         jQuery("<tr>", { "data-id": iditem, class: "sub" })
+                        .append($("<td>").html(textitem))
+                        .append($("<td>").html(idNum))
+                        .append($("<td>")
+                            .append('<div class="btn-group-select"><a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a></div>'))
+                        );
+
+                    //Set delete action button
+                    jQuery(".btn-group-select").unbind("click");
+                    jQuery(".btn-group-select").bind("click", function () {
+                        var idTable = jQuery(this).closest("tr").data("id");
+                        checkRealObject(idTable, this);
+                    });
+                }
+
+            });
+            $("#deleteAllConjunto").click(function () {
+                jQuery("#tlocations tbody").html("");
+                jQuery('#selectConjunto option').hide();
+                jQuery('#selectConjunto').val("");
+            });
+            $("#deleteAllLocation").click(function () {
+                jQuery("#tlocations2 tbody").html("");
+                jQuery('#selectLocations option').show();
+                jQuery('#selectLocations').val("");
+            });
+            $("#deleteAllSubLocation").click(function () {
+                jQuery("#tSublocations2 tbody").html("");
+                jQuery('#selectSubLocations option').show();
+                jQuery('#selectSubLocations').val("");
+            });
+
+            function guardar() {
+                var tipo = "1";
+                var num = "";
+                var region = null;
+                var conjunto = null;
+                var locationx = null;
+                var description = "";
+                var sublocations = jQuery("#tlocations").find(".sub");
+                var sublocations2 = jQuery("#tlocations2").find(".sub");
+                var sublocations3 = jQuery("#tSublocations2").find(".sub");
+                var subids = [];
+                var address = [];
+                debugger
+                var profilelocationid =  jQuery("#profileSelect").val();
+                if (jQuery("#trRegion").css("display") != "none") {
+                    num = jQuery("#num").val();
+                    description = jQuery("#descripcion").val();
+
+                    //Check if is a name and an ID given for region
+                    if (jQuery("#name").val() == "" || jQuery("#name").val() == null) { _alert("error", "Introduce un nombre para la Región"); return; }
+                    if (num == "" || num == null) { _alert("error", "Introduce un ID Región"); return; }
+
+                    for (i = 0; i < sublocations.length; i = i + 1) {
+                        var idtr = jQuery(sublocations[i]).data("id");
+                        subids.push(idtr);
+                    }
+
+                    address = [];
+                    jQuery("#profileSelect option").each(function () {
+                        if (this.text == "Region") {
+                            jQuery("#profileSelect").val(this.value);
+                        }
+
+
+                    })
+                    
+
+                }
+                if (jQuery("#trConjunto").css("display") != "none") {
+                    region = (jQuery("#selectRegion").val() == null ? "" : jQuery("#selectRegion").val());
+                    num = jQuery("#num").val();
+
+                    //Check if is a name and an ID given for region
+                    if (jQuery("#name").val() == "" || jQuery("#name").val() == null) { _alert("error", "Introduce un nombre para la Región"); return; }
+                    if (num == "" || num == null) { _alert("error", "Introduce un ID Región"); return; }
+
+                    for (i = 0; i < sublocations2.length; i = i + 1) {
+                        var idtr = jQuery(sublocations2[i]).data("id");
+                        subids.push(idtr);
+                    }
+                    address.push(jQuery("#_HTKFieldcalle").val());
+                    address.push(jQuery("#_HTKFieldcolonia").val());
+                    address.push(jQuery("#_HTKFieldMunicipio").val());
+                    address.push(jQuery("#_HTKFieldciudad").val());
+                    address.push(jQuery("#_HTKFieldzipcode").val());
+                    address.push(jQuery("#_HTKFieldestado").val());
+                    address.push(jQuery("#_HTKFieldpais").val());
+
+                    description = jQuery("#_HTKFielddescripcion").val();
+                    jQuery("#profileSelect option").each(function () {
+                        if (this.text == "Conjunto") {
+                            jQuery("#profileSelect").val(this.value);
+                        }
+
+
+                    })
+                }
+                if (jQuery("#trUbicacion").css("display") != "none" || jQuery("#LocationSection").hasClass("active")) {
+                    num = jQuery("#num").val();
+
+                    //Check if is a name and an ID given for region
+                    if (jQuery("#name").val() == "" || jQuery("#name").val() == null) { _alert("error", "Introduce un nombre para la Ubicacion"); return; }
+                    if (num == "" || num == null) { _alert("error", "Introduce un ID Ubicacion"); return; }
+                    for (i = 0; i < sublocations3.length; i = i + 1) {
+                        var idtr = jQuery(sublocations3[i]).data("id");
+                        subids.push(idtr);
+                    }
+                    conjunto = jQuery("#selectConjunto").val();
+                    description = $("#name").val(); //jQuery("#descripcion1").val();
+                    jQuery("#profileSelect option").each(function () {
+                        if (this.text == "Ubicacion") {
+                            jQuery("#profileSelect").val(this.value);
+                        }
+
+
+                    })
+
+                    address = [];
+                }
+                //  if (jQuery("#trSubUbicacion").css("display") != "none") {
+                if(jQuery("#SubLocationSection").hasClass("active")){
+                    num = jQuery("#num").val();
+
+                    //Check if is a name and an ID given for region
+                    if (jQuery("#name").val() == "" || jQuery("#name").val() == null) { _alert("error", "Introduce un nombre para la Sub Ubicacion"); return; }
+                    if (num == "" || num == null) { _alert("error", "Introduce un ID Región"); return; }
+
+                    locationx = jQuery("#selectLocations").val();
+                    description = $("#name").val(); //jQuery("#descripcion1").val();
+
+                    address = [];
+                    jQuery("#profileSelect option").each(function () {
+                        if (this.text == "Sub-Ubicaciones") {
+                            jQuery("#profileSelect").val(this.value);
+                        }
+
+
+                    })
+                }
+                descripcion = (descripcion == undefined || descripcion == null ? "" : descripcion);
+               
+                var formString = "name=" + $("#name").val() + "&locationID=" + selectedId + "&profileSelect=" + $("#profileSelect").val() + "&parentSelect=" + selectedParent + "&tipo=" + tipo + "&number=" + num + "&description=" + description + "&region=" + region + "&conjunto=" + conjunto + "&location=" + locationx + "&description1=" + $("descripcion1").val();// + "&" + $("#locationForm").serialize();
+
+                var fd = new FormData();
+                fd.append('data', formString);
+                //fd.append('file', $('#file')[0].files[0]);
+                fd.append('subs', subids);
+                fd.append('name', jQuery("#name").val());
+                fd.append('address', address);
+                _loading();
+                $.ajax({
+                    url: "/Locations/LocationTables/saveLocation",
+                    type: "POST",
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        _loading();
+                        data = JSON.parse(data);
+                        if (data["status"] == "error") {
+                            _alert("error", data["msg"]);
+                        } else {
+                            _alert("success", "Guardado Correctamente");
+                            $("#admin_panel_location").modal("hide");
+                            resetData();
+                            model.init("Region");
+                            model1.init("Conjunto");
+                            model3.init("SubLocations");
+                            model2.init("");
+                            //$("#img_pre").attr("src", "/Content/Images/planos/No-Imagen-Disponible.png");
+                        }
+                      
+
+                    },
+                    error: function () {
+                        //_loading();
+                        _alert("error", "Ha ocurrido un error");
+                        _loading();
+                    }
+                });
+            }
+
+            jQuery("#admin_panel_location").hide();
+            model.init("Region");
+            model1.init("Conjunto");
+            model2.init("");
+            model3.init("SubLocations");
+            table.init();
+            table1.init();
+            table2.init();
+            table3.init();
+            var rootdata = { id: "null", name: "Home" }
+            tree.init(rootdata)
+          //  setRoute(id);
+        });
+
+        function checkRealObject(idTable, thisrow) {
+            debugger;
+            var nameCreate = jQuery(thisrow).closest("tr").children('td:first').text();
+
+            if (idTable == "all") { //show all values
+                _confirm(
+                    {
+                        title: "Eliminar Ubicación",
+                        message: '¿Seguro que desea eliminar la relacion de la ubicación "' + nameCreate + '"?, Esta acción puede provocar perdida de datos.',
+                        action: function () {
+                            jQuery('#selectLocations option').show();
+                            jQuery(this).closest("tr").remove();
+                        }
+                    }
+                );
+            } else {
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/checkRealObject",
+                    type: "POST",
+                    data: {locationID: idTable},
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        if (data == "false") {
+                            jQuery('#selectLocations option:contains(' + nameCreate + ')').show();
+                            jQuery(thisrow).closest("tr").remove();
+                        } else {
+                            _alert("error", "Esta Ubicación contiene activos!");
+                        }
+                        _loading();
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ocurrio un error");
+                    }
+                });
+            }
+        }
+       
+            jQuery("#subtab").unbind("click.subtab");
+            jQuery("#subtab").bind("click.subtab", function () {
+                idselectlocation = "";
+                jQuery("#tabHeader1 li").removeClass("active")
+                jQuery("#tabContent1 div").removeClass("active")
+                jQuery("#subtab").addClass("active")
+                jQuery("#subSection").addClass("active")
+                jQuery("#SububicationTableInfo").show()
+                var clone = jQuery("#tlocations2").clone(false);
+                jQuery(clone).attr("id", "tablenew");
+                jQuery("#tablelocationselect").html("");
+                var div=jQuery("<div>").append(jQuery("<label>Ubicaciones ya Asignadas</label>")).append("<br>").append(clone);
+                jQuery("#tablelocationselect").html(div);
+                var newdiv = jQuery("<input value=\"Asignar\" class=\"btn blue\" type=\"button\" id=\"assign\">");
+                jQuery("#assign").remove();
+                jQuery("#tSublocations2").after(newdiv);
+                jQuery("#tablenew tbody tr").unbind("click.tr");
+                jQuery("#tablenew tbody tr").bind("click.tr", function () {
+                    jQuery(this).closest("tbody").find("tr").removeClass("active");
+                    jQuery(this).addClass("active")
+                    idselectlocation = jQuery(this).data("id");
+                    jQuery("#deleteAllSubLocation").trigger("click");
+                });
+                jQuery("#assign").unbind("click.assing");
+                jQuery("#assign").bind("click.assing", function () {
+                    debugger;
+                    var sublocationsarray = [];
+                    jQuery("#tSublocations2 tbody").find("[data-id]").each(function () { sublocationsarray.push(jQuery(this).data("id")) })
+                    var jsonsubs = JSON.stringify(sublocationsarray)
+                    var name = jQuery("[name=name]").val()
+                    var number = jQuery("[name=number]").val()
+                    if (idselectlocation.length > 0) {
+                        if (sublocationsarray.length > 0) {
+                            jQuery.ajax({
+                                url: "/Locations/LocationTables/Assign",
+                               
+                                data: { idlocation: idselectlocation, sublocations: jsonsubs, name: name, number: number, idoffice: selectedId },
+                                type: "POST",
+                                beforeSend: _loading(),
+
+                                success: function (data) {
+                                    var result = JSON.parse(data);
+                                    if (result.status!="success") {
+                                        alert(result.status);
+                                      
+                                    } else {
+                                        jQuery("#deleteAllSubLocation").trigger("click");
+                                        selectedId = result.idoffice;
+                                        jQuery("#tablenew tbody tr").filter(".active").data("id",result.idlocation);
+                                        alert("Las sub ubicaciones se asignaron correctamente")
+                                        
+                                    }
+                                    _loading();
+                                },
+                                error: function (errorThrown) {
+                                    alert("Ocurrio un error, intenta más tarde.");
+                                    jQuery("#T9").val("");
+                                    _loading();
+                                }
+                            });
+                        } else {
+                            alert("agrega almenos una sub ubicacion");
+                        }
+                    } else {
+                        alert("elige una ubicacion de la tabla");
+                    }
+
+                })
+            });
+           
+        
+        
+      
+        //START - Import Section
+        jQuery("#T9").bind("change.changeImage", function () {
+
+            var fa = new FormData();
+            //var idcateg = jQuery("#importbtn").data("idcat");
+
+            fa.append('file', jQuery('#T9')[0].files[0]);
+            //fa.append('idcategory', idcateg);
+            var fileup = jQuery('#T9')[0].files[0]
+            var format = fileup.name.split('.');
+
+            var ext = format[format.length - 1];
+            ext = ext.toLowerCase();
+
+            if (ext == "xlsx") {
+                jQuery.ajax({
+                    url: "/Locations/LocationTables/ImpExcelUbicacion",
+                    contentType: false,
+                    processData: false,
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                        if (data != null) {
+                            jQuery('#excelTable').html("");
+                            jQuery('#excelTable').html(data);
+                            jQuery('#excelTable').modal("show");
+                            jQuery("#T9").val("");
+                            _loading();
+                        } else {
+                            alert("Ocurrio un error, Verifique el Archivo Fuente");
+                            jQuery("#T9").val("");
+                            _loading();
+                        }
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        jQuery("#T9").val("");
+                        _loading();
+                    }
+                });
+
+            } else {
+                alert("Elija Un Archivo de Excel(solo Formato xlsx)");
+                jQuery("#T9").val("");
+            }
+            return null;
+        });
+        //END - Import Section
+    </script>
+

@@ -1,0 +1,161 @@
+﻿@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.User.Models;
+@model JArray
+
+@{
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["movement"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+
+        }
+        if (x.Contains("c"))
+        {
+
+            add = "c";
+
+        }
+    }
+    
+  
+
+}
+
+<div class="row-fluid">
+    <div class="span12">
+        <div class="light_blue set_color">
+            <div class="well-header widgetclient titleclient">
+                <h5>Lista de Movimientos</h5>
+                @if (allp["movement"]["grant"].Count() > 0)
+                {
+                    foreach (string x in allp["movement"]["grant"])
+                    {
+                        if (x.Contains("c"))
+                        {
+                            <div class="btn-group">
+                                @{string process = ViewBag.idProcess;
+                                <button class="btn btn-mini dark_green fileinput-button" onclick="window.location.href='/Movement/MovementProfile/newProfile?idProcess=@ViewBag.idProcess'" data-original-title="Agregar Movimiento" rel="tooltip" data-placement="left">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                                }
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <div class="well-content no-search">
+                <div class="divTree">
+                    <table class="table table-striped table-bordered table-hover" id ="movementTableContent">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Creador</th>
+                                <th>Fecha de Creación</th>
+                                <th>Acciones</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (JsonConvert.SerializeObject(Model) == "[]")
+                            { 
+                                <tr >
+                                    <td colspan ="4">
+                                        <p class="passCenter">No extisten movimientos..</p>
+                                    </td>
+                                </tr>
+                            }
+
+                            @foreach (JObject profiles in Model)
+                            {
+                                <tr data-name="@profiles["name"]" data-id="@profiles["_id"]">
+                                    <td>@profiles["name"]</td>
+                                    <td>
+                                        @{try
+                                          {
+                                              UserTable userTable = new UserTable();
+                                              string rowString = userTable.GetRow(profiles["Creator"].ToString());
+                                              JObject creatorSrting = JsonConvert.DeserializeObject<JObject>(rowString);  
+                                            @creatorSrting["user"].ToString()
+                                          }
+                                          catch (Exception e) { }
+                                        }
+                                    </td>
+                                    <td>@profiles["CreatedDate"]
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if (allp["movement"]["grant"].Count() > 0)
+                                            {
+                                                foreach (string x in allp["movement"]["grant"])
+                                                {
+                                                    if (x.Contains("u"))
+                                                    {
+                                                <a class="btn" href="/Movement/MovementProfile/newProfile?idProfile=@profiles["_id"]&idProcess=@ViewBag.idProcess"><i class="icon-edit"></i></a>
+                                                    }
+                                                }
+                                            }
+
+                                            @if (allp["movement"]["grant"].Count() > 0)
+                                            {
+                                                foreach (string x in allp["movement"]["grant"])
+                                                {
+                                                    if (x.Contains("d"))
+                                                    {
+                                                <a class="btn" href="#" onclick="deleteMovement(this)"><i class="icon-trash"></i></a>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteMovement(thisMovement) {
+        _idMovement = jQuery(thisMovement).closest("tr").data("id");
+        _confirm({
+            title: "Eliminar Movimiento",
+            message: "El realizar esta acción puede ocasionar pérdida de información en las solicitudes, seguro que desea continuar?",
+            action: function () {
+                jQuery.ajax({
+                    url: "/Movement/Movement/deleteMovement",
+                    type: "POST",
+                    data: { idMovement: _idMovement },
+                    beforeSend: _loading(),
+                    complete: _loading(),
+                    success: function (data) {
+                        _alert("success", "Eliminado Correctamente");
+                        jQuery(thisMovement).closest("tr").remove();
+                        if (jQuery('#movementTableContent tbody tr').length == 0) {
+                            jQuery('#movementTableContent').append(jQuery(" <tr />").append(
+                                jQuery("<td />").attr("colspan", "4").append(
+                                jQuery("<p />").addClass("passCenter").text("No extisten movimientos.."))));      
+                        }
+                    },
+                    error: function (errorThrown) {
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+        });
+    }
+</script>

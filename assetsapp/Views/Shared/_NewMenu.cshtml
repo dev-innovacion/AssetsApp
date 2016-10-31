@@ -1,0 +1,873 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    string thisAction = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("action").ToLower();
+    string thisController = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("controller").ToLower();
+    string thisArea = null;
+    try
+    {
+        thisArea = ViewContext.RouteData.DataTokens["area"].ToString().ToLower();
+    }
+    catch (Exception e) { }
+
+    var datos = "";
+    var dataclient = "";
+    try
+    {
+        if (Session["PermissionsClient"].ToString() != null)
+        {
+            dataclient = Session["PermissionsClient"].ToString();
+
+        }
+        if (Session["Permissions"].ToString() != null)
+        {
+            datos = Session["Permissions"].ToString();
+        }
+        else
+        {
+            Response.Redirect("/User/login");
+        }
+
+    }
+    catch (Exception ex)
+    {
+        if (Request.Cookies["permissions"] != null)
+        {
+
+            if (Request.Cookies["_loggeduser"] != null)
+            {
+                Session["LoggedUser"] = Request.Cookies["_loggeduser"].Value;
+            }
+            if (Request.Cookies["_id2"] != null)
+            {
+                Session["_id"] = Request.Cookies["_id2"].Value;
+            }
+            if (Request.Cookies["_picture"] != null)
+            {
+                Session["ProfilePicture"] = Request.Cookies["_picture"].Value;
+            }
+            if (Request.Cookies["permissions"] != null)
+            {
+                Session["Permissions"] = Request.Cookies["permissions"].Value;
+            }
+            if (Request.Cookies["permissionsclient"] != null)
+            {
+                Session["PermissionsClient"] = Request.Cookies["permissionsclient"].Value;
+            }
+
+            dataclient = Session["PermissionsClient"].ToString();
+            datos = Session["Permissions"].ToString();
+        }
+
+        else
+        {
+            Response.Redirect("/User/login");
+        }
+
+    }
+
+    JObject permissionsClient = JsonConvert.DeserializeObject<JObject>(dataclient);
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+   
+}
+
+<!-- Inicio Menu -->
+<div id="main_navigation" class="blue">
+    <div class="inner_navigation">
+        <ul class="main">
+            @*-- Dashboard --*@
+            <li @try
+                {
+                    if (thisController == "home" && thisArea == null)
+                    {<text>class="active"</text>}
+
+                }
+                catch (Exception ex) { } >
+                <a href="/" @if (thisController == "home")
+                            {<text>id="current"</text>}><i class="icon-dashboard"></i>Dashboard</a>
+            </li>
+
+            @*-- Catálogos --*@
+            @*<li>
+                <a href="#" id="current">
+                    <i class="icon-book"></i>Catálogos2
+                </a>
+                <ul class="sub_main">
+                    <li class="active">
+                        <a href="/User/User">
+                            <i class="icon-user"></i> Usuarios2
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Locations/Location">
+                            <i class="icon-building"></i> Conjuntos y ubicaciones
+                        </a>
+                    </li>
+                </ul>
+            </li>*@
+         @try
+         {
+            if ((allp["users"]["grant"].Children().Contains("r") && permissionsClient["users"]["grant"].Children().Contains("r")) || (allp["location"]["grant"].Children().Contains("r") && permissionsClient["location"]["grant"].Children().Contains("r")))
+            {
+            <li>
+                <a href="#">
+                    <i class="icon-book"></i>Catálogos
+                </a>
+                <ul class="sub_main">
+                     @try
+                        {
+                            if(allp["users"]["grant"].Count() > 0 && permissionsClient["users"]["grant"].Count() > 0)
+                            {
+
+                                if (allp["users"]["grant"].Children().Contains("r") && permissionsClient["users"]["grant"].Children().Contains("r"))
+                                {
+                                    <li>
+                                        <a href="/User/User">
+                                            <i class="icon-user"></i> Usuarios
+                                        </a>
+                                    </li>
+                                        
+                                }
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            <li>
+                                <a href="/User/User">
+                                    <i class="icon-user"></i> Usuarios
+                                </a>
+                            </li>
+                        }
+                    @try
+                        {
+                            if (allp["employee"]["grant"].Count() > 0 && permissionsClient["employee"]["grant"].Count() > 0)
+                            {
+
+                                if (allp["employee"]["grant"].Children().Contains("r") && permissionsClient["employee"]["grant"].Children().Contains("r"))
+                                {
+                                    <li>
+                                        <a href="/Employee/Employee">
+                                            <i class="icon-user"></i> Responsables
+                                        </a>
+                                    </li>
+
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                            <li>
+                                <a href="/Employee/Employee">
+                                    <i class="icon-user"></i> Empleados
+                                </a>
+                            </li>
+                        }
+                    @try
+                        {
+                            if (allp["location"]["grant"].Count() > 0 && permissionsClient["location"]["grant"].Count() > 0)
+                            {
+
+                                if (allp["location"]["grant"].Children().Contains("r") && permissionsClient["location"]["grant"].Children().Contains("r"))
+                                    {
+                    @*<li>
+                        <a href="/Locations/Location">
+                            <i class="icon-building"></i> Ubicaciones
+                        </a>
+                    </li>*@
+                    <li>
+                        <a href="/Locations/LocationTables">
+                            <i class="icon-building"></i> Ubicaciones
+                        </a>
+                    </li>
+@*
+                      <li>
+                        <a href="/Locations/Location">
+                            <i class="icon-building"></i> Arbol de ubicaciones
+                        </a>
+                    </li>
+*@
+                         }
+                         }}catch(Exception ex){
+                         
+                          <li>
+                        <a href="/Locations/LocationTables">
+                            <i class="icon-building"></i> Oficinas y ubicaciones
+                        </a>
+                          </li>
+                            <li>
+                        <a href="/Locations/Location">
+                            <i class="icon-building"></i> Arbol de ubicaciones
+                        </a>
+                    </li>
+                         }
+
+                </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+            @*-- Activos --*@
+            @try
+            {
+                if ((allp["objects"]["grant"].Children().Contains("r") && permissionsClient["objects"]["grant"].Children().Contains("r")) || (allp["objectsreference"]["grant"].Children().Contains("r") && permissionsClient["objectsreference"]["grant"].Children().Contains("r")))
+                {
+                    <li>
+                        <a href="#">
+                            <i class="icon-tags"></i> Activos
+                        </a>
+                        <ul class="sub_main">
+                            @try
+                            {
+                                if (allp["objects"]["grant"].Count() > 0 && permissionsClient["objects"]["grant"].Count() > 0)
+                                {
+
+                                    if (allp["objects"]["grant"].Children().Contains("r") && permissionsClient["objects"]["grant"].Children().Contains("r"))
+                                    {
+                                        <li>
+                                            <a href="/ObjectAdmin/ObjectAdmin">
+                                                <i class="icon-tag"></i> Control de activos
+                                            </a>
+                                        </li>
+                                    }
+                                }
+            
+                            }
+                            catch (Exception ex) { }
+            @try 
+            { 
+                if (allp["objectsreference"]["grant"].Count() > 0 && permissionsClient["objectsreference"]["grant"].Count() > 0)
+                {
+                    if (allp["objectsreference"]["grant"].Children().Contains("r") && permissionsClient["objectsreference"]["grant"].Children().Contains("r"))
+                    {
+                        <li>
+                            <a href="/ObjectReference/Object">
+                                <i class="icon-sitemap"></i> Referencias y categorías
+                            </a>
+                        </li>
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+                        <li>
+                            <a href="/Assignments/Assignments">
+                                <i class="icon-ok-circle"></i> Asignaciones de activos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Assignments/Assignments/Voucher">
+                                <i class="icon-table"></i> Responsivas
+                            </a>
+                        </li>    
+
+            </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+
+            @*-- Movimientos --*@
+           @try {
+             
+                if (allp["demand"]["grant"].Children().Contains("r") && permissionsClient["demand"]["grant"].Children().Contains("r"))
+                   {
+            <li>
+                <a href="#">
+                    <i class="icon-random"></i> Movimientos
+                </a>
+                <ul class="sub_main">
+                @try {
+                    if (allp["demand"]["grant"].Count() > 0 && permissionsClient["demand"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["demand"]["grant"].Children().Contains("r") && permissionsClient["demand"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/ObjectAdmin/Demand">
+                            <i class="icon-file-text"></i> Administrar solicitudes
+                        </a>
+                    </li>}}
+                }
+                catch (Exception ex) {  <li>
+                        <a href="/ObjectAdmin/Demand">
+                            <i class="icon-file-text"></i> Administrar solicitudes
+                        </a>
+                    </li>}
+                </ul>
+            </li>
+               
+                 }}
+                catch (Exception ex) { }
+
+            @*-- Etiquetaje --*@
+        @try
+          {
+                            if (allp["inventory"]["grant"].Count() > 0 && permissionsClient["inventory"]["grant"].Count() > 0)
+                            {
+
+                                if (allp["inventory"]["grant"].Children().Contains("r") && permissionsClient["inventory"]["grant"].Children().Contains("r"))
+                                    {
+            <li>
+                <a href="#">
+                    <i class="icon-th"></i> Etiquetaje
+                </a>
+                <ul class="sub_main">
+                    @try {
+                   
+                    <li style="display:none">
+                        <a href="/Tags/Labeling">
+                            <i class="icon-tags"></i> Creación de etiquetas
+                        </a>
+                    </li>
+                    }
+                    catch (Exception ex) { }
+                    @try {
+                    <li>
+                        <a href="/Tags/Tags">
+                            <i class="icon-share"></i> Descargar/subir etiquetaje
+                        </a>
+                    </li>
+                    }
+                    catch (Exception ex) {
+                    
+                    }
+                </ul>
+            </li>
+              }}}
+                catch (Exception ex) { }
+            @*-- Inventarios --*@
+            @try
+            {
+                if (allp["inventory"]["grant"].Count() > 0 && permissionsClient["inventory"]["grant"].Count() > 0)
+                {
+                    if (allp["inventory"]["grant"].Children().Contains("r") && permissionsClient["inventory"]["grant"].Children().Contains("r"))
+                    { 
+               <li>
+                <a href="#">
+                    <i class="icon-edit"></i> Inventarios
+                </a>
+                <ul class="sub_main">
+                @try
+                {
+                    if (allp["inventory"]["grant"].Count() > 0 && permissionsClient["inventory"]["grant"].Count() > 0)
+                    {
+
+                        if (allp["inventory"]["grant"].Children().Contains("r") && permissionsClient["inventory"]["grant"].Children().Contains("r"))
+                        {
+@*
+                    <li>
+                        <a href="/Inventory/SceneInventory">
+                            <i class="icon-upload-alt"></i> Recepción de inventario
+                        </a>
+                    </li>
+              
+             
+                    <li>
+                        <a href="/Inventory/Inventory">
+                            <i class="icon-calendar"></i> Calendarizar inventario
+                        </a>
+                    </li>
+*@
+                     <li>
+                         <a href="/Inventory/SceneInventory/setSdf?idInventory=0">
+                            <i class="icon-check">
+                             </i> Cotejo de activos
+                        </a>
+                    </li>
+                     <li>
+                         <a href="/Tags/Tags/Index2">
+                             <i class="icon-share">
+                             </i> Descargar/subir inventario
+                         </a>
+                    </li>
+                        }
+                    }
+                }
+                catch (Exception ex)
+                { 
+                 <li>
+                        <a href="/Inventory/SceneInventory">
+                            <i class="icon-upload-alt"></i> Recepción de inventario
+                        </a>
+                    </li>
+              
+             
+                    <li>
+                        <a href="/Inventory/Inventory">
+                            <i class="icon-calendar"></i> Calendarizar inventario
+                        </a>
+                    </li>
+                }
+                </ul>
+            </li>
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+            @*-- Reportes --*@
+          @try {
+               if (allp["reports"]["grant"].Count() > 0 && permissionsClient["reports"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["reports"]["grant"].Children().Contains("r") && permissionsClient["reports"]["grant"].Children().Contains("r"))
+                            {
+            <li>
+                <a href="/Reports/Reports">
+                    <i class="icon-bar-chart"></i> Reportes
+                </a>
+            </li>
+          }}}
+          catch (Exception ex) { 
+           <li>
+                <a href="/Reports/Reports">
+                    <i class="icon-bar-chart"></i> Reportes
+                </a>
+            </li>
+          
+          }
+
+            @*-- Procesos y Reglas --*@
+@*
+             @try
+            {
+                if ((allp["processes"]["grant"].Children().Contains("r") && permissionsClient["processes"]["grant"].Children().Contains("r")) || (allp["rules"]["grant"].Children().Contains("r") && permissionsClient["rules"]["grant"].Children().Contains("r")))
+                {
+            <li>
+                <a href="#">
+                    <i class="icon-cogs"></i> Procesos y reglas
+                </a>
+                <ul class="sub_main">
+                 @try {
+                     if (allp["processes"]["grant"].Count() > 0 && permissionsClient["processes"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["processes"]["grant"].Children().Contains("r") && permissionsClient["processes"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Processes/Process">
+                            <i class="icon-list"></i> Lista de procesos
+                        </a>
+                    </li>
+               
+                    <li>
+                        <a href="/Processes/Diagram">
+                            <i class="icon-puzzle-piece"></i> Diagramador de procesos
+                        </a>
+                    </li>
+                 }}}
+                 catch (Exception ex) {
+                  <li>
+                        <a href="/Processes/Process">
+                            <i class="icon-list"></i> Lista de procesos
+                        </a>
+                    </li>
+               
+                    <li>
+                        <a href="/Processes/Diagram">
+                            <i class="icon-puzzle-piece"></i> Diagramador de procesos
+                        </a>
+                    </li>
+                 }
+                 @try {
+                       if (allp["rules"]["grant"].Count() > 0 && permissionsClient["rules"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["rules"]["grant"].Children().Contains("r") && permissionsClient["rules"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Rule/ObjectRule">
+                            <i class="icon-warning-sign"></i> Reglas
+                        </a>
+                    </li>
+                 }}}catch (Exception ex) {
+                      <li>
+                        <a href="/Rule/ObjectRule">
+                            <i class="icon-warning-sign"></i> Reglas
+                        </a>
+                    </li>}
+                </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+*@
+            @*-- Avanzado --*@
+         @try
+         {
+             if ((allp["profiles"]["grant"].Children().Contains("r") && permissionsClient["profiles"]["grant"].Children().Contains("r")) || (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r")) || (allp["movement"]["grant"].Children().Contains("r") && permissionsClient["movement"]["grant"].Children().Contains("r")) || (allp["lists"]["grant"].Children().Contains("r") && permissionsClient["lists"]["grant"].Children().Contains("r")) || (allp["designs"]["grant"].Children().Contains("r") && permissionsClient["designs"]["grant"].Children().Contains("r")))
+             {
+            <li>
+                <a href="#">
+                    <i class="icon-cog"></i> Avanzado
+                </a>
+                <ul class="sub_main">
+                    <li>
+                        <a href="/LogBook/LogBook">
+                            <i class="icon-building"></i> Bitácora
+                        </a>
+                    </li>
+                @try {
+                     if (allp["profiles"]["grant"].Count() > 0 && permissionsClient["profiles"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["profiles"]["grant"].Children().Contains("r") && permissionsClient["profiles"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/User/UserProfile">
+                            <i class="icon-user"></i> Puesto de usuario
+                        </a>
+                    </li>
+                }}}catch (Exception ex) {
+                <li>
+                        <a href="/User/UserProfile">
+                            <i class="icon-user"></i> Puesto de usuario
+                        </a>
+                    </li>
+                
+                }
+@*
+                 @try {
+               if (allp["profiles"]["grant"].Count() > 0 && permissionsClient["profiles"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["profiles"]["grant"].Children().Contains("r") && permissionsClient["profiles"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Locations/LocationProfile">
+                            <i class="icon-building"></i> Perfiles de ubicaciones
+                        </a>
+                    </li>
+                     
+                  }}}catch (Exception ex) {
+                   <li>
+                        <a href="/Locations/LocationProfile">
+                            <i class="icon-building"></i> Perfiles de ubicaciones
+                        </a>
+                    </li>}
+                 @try {
+                      if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Locations/customType">
+                            <i class="icon-wrench"></i> Campos de ubicaciones
+                        </a>
+                    </li>
+                 }}
+                  }catch (Exception ex) {
+                     <li>
+                        <a href="/Locations/customType">
+                            <i class="icon-wrench"></i> Campos de ubicaciones
+                        </a>
+                    </li>
+                  }
+*@
+                 @try {
+                     if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/User/customType">
+                            <i class="icon-wrench"></i> Campos de usuario
+                        </a>
+                    </li>}}
+                 }catch (Exception ex) {
+                 
+                  <li>
+                        <a href="/User/customType">
+                            <i class="icon-wrench"></i> Campos de usuario
+                        </a>
+                    </li>
+                 }
+                 @try {
+                        if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/ObjectReference/customType">
+                            <i class="icon-wrench"></i> Campos de activos
+                        </a>
+                    </li>
+                  }}}catch (Exception ex) { 
+                   <li>
+                        <a href="/ObjectReference/customType">
+                            <i class="icon-wrench"></i> Campos de activos
+                        </a>
+                    </li>
+                  
+                  }
+                 @try {
+                        if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Movement/CustomType">
+                            <i class="icon-wrench"></i> Campos de movimientos
+                        </a>
+                    </li>
+                     
+                   }}}catch (Exception ex) { 
+                   <li>
+                        <a href="/Movement/CustomType">
+                            <i class="icon-wrench"></i> Campos de movimientos
+                        </a>
+                    </li>
+                   
+                   
+                   
+                   }
+                 @try {
+                  if (allp["movement"]["grant"].Count() > 0 && permissionsClient["movement"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["movement"]["grant"].Children().Contains("r") && permissionsClient["movement"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Movement/Movement">
+                            <i class="icon-random"></i> Administración de movimientos
+                        </a>
+                    </li>
+                  }}}catch (Exception ex) {
+                  <li>
+                        <a href="/Movement/Movement">
+                            <i class="icon-random"></i> Administración de movimientos
+                        </a>
+                    </li>
+                  }
+                  <!--  @@try
+                    {
+                        if (allp["profiles"]["grant"].Count() > 0 && permissionsClient["profiles"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["profiles"]["grant"].Children().Contains("r") && permissionsClient["profiles"]["grant"].Children().Contains("r"))
+                            {
+                                <li>
+                                    <a href="/Movement/MovementProfile">
+                                        <i class="icon-random"></i> Perfiles de movimientos
+                                    </a>
+                                </li>
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        <li>
+                            <a href="/Movement/MovementProfile">
+                                <i class="icon-random"></i> Administración de perfiles de movimientos
+                            </a>
+                        </li>
+                    }-->
+                  
+                 @try {
+                      if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["custom_fields"]["grant"].Children().Contains("r") && permissionsClient["custom_fields"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/Movement/Adjudicating">
+                            <i class="icon-thumbs-up-alt"></i> Configuración de dictaminadores
+                        </a>
+                    </li>
+                  }}}catch (Exception ex) { 
+                  
+                    <li>
+                        <a href="/Movement/Adjudicating">
+                            <i class="icon-thumbs-up-alt"></i> Configuración de dictaminadores
+                        </a>
+                    </li>
+                  
+                  }
+                 @try {
+                         if (allp["lists"]["grant"].Count() > 0 && permissionsClient["lists"]["grant"].Count() > 0)
+                        {
+
+                            if (allp["lists"]["grant"].Children().Contains("r") && permissionsClient["lists"]["grant"].Children().Contains("r"))
+                            {
+                    <li>
+                        <a href="/List/List/index">
+                            <i class="icon-list"></i> Administrar listas
+                        </a>
+                    </li>
+                  }}}catch (Exception ex) { 
+                  
+                    <li>
+                        <a href="/List/List/index">
+                            <i class="icon-list"></i> Administrar listas
+                        </a>
+                    </li>
+                  }
+                 @try {
+           if (allp["designs"]["grant"].Count() > 0 && permissionsClient["designs"]["grant"].Count() > 0)
+              {
+
+                            if (allp["designs"]["grant"].Children().Contains("r") && permissionsClient["designs"]["grant"].Children().Contains("r"))
+                   {
+                    <li>
+                        <a href="/Design/Design">
+                            <i class="icon-picture"></i> Administrar diseño
+                        </a>
+                    </li>
+                  }}}catch (Exception ex) { 
+                  <li>
+                        <a href="/Design/Design">
+                            <i class="icon-picture"></i> Administrar diseño
+                        </a>
+                    </li>
+                  
+                  }
+                
+                    <li>
+                        <a href="/Semaphore/Semaphore">
+                            <i class="icon-circle"></i> Administrar Semáforos
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+            @*-- Mensajería --*@
+            @try
+            {
+                if ((allp["messages"]["grant"].Children().Contains("r") && permissionsClient["messages"]["grant"].Children().Contains("r")) || (allp["tickets"]["grant"].Children().Contains("r") && permissionsClient["tickets"]["grant"].Children().Contains("r")) || (allp["support"]["grant"].Children().Contains("r") && permissionsClient["support"]["grant"].Children().Contains("r")))
+                {
+            <li>
+                <a href="#">
+                    <i class="icon-bullhorn"></i> Mensajería
+                </a>
+                <ul class="sub_main">
+                   
+                @try {
+                if (allp["messages"]["grant"].Count() > 0 && permissionsClient["messages"]["grant"].Count() > 0)
+                {
+
+                            if (allp["messages"]["grant"].Children().Contains("r") && permissionsClient["messages"]["grant"].Children().Contains("r"))
+                   {
+                    <li>
+                        <a href="/Message/Message">
+                            <i class="icon-envelope"></i> Mensajes
+                        </a>
+                    </li>
+                   }}}catch (Exception ex) {
+                    <li>
+                        <a href="/Message/Message">
+                            <i class="icon-envelope"></i> Mensajes
+                        </a>
+                    </li>
+                   
+                   }
+@**
+                 @try {
+         if (allp["tickets"]["grant"].Count() > 0 && permissionsClient["tickets"]["grant"].Count() > 0)
+                {
+
+                            if (allp["tickets"]["grant"].Children().Contains("r") && permissionsClient["tickets"]["grant"].Children().Contains("r"))
+                   {
+                    <li>
+                        <a href="/Tickets/Tickets">
+                            <i class="icon-ticket"></i> Tickets
+                        </a>
+                    </li>
+                    }}}catch (Exception ex) { 
+                     <li>
+                        <a href="/Tickets/Tickets">
+                            <i class="icon-ticket"></i> Tickets
+                        </a>
+                    </li>
+                    
+                    }
+**@
+                 @try {
+                 if (allp["support"]["grant"].Count() > 0 && permissionsClient["support"]["grant"].Count() > 0)
+                {
+
+                            if (allp["support"]["grant"].Children().Contains("r") && permissionsClient["support"]["grant"].Children().Contains("r"))
+                   {
+                    <li style="display:none">
+                        <a href="#">
+                            <i class="icon-stethoscope"></i> Soporte
+                        </a>
+                    </li>
+                      }}}catch (Exception ex) {
+                      
+                        <li style="display:none">
+                        <a href="#">
+                            <i class="icon-stethoscope"></i> Soporte
+                        </a>
+                       </li>
+                      
+                      }
+             
+                </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+             @*-- Hardware --*@
+            @try
+            {
+                if ((allp["hardware"]["grant"].Children().Contains("r") && permissionsClient["hardware"]["grant"].Children().Contains("r")) || (allp["edgeware"]["grant"].Children().Contains("r") && permissionsClient["edgeware"]["grant"].Children().Contains("r")))
+             {
+            <li>
+                <a href="#">
+                    <i class="icon-laptop"></i> Hardware
+                </a>
+                <ul class="sub_main">
+                     
+                @try {
+               if (allp["hardware"]["grant"].Count() > 0 && permissionsClient["hardware"]["grant"].Count() > 0)
+                {
+
+                  if (allp["hardware"]["grant"].Children().Contains("r") && permissionsClient["hardware"]["grant"].Children().Contains("r"))
+                   {
+                    <li>
+                        <a href="/Hardware/Hardware">
+                            <i class="icon-mobile-phone"></i> Handhelds
+                        </a>
+                    </li>
+                     }}}catch (Exception ex) { 
+                     
+                      <li>
+                        <a href="/Hardware/Hardware">
+                            <i class="icon-mobile-phone"></i> Catálogo de hardware
+                        </a>
+                    </li>
+                     
+                     }
+                 @try
+                 {
+                     if (allp["edgeware"]["grant"].Count() > 0 && permissionsClient["edgeware"]["grant"].Count() > 0)
+                     {
+
+                         if (allp["edgeware"]["grant"].Children().Contains("r") && permissionsClient["edgeware"]["grant"].Children().Contains("r"))
+                   {                    
+                    <li style="display:none">
+                        <a href="#">
+                            <i class="icon-rss"></i> Edgeware
+                        </a>
+                    </li >
+                     }}}catch (Exception ex) { 
+                       <li style="display:none">
+                        <a href="#">
+                            <i class="icon-rss"></i> Edgeware
+                        </a>
+                    </li>
+                     
+                     }
+            
+                </ul>
+            </li>
+            }}
+            catch (Exception ex) { }
+
+            @*End :: New Menu*@
+        </ul>
+    </div>
+</div>
+<!-- Fin de Menu -->

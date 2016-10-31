@@ -1,0 +1,941 @@
+﻿@{Layout = null;}
+
+
+@model List<List<string>>
+@{
+    ViewBag.Title = "Table Excel";
+    int count = 0;
+    int index = 0;
+    List<string> listheads = new List<string>();
+    string idcategory = ViewData["idcategory"].ToString();
+    int idselect = 0;
+   string cad="";
+   int selectvalue = 0;
+   var file = ViewData["Filerequest"];
+   string filename= Request.Files["file"].FileName;
+   filename = filename.Split('.')[0];
+   int nameheadx = 0;
+  
+   
+   
+}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+
+    <h3 class="modal-header-text">@filename</h3>
+</div>
+<div class="modal-body">
+    <div class="row-fluid">
+        <div class="span5">
+
+            @foreach (var item in Model)
+            {
+
+                foreach (var td in item)
+                {
+                    if (td == "")
+                    {
+                        listheads.Add("Undefined"+nameheadx);
+                        nameheadx++;
+                    }
+                    else
+                    {
+                        listheads.Add(td);
+                    }
+
+                }
+              
+
+
+                break;
+               
+            }
+            <h2>  Campos del Activo :</h2>
+            <br />
+            <div style="overflow:auto;max-height:350px;">
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">ID Artículo :</label></div>
+
+                    <div class="span7">
+                        <select id="name1" class="chosen" data-required="1" data-name="object_id">
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br/>
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Descripción :</label></div>
+
+                    <div class="span7">
+                        <select id="name2" class="chosen" data-required="1" data-name="name">
+                            @{selectvalue = 0; index = 0;}
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br />
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Marca :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name3" class="chosen" data-required="0" data-name="marca">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br />
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Modelo :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name4" class="chosen" data-required="0" data-name="modelo">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br />
+                </div>
+                <div class="row-fluid" style="display:none">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Perfil de Activo :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name5" class="chosen" data-required="0" data-name="perfil">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br />
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Departamento :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name6" class="chosen" data-required="0" data-name="department">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+
+                    <br />
+                </div>
+                <div class="row-fluid" style="display:none">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Ubicación :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name7" class="chosen" data-required="0" data-name="location_id">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+                    <br />
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Precio de Compra :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name8" class="chosen" data-required="0" data-name="precio">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Tipo de Activo :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name11" class="chosen" data-required="0" data-name="assettype">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Imagen :</label></div>
+                    @{selectvalue = 0; index = 0;}
+                    <div class="span7">
+                        <select id="name9" class="chosen" data-required="0" data-name="image">
+                            @selectvalue = 0;
+                            @foreach (string opt in listheads)
+                            {
+                                if (index == 0)
+                                {
+                                    <option value="no">Elige una opcion</option>
+                                    index++;
+                                }
+                                <option value="@selectvalue">@opt</option>
+                                selectvalue++;
+                            }
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row-fluid">
+                    <div class="span5"> <label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">Carpeta de imágenes :</label></div>
+                    <div class="span7">
+                        <input  type="text" id="ruta"/>
+                        <button id="filebtn" class="btn btn-mini purple  fileinput-button" data-idcat="0">
+                            <i class="icon-cloud-upload icon-white"></i>
+                            <span>Seleccionar</span>
+                            <input type="file" id="fileImagen" />
+                        </button>
+                        
+                    </div>
+                </div>
+                <br />
+                @foreach (var datacateg in (List<List<string>>)ViewData["categoriedata"])
+                {
+
+                    index = 0;
+                    selectvalue = 0;
+                    List<string> listrowscat = new List<string>();
+                    foreach (string x in datacateg)
+                    {
+                        listrowscat.Add(x.ToString());
+
+                    }
+                    string[] arrayf = listrowscat.ToArray();
+
+                    <div class="row-fluid">
+
+                        <div class="span5"><label style="font-size:16px;padding:5% 0% 0% 0%;float:right;">@arrayf[1] :</label></div>
+                        <div class="span7 no-search">
+                            <select id="@idselect" data-required="@arrayf[2]" data-name="@arrayf[1]" class="chosen">
+                                @foreach (string opt in listheads)
+                                {
+                                    if (index == 0)
+                                    {
+                                        <option value="no">Elige una opcion</option>
+                                        index++;
+                                    }
+                                    <option value="@selectvalue">@opt</option>
+                                    selectvalue++;
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+                    <br />
+                                idselect++;
+                }
+            </div>
+        </div>
+
+        <div class="span7 ">
+            <h2>  Datos A Importar :</h2>
+            <div style="overflow:auto;max-height:350px;">
+                <table id="exceldatatable" class="table table-striped table-hover ">
+
+
+                    @foreach (var item in Model)
+                    {
+                        nameheadx = 0;
+                        <thead>
+                            <tr>
+                                <th class="table-icon hidden-480 gray" data-head="checkall"><input type="checkbox" name="selectall" class="uniform" checked></th>
+                                @foreach (var td in item)
+                                {
+                                    string value = td;
+                                    if (td == "")
+                                    {
+                                        value = "Undefined"+nameheadx;
+                                        nameheadx++;
+                                    }
+                                    <th class="hidden-480 gray" style="color:white;" data-head="@value">@value</th>
+                                }
+                               
+                            </tr>
+                        </thead>
+                                count++;
+                                break;
+
+                    }
+
+                    <tbody>
+                      
+
+                        @foreach (var item in Model)
+                        {
+
+                           
+                            if (count > 1)
+                            {
+                                <tr>
+                                    <td class="table-icon hidden-480">
+                                        <input type="checkbox" name="selectdate" class="uniform" checked>
+                                    </td>
+                                    @foreach (var td in item)
+                                    {
+                                        
+                                        <td class="hidden-480" data-td="@td">@td</td>
+
+                                    }
+                                </tr>
+
+                            }
+                            count++;
+
+                        }
+                    </tbody>
+
+
+
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</div>
+@{
+    
+    string fileLocation2 = ViewData["Filelocation"].ToString();
+   
+    if (System.IO.File.Exists(fileLocation2))
+    {
+
+        System.IO.File.Delete(fileLocation2);
+    }
+   
+}
+<div class="modal-footer">
+    <input value="Guardar" class="btn blue" type="submit" id="saveImport">
+    <input value="Cancelar" class="btn grey" type="button" id="delete_cancel_buttonx">
+</div>
+<script src="~/Content/Scripts/lz-string-1.3.3.js"></script>
+    <script type="text/javascript">
+
+        var repeat = 0;
+        jQuery(document).ready(function (jQuery) {
+            debugger;
+            var idcateg = "";
+            @(new HtmlString("idcateg = '" + idcategory + "';"))
+            var array = new Array();
+            var validateselect = new Array();
+            var arrayhead = new Array();
+            var numhead = new Array();
+            
+            jQuery('#exceldatatable tr').eq(0).each(function () {
+                var i = 0;
+                var j = 0;
+                jQuery(this).find('th').each(function () {
+
+                    if (i > 0) {
+                        arrayhead.push(jQuery(this).html());
+                        numhead.push(j);
+                        j++;
+                    }
+                    i++;
+                });
+            });
+            jQuery("input[name=selectall]").change(function () {
+                jQuery('input[type=checkbox]').each(function () {
+                    if (jQuery("input[name=selectall]:checked").length == 1) {
+                        this.checked = true;
+                    } else {
+                        this.checked = false;
+                    }
+                });
+            });
+            jQuery("#saveImport").on('click', function () {
+
+                var jsondataobj = new Array();
+
+                var relation = new Array();
+
+                var value = jQuery('#name1').val();
+                var value1 = jQuery('#name2').val();
+
+                if (value != "no" && value1 != "no") {
+                    for (var i = 0; i < validateselect.length; i++) {
+
+                        var valuex = jQuery('#' + validateselect[i] + '').val();
+                        var nameselectx = jQuery('#' + validateselect[i] + '').data('name');
+                        var reqselect = jQuery('#' + validateselect[i] + '').data('required');
+
+                        if (valuex == "no" && reqselect == 1) {
+
+                            alert("Elija una Opcion para el Campo : " + nameselectx);
+
+                            return false;
+
+                        }
+
+                    }
+
+                    for (var i = 0; i < array.length; i++) {
+                        var order = { "namecol": null, "numcol": null };
+
+                        for (var j = 0; j < arrayhead.length; j++) {
+
+                            if (array[i].value == numhead[j]) {
+
+                                order.namecol = array[i].selectname;
+                                order.numcol = j;
+                                relation.push(order);
+                            }
+                        }
+                    }
+
+
+
+                    jQuery('#exceldatatable tr').each(function () {
+
+                        var i = 0;
+                        var enter = 0;
+                        var profileFieldsarray = new Array();
+                        var objectprofile = {};
+                        var objects = { "object_id": null, "name": null, "location_id": null, "department": null, "marca": null, "modelo": null, "perfil": null, "precio": null, "assetType":null, "ext": null, "parentCategory": null, "profileFields": null ,"imagen":null};
+                        var check = 0;
+                        if (jQuery(this).find('input[name="selectdate"]').is(':checked')) {
+                            check++;
+
+                        }
+
+                        if (check != 0) {
+                            var w = 0;
+                            jQuery(this).find('td').each(function () {
+
+
+                                if (w > 0) {
+                                    for (var z = 0; z < relation.length; z++) {
+
+                                        if (relation[z].numcol == i) {
+
+                                            if (relation[z].namecol == "name") {
+                                                objects.name = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "object_id") {
+                                                objects.object_id = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "location_id") {
+                                                objects.location_id = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "department") {
+                                                objects.department = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "marca") {
+                                                objects.marca = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "modelo") {
+                                                objects.modelo = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "perfil") {
+                                                objects.perfil = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "precio") {
+                                                objects.precio = jQuery(this).html();
+                                            }
+                                            else if (relation[z].namecol == "assettype") {
+                                                objects.assetType = jQuery(this).html();
+                                            }
+
+                                            else if (relation[z].namecol == "image") {
+                                                objects.imagen = jQuery(this).html();
+                                            }
+                                            else {
+
+                                                var nameprof = "_HTKField" + relation[z].namecol;
+
+
+
+                                                objectprofile[nameprof] = jQuery(this).html();
+                                                profileFieldsarray.push(objectprofile);
+
+                                            }
+                                        }
+                                    }
+                                    i++;
+                                    enter++;
+                                }
+                                w++;
+                            });
+
+                            if (enter > 0) {
+                                objects.profileFields = objectprofile;
+                                objects.parentCategory = idcateg;
+                                objects.ext = "";
+                                jsondataobj.push(objects);
+                            }
+                        }
+                    });
+
+                    var jsondata1 = JSON.stringify(jsondataobj);
+                    // var compressjson = compress(jsondata1);
+                    //  var compressed = LZString.compress(jsondata1);
+                    //  var  compressed64 = LZString.compressToBase64(jsondata1);
+                    //  var compressed = unescape(LZString.compress(compressed64));
+                    var ruta=null;
+                    if (jQuery("#ruta").val() != "")
+                        ruta = jQuery("#ruta").val();
+                    var archivo = jQuery('#fileImagen')[0].files[0];
+                    var formData = new FormData();
+
+                    formData.append("data", jsondata1);
+                    formData.append("folderimages", archivo);
+                    
+                    jQuery.ajax({
+                        
+                        url: "/ObjectReference/Object/saveImport",
+                        data: formData, //,folderimages:ruta
+                        enctype: "multipart/form-data",
+                        // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                        contentType: false,
+                        processData: false,
+                        type: "POST",
+                        beforeSend: _loading(),
+
+                        success: function (data) {
+
+                            jQuery('#excelTable').find(".modal-body").html("");
+
+                            jQuery('#excelTable').modal("hide");
+
+                            if (data == null || data == "null") {
+                                _alert("error", "Problemas Al importar datos, Verifique el Archivo Fuente");
+
+                                _loading();
+
+                                return null;
+
+                            } else {
+                                if (data != "saved") { _alert("success", "Datos Importados Correctamente."+data); }
+                                else
+                                    _alert("success", "Datos Importados Correctamente");
+
+                                model.init();
+                                _loading();
+                               
+                                return null;
+                            }
+
+
+
+
+                        },
+                        error: function (errorThrown) {
+                            alert("Ocurrio un error, intenta más tarde.");
+
+                            _loading();
+
+                        }
+                    });
+                } else { alert("Elija una Relacion para el Nombre de los Objetos"); }
+
+            });
+
+            jQuery("#delete_cancel_buttonx").on("click", function () {
+                jQuery("#excelTable").modal("hide");
+            });
+            jQuery('#name1').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name1').val();
+                var nameselect = jQuery('#name1').data('name');
+                var htmlselect = jQuery('#name1 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name1').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name2').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name2').val();
+                var nameselect = jQuery('#name2').data('name');
+                var htmlselect = jQuery('#name2 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name2').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+ 
+            jQuery('#name3').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name3').val();
+                var nameselect = jQuery('#name3').data('name');
+                var htmlselect = jQuery('#name3 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name3').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name4').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name4').val();
+                var nameselect = jQuery('#name4').data('name');
+                var htmlselect = jQuery('#name4 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name4').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name5').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name5').val();
+                var nameselect = jQuery('#name5').data('name');
+                var htmlselect = jQuery('#name5 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name5').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name6').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name6').val();
+                var nameselect = jQuery('#name6').data('name');
+                var htmlselect = jQuery('#name6 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name6').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name7').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name7').val();
+                var nameselect = jQuery('#name7').data('name');
+                var htmlselect = jQuery('#name7 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name7').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name8').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name8').val();
+                var nameselect = jQuery('#name8').data('name');
+                var htmlselect = jQuery('#name8 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name8').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name9').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name9').val();
+                var nameselect = jQuery('#name9').data('name');
+                var htmlselect = jQuery('#name9 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name9').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            jQuery('#name11').on('change', function () {
+
+                var objetdata = { "selectname": null, "option": null, "value": null };
+                var value = jQuery('#name11').val();
+                var nameselect = jQuery('#name11').data('name');
+                var htmlselect = jQuery('#name11 option:selected').html();
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if (array[i].selectname == nameselect) {
+                        array.splice(i, 1);
+                    }
+                }
+                objetdata.selectname = nameselect;
+                objetdata.option = htmlselect;
+                objetdata.value = value;
+                if (value != "no") {
+                    var exist = 0;
+
+                    for (var i = 0; i < array.length; i++) {
+
+                        if (array[i].value == value) {
+                            jQuery('#name11').val('no');
+                            alert("Esta opcion ya ha sido seleccionada")
+                            exist++;
+                        }
+                    }
+                    if (exist == 0) { array.push(objetdata); }
+                }
+            });
+
+            @for (int i = 0; i < idselect; i++)
+        {
+           @(new HtmlString(" jQuery('#" + i + "').on('change', function () {  validateinput = 0; var objetdata = { 'selectname': null, 'option': null,'value':null }; var value = jQuery('#" + i + "').val();var nameselect = jQuery('#" + i + "').data('name'); var htmlselect = jQuery('#" + i + " option:selected').html();  for (var i = 0; i < array.length; i++){if (array[i].selectname == nameselect){array.splice(i, 1);}} objetdata.selectname = nameselect; objetdata.option =  htmlselect; objetdata.value = value;  if(value!='no'){ var exist =0; for(var i = 0; i < array.length; i++) { if (array[i].value == value){jQuery('#" + i + "').val('no'); alert('Esta opcion ya ha sido seleccionada'); exist++;}} if(exist == 0) { array.push(objetdata); }}});"))
+             @(new HtmlString(" validateselect.push(" + i + ");"))
+
+        }
+
+            jQuery("#fileImagen").bind("change.changeImage", function () {
+          
+                var fileup = jQuery('#fileImagen')[0].files[0];
+              
+                jQuery("#ruta").val(fileup.name);
+            });
+
+        });
+
+    </script>

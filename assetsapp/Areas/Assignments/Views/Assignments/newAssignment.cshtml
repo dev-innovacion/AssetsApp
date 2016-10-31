@@ -1,0 +1,650 @@
+﻿@using MongoDB.Driver
+@using MongoDB.Bson
+@model JArray
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.ObjectAdmin.Models;
+@{
+    int count = 0;}
+
+
+<!-- Common Kendo UI Web CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" />
+<!-- Default Kendo UI Web theme CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" />
+<!-- Kendo UI Web combined JavaScript -->
+<script src="~/Scripts/kendo/2014.1.318/kendo.web.min.js"></script>
+<script src="~/Scripts/kendo/2014.1.318/kendo.treeview.min.js"></script>
+
+<div class="inner_content" id="divemployee" style="display:none;">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+
+                <div class="span4">
+                    <div class="search">
+                        Empleado: <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Empleado de búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+                <div class="span8">
+                    <div class="btn-group pull-right top-btn">
+
+
+                        <a href="/Assignments/Assignments" class="grey btn">Regresar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Empleado</h5>
+                    </div>
+                    <div class="well-content no-search" id="employeeTable">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="inner_content" id="divassignment" style="display:none;">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Empleado seleccionada</h3>
+                </div>
+
+            </div>
+
+            <div class="span12" id="divemployeedetail">
+                <div class="span8">
+                    <p class="ModuleTitle">@ViewBag.Employeedetail</p>
+                </div>
+                <div class="span4">
+                    <div class="btn-group pull-right top-btn">
+
+
+                        <a href="#" id="btnback_employee" class="grey btn">Regresar</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Asignado Activos</h5>
+                    </div>
+                    <div class="well-content no-search" id="assignedassetTable">
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="widgets_area">
+
+        @*<div class="row-fluid">
+                <div class="span12">
+                    <div class="span4">
+                        <div class="search">
+                            Activos: <input type="text" data-provide="typeahead" id="ActivosSearch" name="ActivosSearch" class="typehead span8" placeholder="Activos de búsqueda" data-source="" />
+                            <button type="submit" class="square-button green" id="ActivosSearchButton"><i class="icon-search"></i></button>
+                        </div>
+                    </div>
+                    <div class="span4">
+
+                    </div>
+                </div>
+            </div>*@
+
+        <br />
+
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span3" style="width: 1050px; padding:inherit;">
+                    <div class="span12">
+                        <div class="light_blue set_color">
+
+                            @{count = 0;}
+                            <div class="well-content no-search">
+                                <input type="text" style="width:100%;margin-bottom:7px;" data-provide="typeahead" id="locationSearch" name="locationSearch" class="typeahead span8" placeholder="ubicación de búsqueda" data-source='[@foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                                                                                                                                        {
+                                                                                                                                            if (count == 0)
+                                                                                                                                            {@(new HtmlString('"' + mails.Value + '"')) count++;
+                                                                                                                                            }
+                                                                                                                                            else
+                                                                                                                                            {@(new HtmlString("," + '"' + mails.Value + '"'))}  }]' />
+                                <div class="k-header">
+                                    <div id="category_tree">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="span9" style="width: 1000px; padding-left:-50px; padding-top:50px;" >
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <div class="span4">
+
+                                <button onclick="SaveAssignment();" class="grey btn">Asignar</button>
+                            </div>
+                            <div class="span8">
+                                <div class="search">
+                                    Activos: <input type="text" data-provide="typeahead" id="ActivosSearch" name="ActivosSearch" class="typehead span8" placeholder="Activos de búsqueda" data-source="" />
+                                    <button type="submit" class="square-button green" id="ActivosSearchButton" onclick="loadFilterAsset();"><i class="icon-search"></i></button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row-fluid" style="">
+                        <div class="span12">
+                            <div class="light_blue set_color">
+                                <div class="well-header widgetclient titleclient">
+                                    <h5 id="category_header">Activos</h5>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="span12 well-content no_padding">
+
+
+
+                            <div class="tab-pane" id="assetTable">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+
+</script>
+@section scripts{
+    <script src="~/RivkaBase/Scripts/RivkaViewer2/RivkaViewer.js"></script>
+    <script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+    <script type="text/javascript">
+    var locationId = "";
+    var EmployeeId = null;
+    var model = {
+        parentCategory: locationId == "" ? "null" : locationId,
+        //parentCategory: location.hash == "" ? "null" : location.hash.substring(1),
+    };
+    function LoadSubLocations() {
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/loadLocations",
+            type: "POST",
+            async: false,
+            data: { conjunto: model.parentCategory },
+            success: function (data) {
+                jQuery("#selectLocation").html(data);
+            }
+        });
+    }
+    var route = {
+        onRouteElementClickAction: function () {
+            var liElement = jQuery(this).closest("li");
+            model.parentCategory = liElement.data("id") == null ? "null" : liElement.data("id");
+            //  location.hash = model.parentCategory;
+            liElement.nextAll().remove();
+            var liText = liElement.find("a").text();
+            liElement.addClass("active");
+            liElement.empty();
+            liElement.text(liText);
+            var id = model.parentCategory;
+            var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(id);
+            jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+        },
+
+        openCategoryFromThis: function (node) {
+            model.parentCategory = jQuery(node).data("id");
+            //  location.hash = model.parentCategory;
+        },
+
+        appendNode: function (obj) {
+            try {
+                id = obj.id;
+            } catch (Exception) {
+                return null;
+            }
+            try {
+                name = obj.name;
+            } catch (Exception) {
+                return null;
+            }
+            var newCategoryElement = jQuery("<li/>").addClass("active").text(name).attr("data-id", id);
+
+            var lastElement = jQuery("#categoryRoute li:last");
+            lastElementText = lastElement.text();
+            lastElement.removeClass("active");
+            lastElement.empty();
+            lastElement.append(jQuery("<a/>").text(lastElementText).on("click", route.onRouteElementClickAction));
+            lastElement.append(
+                jQuery("<span/>")
+                    .addClass("divider")
+                    .text(">")
+            );
+            jQuery("#categoryRoute").append(newCategoryElement);
+        },
+
+        setFullRoute: function (object) {
+            var liElement = jQuery("#root");
+            liElement.nextAll().remove();
+            if (!liElement.hasClass("active")) {
+                var liText = liElement.find("a").text();
+                liElement.addClass("active");
+                liElement.empty();
+                liElement.text(liText);
+            }
+
+            for (var i = object.length - 1; i >= 0; i--) {
+                route.appendNode(object[i]);
+            }
+
+            var lastElement = jQuery("#categoryRoute li:last");
+            lastElementText = lastElement.text();
+            jQuery("#category_header").text(lastElementText);
+        }
+    };
+
+    jQuery(document).ready(function (jQuery) {
+
+        function obtenerNodes(nodoid) {
+            var iduser = "@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/Assignments/Assignments/getNodeContent2",
+                type: "POST",
+                data: { id: nodoid, userid: iduser },
+                async: false,
+                success: function (data) {
+                    var locations = JSON.parse(data);
+
+                    datos = locations;
+
+                    if (datos.hijos.length > 0) {
+                        var dataItem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(nodoid);
+                        jQuery("#category_tree").data("kendoTreeView").append(datos.hijos, jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid));
+                    }
+
+                },
+                error: function (data) {
+                    //_alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+
+        function InitNodes(nodoid) {
+            var iduser = "@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/Assignments/Assignments/getNodeContent2",
+                type: "POST",
+                data: { id: nodoid, userid: iduser },
+                success: function (data) {
+                    var result = JSON.parse(data);
+
+                    var locations = result.hijos;
+                    model.parentCategory = result.id;
+                    //model.init();
+                    datos = locations;
+                    var objetos = {
+                        id: result.id, text: result.name, expanded: true, "spriteCssClass": "objectimg", "hasChildren": true, items: datos
+                    }
+                    jQuery("#category_tree").kendoTreeView({
+                        dataSource: [
+                            objetos
+                        ]
+                       ,
+                        dataTextField: "text",
+                        loadondemand: true,
+                        select: onSelect,
+                        expand: onExpand
+                    });
+                },
+                error: function (data) {
+                    //_alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+        //profilemodal.bindAll();
+        //  jQuery("#object_panel").hide();
+        function onSelect(e) {
+            
+            var dataItem = this.dataItem(e.node);
+            var id = dataItem.id;
+            console.log("Estoy en la consolar -> " + id);
+
+            location.hash = id;
+            model.parentCategory = id;
+
+            //  model.init();
+            var children = jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid).children('.k-group').length;
+            if ( children == 0) {
+                obtenerNodes(dataItem.id);
+            }
+            loadFilterAssetbylocation();
+
+
+        }
+
+        function onExpand(e) {
+
+        }
+
+
+        var nodo = "null";
+
+        InitNodes(nodo);
+
+
+        function setTree(id) {
+            jQuery.ajax({
+                url: "/Assignments/Assignments/getRoute",
+                data: { parentCategory: id },
+                type: "POST",
+                success: function (data) {
+                    var data = JSON.parse(data);
+
+                    for (i = data["route"].length - 1; i >= 0; i--) {
+                        var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(data["route"][i].id);
+                        if (jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid).children('.k-group').length == 0) {
+                            obtenerNodes(getitem.id);
+
+
+                        }
+                        if (i == 0) { jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid)); }
+                    }
+
+
+                    //     tree.openRoute(data["route"]);
+                }, error: function () { _alert("error", "Ha ocurrido un error"); }
+            });
+        }
+
+
+        jQuery("#locationSearch").on('keypress', function (e) {
+
+            if (e.which == 13) {
+
+                var cad = jQuery(this).val();
+                var listmailsf = [];
+                var id = "null";
+                @foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                    {
+                    string value=mails.Value.Replace("\"", "'");
+                    value=mails.Value.Replace("'", "\'");
+                        @(new HtmlString("listmailsf.push('" + mails.Key + "|" + value + "');\n"));
+                }
+
+
+                    for (var i = 0; i < listmailsf.length; i++) {
+                        var cadenas = listmailsf[i].split('|');
+
+                        if (cadenas[1] == cad) {
+                            id = cadenas[0];
+                        }
+
+                    }
+                    setTree(id);
+                    //    location.hash = id;
+                    model.parentCategory = id;
+
+
+
+                }
+            });
+
+            jQuery("#ActivosSearch").on('keypress', function (e) {
+                if (e.which == 13) {
+                    loadFilterAsset();
+                }
+
+            });
+
+
+
+        });
+
+        //----------------------------------------------------------------------------------------------
+        function headers1() {
+            setTimeout(function () {
+                var table = jQuery("#objectsTab_rvtable").dataTable();
+                table.fnAdjustColumnSizing();
+
+            }, 2000);
+
+
+        }
+
+        function loadFilterAsset() {
+            var stringToSearch = jQuery("#ActivosSearch").val();
+            jQuery.ajax({
+                url: "/Assignments/Assignments/filterAssetList",
+                type: "POST",
+                data: { data: stringToSearch, locationId: "" },
+                beforeSend: _loading(),
+                success: function (data) {
+                    jQuery("#assetTable").html(data);
+                    _loading();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+        function loadFilterAssetbylocation() {
+            jQuery("#ActivosSearch").val("");
+            jQuery.ajax({
+                url: "/Assignments/Assignments/filterAssetList",
+                type: "POST",
+                data: { data: "", locationId: model.parentCategory },
+                beforeSend: _loading(),
+                success: function (data) {
+                    jQuery("#assetTable").html(data);
+                    _loading();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+
+        function ChkAll(e) {
+            jQuery("input[name=AssetCheck]").each(function () {
+                jQuery(this).prop("checked", jQuery(e).prop("checked"));
+            });
+
+        }
+        function SaveAssignment() {
+            var AssetIds = new Array();
+            var assignMentId= '@ViewBag.EditAssignMentId';
+            var Count = 0;
+            jQuery("input[name=AssetCheck]").each(function () {
+                if (jQuery(this).prop("checked") == true) {
+                    AssetIds[Count] = jQuery(this).attr("id");
+                    Count++;
+                }
+            });
+
+            if (EmployeeId == null || EmployeeId == "" || EmployeeId == "null") {
+                _alert("error", "Seleccione Responsible");
+            }
+            else if (Count == 0) {
+                _alert("error", "Seleccione Activos");
+            }
+            else {
+                _loading();
+                jQuery.ajax({
+                    url: "/Assignments/Assignments/SaveAssignment",
+                    type: "POST",
+                    data: { assignmentId: assignMentId, employee: EmployeeId, AssetIds: AssetIds },
+                    traditional: true,
+                    
+                    success: function (data) {
+                        _loading();
+                        if (data == null || data == "null" || data == "") {
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                        else {
+                            _alert("success", "Correctamente Añadido");
+                            if (data != null && data != "null") {
+
+                                window.location.href = '/Assignments/Assignments';
+                            }
+                        }
+
+
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+
+        }
+
+
+        $(document).ready(function ($) {
+
+            if ('@ViewBag.EditAssignMentId' != "") {
+            EmployeeId = '@ViewBag.EmployeeId';
+            jQuery("#divemployee").css("display", "none");
+            jQuery("#divassignment").css("display", "inline");
+            //jQuery("#divemployeedetail").children('div').eq(0).children('p').text('@ViewBag.Employeedetail');
+            loadAssignedAssettoEmployee();
+
+        }
+        else {
+            jQuery("#divemployee").css("display", "inline");
+            jQuery("#divassignment").css("display", "none");
+            loadEmployee();
+        }
+
+
+        jQuery("#globalSearch").bind("keypress.checkSend", function (e) {
+            if (e.which == 13) {
+                jQuery("#globalSearchButton").click();
+            }
+        });
+        $("#globalSearchButton").click(function () {
+            loadEmployee();
+        });
+        $("#btnback_employee").click(function () {
+            if ('@ViewBag.EditAssignMentId' == "") {
+                loadEmployee();
+                jQuery("#divemployee").css("display", "block");
+                jQuery("#divassignment").css("display", "none");
+            }
+            else {
+                window.location.href = '/Assignments/Assignments';
+            }
+
+
+        });
+
+
+
+
+    });
+
+    function loadEmployee() {
+        var stringToSearch = jQuery("#globalSearch").val();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/getEmployee",
+            type: "POST",
+            data: { data: stringToSearch },
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#employeeTable").html(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+    function assignAssettoEmployee(e) {
+        EmployeeId = jQuery(e).parents('tr').attr('id');
+
+        jQuery("#divemployee").css("display", "none");
+        jQuery("#divassignment").css("display", "inline");
+        var Empdetail = jQuery(e).parents('tr').children('td').eq(0).text() + " " + jQuery(e).parents('tr').children('td').eq(1).text() + " " + jQuery(e).parents('tr').children('td').eq(2).text() + " " + jQuery(e).parents('tr').children('td').eq(3).text();
+        jQuery("#divemployeedetail").children('div').eq(0).children('h3').text(Empdetail);
+
+
+        loadAssignedAssettoEmployee();
+
+
+    }
+
+    function loadAssignedAssettoEmployee() {
+        jQuery.ajax({
+            url: "/Assignments/Assignments/getAssetAssignedtoEmployee",
+            type: "POST",
+            data: { idEmployee: EmployeeId },
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#assignedassetTable").html(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function UnAssignAsset(AssetId, AssignmentId) {
+        _confirm({
+            title: "Eliminar Registros",
+            message: "¿Seguro que desea eliminar los registros ?",
+            action: function () {
+                jQuery.ajax({
+                    url: "/Assignments/Assignments/UnAssignAsset",
+                    type: "POST",
+                    data: { assignmentId: AssignmentId, assetId: AssetId, PartialViewName: 'getAssetAssignedtoEmployee' },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        _loading();
+                        _alert("success", "Eliminado Correctamente");
+                        jQuery("#assignedassetTable").html(data);
+
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+        });
+
+    }
+    </script>
+}
+

@@ -1,0 +1,226 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.User.Models;
+@model JArray
+
+@{
+
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+
+    var add = "";
+    foreach (string x in allp["objects"]["grant"])
+    {
+
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+
+    var addc = "";
+    foreach (string x in dataclientjo["objects"]["grant"])
+    {
+
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+
+<style type="text/css">
+    .dataTables_scrollBody {
+        height: 250px !important;
+    }
+</style>
+
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Asignaciones</h3>
+                </div>
+                <div class="span4">
+
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista</h5>
+                        <div class="btn-group">
+                            @if (add == "c" && addc == "c")
+                            {
+                                <button class="btn btn-mini dark_green fileinput-button" onclick="window.location.href = '/Assignments/Assignments/newAssignment'" id="addAssignmentButton" data-original-title="Agregar" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i> Agregar
+                                </button>
+                            }
+
+                        </div>
+                    </div>
+
+                    <div id="assetTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="responsible_detail_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Responsable detalle</h3>
+    </div>
+    <div class="modal-body">
+        <div id="importresultContent">
+
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                        <label>Nombre: </label>
+                        <label id="employeeName"></label>
+                    </td>
+                    <td rowspan="2" width="50%" style="text-align: left">
+                        <img style="max-height: 100px;" id="employee_img_pre" src="~/Content/Images/imgPerfil/avatar_06.png">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Apellido Paterno: </label>
+                        <label id="employeeLastName">Singh</label>
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Apellido Materno: </label>
+                        <label id="employeeMotherLastName"></label>
+                    </td>
+                    <td>
+                        <label>ID Empleado: </label>
+                        <label id="employeeId"></label>
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Perfil: </label>
+                        <label id="employeeProfile"></label>
+                    </td>
+                    <td>
+
+                        <label>Tipo de Empleado: </label>
+                        <label id="employeeType"></label>
+
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Área: </label>
+                        <label id="employeeArea"></label>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    function loadAssetAssignment() {
+        selectOption = jQuery("#typeShow").val();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/getAssignmentTable",
+            type: "POST",
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#assetTable").html(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+    function deleteAssignment(id) {
+        _confirm({
+            title: "Eliminar Registros",
+            message: "¿Seguro que desea eliminar los registros ?",
+            action: function () {
+                _loading();
+                jQuery.ajax({
+                    url: "/Assignments/Assignments/deleteAssignment",
+                    datatype: "json",
+                    type: "POST",
+                    data: { assignmentID: id },
+                    traditional: true,
+                    success: function (data) {
+                        if (data == null || data == "null" || data == "") {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                        else {
+                            _loading();
+                            _alert("success", "Eliminado Correctamente");
+                            loadAssetAssignment();
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    function ShowResponsibleDetail(id) {
+
+
+        _loading();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/GetEmployeeDetail",
+            datatype: "json",
+            type: "POST",
+            data: { assignmentId: id },
+            traditional: true,
+            success: function (data) {
+                _loading();
+                data = JSON.parse(data);
+                if (data == "null" || data == null || data == "") {
+
+                    alert("Ha ocurrido un error");
+                }
+                else {
+                    jQuery("#employeeName").html(data["name"]);
+                    jQuery("#employeeLastName").html(data["lastname"]);
+                    jQuery("#employeeMotherLastName").html(data["motherlastname"]);
+                    jQuery("#employeeId").html(data["employee"]);
+                    jQuery("#employeeProfile").html(data["profileId"]);
+                    jQuery("#employeeType").html(data["type"]);
+                    jQuery("#employeeArea").html(data["area"]);
+                    if (data["ImgUrl"] != "NoImage") {
+                        jQuery('#employee_img_pre').attr('src', data["ImgUrl"]);
+                    }
+
+                    jQuery("#importresultContent").find("label").css("font-size", "15px");
+                    jQuery("#responsible_detail_panel").modal("show");
+                }
+
+            }
+        });
+    }
+
+
+    jQuery(document).ready(function ($) {
+        loadAssetAssignment();
+
+    });
+
+
+</script>

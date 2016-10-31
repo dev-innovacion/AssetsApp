@@ -1,0 +1,1950 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.ObjectAdmin.Models;
+
+
+@{
+    int count = 0;
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "u";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["objects"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["objects"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+
+}
+<!-- Common Kendo UI Web CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" />
+<!-- Default Kendo UI Web theme CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" />
+<!-- Kendo UI Web combined JavaScript -->
+<script src="~/Scripts/kendo/2014.1.318/kendo.web.min.js"></script>
+<script src="~/Scripts/kendo/2014.1.318/kendo.treeview.min.js"></script>
+
+<div class="widgets_area">
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Control de Activos</h3>
+            </div>
+            <div class="span4">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typeahead span8" placeholder="Búsqueda" data-source='[@foreach (var mails in (Dictionary<string, string>)ViewData["objsReference"])
+                                                                                                                                            {
+                                                                                                                                                if (count == 0)
+                                                                                                                                                {@(new HtmlString('"' + mails.Value + '"')) count++;
+                                                                                                                                                }
+                                                                                                                                                else
+                                                                                                                                                {@(new HtmlString("," + '"' + mails.Value + '"'))}  }]' />
+                    ><button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span3">
+                <div class="span12">
+                    <div class="light_blue set_color">
+                        <div class="well-header widgetclient titleclient">
+                            <h5>Ubicaciones</h5>
+                        </div>
+                        @{count = 0;}
+                        <div class="well-content no-search">
+                                <input type="text" style="width:100%;margin-bottom:7px;" data-provide="typeahead" id="globalSearch2" name="globalSearch2" class="typeahead span8" placeholder="Búsqueda" data-source='[@foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                                                                                                                                        {
+                                                                                                                                            if (count == 0)
+                                                                                                                                            {@(new HtmlString('"' + mails.Value + '"')) count++;
+                                                                                                                                            }
+                                                                                                                                            else
+                                                                                                                                            {@(new HtmlString("," + '"' + mails.Value + '"'))}  }]' />
+                            <div class="k-header">
+                                <div id="category_tree">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span9">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div class="light_blue set_color">
+                            <div class="well-header widgetclient titleclient">
+                                <h5 id="category_header">Activos</h5>
+                                <div class="btn-group" id="thisCategoryOptions">
+                                    <!-- View Buttons -->
+                                    <button class="btn btn-mini purple" id="userpopup" data-original-title="Asignar Usuario" rel="tooltip" data-placement="top">
+                                        <i class=" icon-user icon-white"></i>
+                                        <span></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span12">
+                        <ul class="breadcrumb" id="categoryRoute">
+                            <li id="root" class="active" data-id="null">Home</li>
+                        </ul>
+                    </div>
+                    <div class="span12 well-content no_padding">
+                        <span id="totalact" style="font-size:large;float: left;"></span>
+                        <span style="float: right;">
+                            Rangos de Activos a Mostrar
+                            <select id="pagination"> 
+                                <option value=" 1" data-skip="1">1-500</option>
+                                
+                            </select>
+                        </span>
+                        <div class="row-fluid">
+
+                            <div id="resultsPreview" class="resultsPreview">
+                            </div>
+                        </div>
+                       
+                        <div class="tab-pane" id="objectsTab">
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="object_panel" class="modal modal-objectadmin  hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="titleProcess"></h4>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="navbar-inner">
+                    <ul class="nav nav-tabs" id="tabDetalles">
+                        <li class="active" id="tabProcess"><a href="#process" data-toggle="tab">Inf. General</a></li>
+                    </ul>
+                </div>
+                <!-- Tabs Content -->
+                <div class="tab-content" id="tabContentDetalles">
+                    <!--Processes Section -->
+                    <div class="tab-pane active" id="process">
+                        <table class="line">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" style="width: 50%; text-align:center">
+                                        <img id="_HTKImagePreview" style="max-height:200px" />
+                                    </td>
+                                    <td>
+                                        <h10>Tipo de Activo (Categoria):</h10>
+                                        <div class="line">
+                                            <label  id="lbltipo"></label>
+                                        </div>
+                                        <br/>
+                                        <h10>Status:</h10>
+                                        <div class="line">
+                                            <label id="lblstatusobj"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Descripción:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblname"></label>
+                                            <input type="text" class="edit" id="txtname" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>ID Artículo:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblobject_id"></label>
+                                            <input type="text" class="edit" id="txtobject" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>ID Perfil:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblperfil"></label>
+                                            <input type="text"  class="edit" id="txtperfil" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>No. de Solicitud:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lbldemand"></label>
+                                            <input type="text" class="edit" id="txtdemand" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Proveedor:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblproveedor"></label>
+                                            <select id="selectProveedor">
+                                                @ViewData["proveedorList"]
+                                            </select>
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>No. de pedido:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblpedido"></label>
+                                            <input type="text" class="edit" id="txtpedido" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>No. de Recepción:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblrecep"></label>
+                                            <input type="text" class="edit" id="txtrecepcion" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>No.act ERP:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblerp"></label>
+                                            <input type="text" class="edit" id="txterp" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Tipo de etiquetado:</h10>
+                                        <div class="line">
+                                            <label id="lbletipo"></label>
+                                        </div>
+
+                                    </td>
+                                    @*<td>
+                                            <h10>Responsable:</h10>
+                                            <div class="line">
+                                                <label class="etiq" id="username"></label>
+
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div id="btncambiar" class='btn blue fileinput-button'>Cambiar</div>
+                                        </td>*@
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Marca:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblmarca"></label>
+                                            <input type="text" class="edit" id="txtmarca" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Modelo:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblmodelo"></label>
+                                            <input type ="text" class="edit" id="txtmodelo" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>No. de Serie:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="seriename"></label>
+                                            <input type="text"  class="edit" id="txtserie" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <h10>No. de Factura:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblfactura"></label>
+                                            <input type="text" class="edit" id="txtfactura" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>RH:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblrh"></label>
+                                            <input type="text" class="edit" id="txtrh" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Cantidad:</h10>
+                                        <div class="line">
+                                            <label id="lblcantidad"></label>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Precio de Compra:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblprecio"></label>
+                                            <input type="text"  class="edit"  id="txtprecio" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Fecha de Compra:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblfecha"></label>
+                                            <input  class="edit" type="date" id="txtfecha" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Departamento:</h10>
+                                        <div>
+                                            <label class="etiq" id="lbldepartment"></label>
+                                            <select id="selectDepartamento">
+                                                @ViewData["departList"]
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2">
+                                        <h10>Ubicacion:</h10>
+                                        <div>
+                                            <label  id="locationobject" data-id=""></label>
+                                            @*<select class="edit" id="selectLocation"></select>*@
+                                            @*<div id="divlocations" class="edit">
+                                                    <label class="etiq" id="locationobject"></label>
+                                                    <div id="btncambiar2" class='btn blue fileinput-button'>
+                                                        Cambiar
+                                                    </div>
+                                                </div>*@
+
+                                        </div>
+                                    </td>
+                                   
+                                    <td>
+                                        <h10>Folio (fue dado de alta):</h10>
+                                        <div class="line">
+                                            <label id="lblfolio"></label>
+                                        </div>
+                                        <br/>
+                                        <h10 ><span>Folio(Historial de movimientos):</span> </h10>
+                                        <div class="line">
+                                            <label id="lblfolio2"></label>
+                                            <br />
+                                            <label id="lblfolio3" style="color:red;"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <h10>EPC:</h10>
+                                        <div>
+                                            <label id="EPCobject"></label>
+                                        </div>
+                                        @*<h10>Serie:</h10>
+                                              <button type="button" name="serieupdate" style="color: white; height: 20px; padding-left: 5px; padding-right: 5px; padding-top: 0px;" class="btn blue" data-original-title="Modificar #Serie" rel="tooltip" data-placement="top"><i class="icon-edit"></i></button>
+
+                                            <div>
+
+                                            </div>
+                                             <div id="seriechange" class="row-fluid" style="margin-top:0px !important;display:none">
+                                                 <div class="span10">
+                                                 <input style="width:110%" name="serieinput" type="number" value="" min="0">
+                                                 </div>
+                                                 <div class="span2">
+                                                     <button type="button" name="seriebtn" style="color:white" class="square-button green" data-original-title="Actualizar #Serie" rel="tooltip" data-placement="top"><i class="icon-ok"></i></button>
+
+                                                 </div>
+                                              </div>*@
+                                    </td>
+                                    <td>
+                                        <h10>Creador:</h10>
+                                        <div>
+                                            <label id="creatorUserProcess"></label>
+                                        </div>
+                                        <div>
+                                            <label id="creatorNameProcess"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+
+
+                                        <h10>Fecha de Creación:</h10>
+                                        <div>
+                                            <label id="createDateProcess"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Tipo de Activo:</h10>
+                                        <div>
+
+                                            <select class="edit" id="assetSelect" name="assetType">
+                                                <option value="null">Seleccione...</option>
+                                                @{ListTable listTable = new ListTable();
+                                                String rowArray = listTable.Get("name", "_HTKassetsType");
+                                                JArray rowString = JsonConvert.DeserializeObject<JArray>(rowArray);
+                                                JArray listas = new JArray();
+                                                foreach (JObject obj in rowString)
+                                                {
+                                                    listas = JsonConvert.DeserializeObject<JArray>(obj["elements"]["unorder"].ToString());
+                                                }
+                                                }
+                                                @foreach (JObject puesto in listas)
+                                                {
+                                                    foreach (KeyValuePair<string, JToken> token in puesto)
+                                                    {
+                                                        <option value='@token.Key'>@token.Value</option>
+
+                                                    }
+
+                                                }
+                                            </select>
+                                            <label class="etiq" id="lblassetType"></label>
+                                        </div>
+                                 
+                                    </td>
+                                    <td>
+                                       
+                                    </td>
+                                    <td>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Guardar" class="btn blue edit" type="button" id="savebutton" data-dismiss="modal">
+                <input value="Aceptar" class="btn blue" type="button" id="cancel_buttonProcess" data-dismiss="modal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="operationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="operation-title">Operaciones</h4>
+            </div>
+            <div class="modal-body">
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td width="50%">
+                                <label>Operación:</label>
+                                <div class="staticField">
+                                    <select id="operationSelecter">
+                                        <option value="Sumatoria">Sumatoria</option>
+                                        <option value="Promedio">Promedio</option>
+                                        <option value="Minimo">Mínimo</option>
+                                        <option value="Maximo">Máximo</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                <label>Seleccione un campo para realizar la operación:</label>
+                                <div class="staticField">
+                                    <select id="operationFieldSelecter">
+                                        @foreach (JObject field in (JArray)ViewData["fields"])
+                                            {
+                                            <option value=' @field["name"].ToString()' data-fieldname="@field["label"].ToString()">@field["label"].ToString()</option>
+                                            }
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="row-fluid">
+                    <div class="span8 error_msg" id="operation_result">
+                    </div>
+                    <div class="span4">
+                        <input value="Añadir" class="btn blue" type="button" id="operation_button" data-dismiss="modal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="profilesPanel" class="modal modal-mini hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Selecciona el usuario a asignar:</h3>
+    </div>
+    <div class="modal-body">
+        <div id="divprofiles">
+            <select id="selectprofiles" class="chosen">
+
+                @{count = 0;}
+                @foreach (var item in (Dictionary<string, string>)ViewData["users"])
+                {
+
+                    if (count == 0)
+                    {
+                    <option value="0">Elige un perfil</option>
+                        count++;
+                    }
+                    <option value="@item.Key">@item.Value</option>
+
+                }
+
+            </select>
+        </div>
+
+        </br>
+        <div id="tablausers">
+            <table id="UserSelecterTable" class="table table-striped table-bordered table-hover">
+                <tr>
+                    <td colspan='3'>
+                        <p class='passCenter'></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" id="final_msg" class="error_msg"></span>
+        <input value="Guardar" class="btn blue"  id="save_button">
+        <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button">
+    </div>
+</div>
+
+<div id="locationsPanel2" class="modal modal-mini hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Selecciona la nueva ubicacion:</h3>
+    </div>
+    <div class="modal-body">
+
+        <div id="tablausers">
+            <label class="lanelMargen">Ubicaciones </label>
+            <div class="divTree4">
+                <div class="well-content no-search">
+                    <select id="ubicacionSelect" name="ubicacionSelect">
+                        <option value=null>Seleccione</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" id="final_msg" class="error_msg"></span>
+        <input value="Guardar" class="btn blue" id="save_button3">
+        <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button3">
+    </div>
+</div>
+
+
+<div id="responmmodal" class="modal hide fade" data-backdrop="static">
+    <div class="modal-header">
+        <h3 class="modal-header-text">Seleccionar Responsable nuevo</h3>
+    </div>
+    <div class="modal-body">
+        <label>Responsable: </label>
+        <div class="staticField">
+            <select id="userSelect" name="userSelect"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input value="Guardar" data-iddemand="" class="btn dark_green" type="button" id="responyes_button">
+        <input value="Cancelar" class="btn grey" type="button" id="responnon_button">
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/RivkaBase/Scripts/RivkaViewer2/RivkaViewer.js"></script>
+    <script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+
+    <script type="text/javascript">
+    var add = "";
+    var upd = "";
+    var del = "";
+    var addc = "";
+    var updc = "";
+    var delc = "";
+    var editingData = null;
+
+    @if (upd != null && upd != "")
+        {
+                @(new HtmlString("upd = '" + upd + "';"))
+        }
+    @if (del != null && del != "")
+        {
+                @(new HtmlString("del = '" + del + "';"))
+        }
+    @if (add != null && add != "")
+        {
+            @(new HtmlString("add = '" + add + "';"))
+        }
+
+    var options = {
+        id: "_id",
+        name: "name",
+        image: "image",
+        permissions: [upd],
+        data: { "referenceid": "objectReference","systemstatus":"system_status" },
+        showSelecters: true,
+        defaultGrouping: "null",
+       
+        columnNames: { "name": "Descripción", "nameassetType": "Tipo de Activo", "EPC": "EPC", "EPC_conflicto": "EPC en Conflicto","quantity":"Cantidad", "object_id": "ID Artículo", "serie": "No. de Serie", "etiquetado": "Tipo de Etiquetado", "namelocation": "Ubicación", "marca": "Marca", "modelo": "Modelo", "departmentName": "Departamento", "perfil": "Perfil", "price": "Precio", "nameCreator": "Creador", "CreatedDate": "Fecha de Creación", "LastmodDate": "Última Modificación", "status": "Estatus", "currentmove": "Movimiento" },
+        columnShow: {
+            "name": 1, "nameassetType": 1, "EPC": 1,"EPC_conflicto":1,"quantity":1, "object_id": 1, "serie": 1, "label": 0, "location": 1, "marca": 1, "modelo": 1, "departmentName": 0, "perfil": 0, "precio": 0, "nameCreator": 1, "CreatedDate": 0, "LastmodDate": 0,"status":1,"currentmove":1
+            },
+        displayConfiguration: {
+            tableOptions: {
+                onEditRowAction: function () {
+                    var tr = jQuery(this).closest("tr");
+                    objectModal.onEditAction(tr);
+                },
+                onDeleteRowAction: null,
+                onSelectRowAction: null,
+            },
+
+            tilesOptions: {
+                onEditTileAction: function () {
+                    var tr = jQuery(this).closest("div.tile");
+                    objectModal.onEditAction(tr);
+                },
+                onDeleteTileAction: null,
+                onSelectTileAction: null
+            },
+
+            sliderOptions: {
+                onEditTileAction: function () {
+                    var tr = jQuery(this).closest("div.tile");
+                    objectModal.onEditAction(tr);
+                },
+                onDeleteTileAction: null,
+                onSelectTileAction: null
+            }
+        }
+    };
+
+    obtenerCustomFields();
+    var objectsViewer = new RivkaViewer("objectsTab", options);
+    objectsViewer.setDisplayMethod(RivkaViewer.METHODS.TABLE,options);
+    var operationModal = {
+
+        fieldsOperation: new Array(),
+
+        init: function () {
+            operationModal.bindElements();
+        },
+
+        createPreview: function (containerID) {
+            var container = jQuery("#" + containerID);
+            container.empty();
+            for (var elementIndex in operationModal.fieldsOperation) {
+                var element = operationModal.fieldsOperation[elementIndex];
+                var newElement = jQuery("<label class='alert-info' data-arraykey = '" + elementIndex + "'/>");
+                newElement.text(element.operation + " de " + element.fieldName + ": " + objectsViewer.doOperation(element.field, element.operation));
+                container.append(newElement);
+            }
+        },
+
+        inOperationArray: function (obj) {
+            for (var elementIndex in operationModal.fieldsOperation) {
+                var element = operationModal.fieldsOperation[elementIndex];
+                if (element.field == obj.field && element.operation == obj.operation) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        bindElements: function () {
+            jQuery("#operation_button").unbind("click.addOperation");
+            jQuery("#operation_button").bind("click.addOperation", function () {
+                var operation = jQuery("#operationSelecter").val();
+                var field = jQuery("#operationFieldSelecter").val();
+                var fieldName = jQuery("#operationFieldSelecter option:selected").data("fieldname");
+                var obj = { operation: operation, field: field };
+                if (!operationModal.inOperationArray(obj)) {
+                    operationModal.fieldsOperation.push({ operation: operation, field: field, fieldName: fieldName });
+                    operationModal.createPreview("resultsPreview");
+                }
+            });
+        }
+    };
+
+    function obtenerCustomFields() {
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/getObjectFields",
+            type: "POST",
+            success: function (data) {
+                //$("#tablebody").html(data);
+                var data = JSON.parse(data);
+                for (var i in data) {
+                    options.columnNames[data[i].name] = data[i].label;
+                    options.columnShow[data[i].name] = 0;
+                }
+
+            },
+            error: function (data) {
+                //_alert("error","Ha ocurrido un error");
+            }
+        });
+    }
+
+
+    function obtenerUsers(profileid) {
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/getusers",
+            type: "POST",
+            data: { profileid: profileid },
+            beforeSend:_loading(),
+            success: function (data) {
+                var users = JSON.parse(data);
+                var cadena = "";
+
+                for (var i in users) {
+                    cadena = cadena + "<tr data-id='" + users[i]._id.toString() + "' class='trclick'><td>" + users[i].name.toString() + "</td></tr>";
+                }
+
+                if (data == "" || data == "[]") cadena = "<tr><td colspan='3'><p class='passCenter'>No hay usuarios...</p></td></tr>";
+
+                jQuery("#UserSelecterTable").html(cadena);
+                profilemodal.bindAll();
+                _loading();
+            },
+            error: function (data) {
+                _loading();
+                _alert("error","Ha ocurrido un error");
+            }
+        });
+    }
+
+    function obtenerUsersSelect(profileid) {
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/getusers",
+            type: "POST",
+            data: { profileid: profileid },
+            //   async: false,
+            success: function (data) {
+                var users = JSON.parse(data);
+                var cadena = "<option value='0'>Elige un perfil</option>";
+
+                for (var i in users) {
+                    cadena = cadena + "<option value='" + users[i]._id.toString() + "'>" + users[i].name.toString() + "</option>";
+                }
+
+                //  if (data == "" || data == "[]") cadena = "<tr><td colspan='3'><p class='passCenter'>No hay usuarios...</p></td></tr>";
+
+                jQuery("#userSelect").html(cadena);
+                jQuery("#responmmodal").modal("show");
+            },
+            error: function (data) {
+                //_alert("error","Ha ocurrido un error");
+            }
+        });
+    }
+
+    function getObjectInfo(selectedObject) {
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/getObjectInfo",
+            type: "POST",
+            data: { idobject: selectedObject },
+            beforeSend: _loading(),
+            success: function (data) {
+                editingData = data;
+                data = JSON.parse(data);
+                try {
+                    //if (data["location"].toString() != "")
+                    //    jQuery("#selectLocation").val(data["location"]);
+                    jQuery("#locationobject").text(data["locationRoute"]);
+
+                    jQuery("#lbltipo").text(data["nameCategory"]);
+                    jQuery("#lblstatusobj").text(data["status"]);
+
+                    if (data["label"].toString() == "normal")
+                        jQuery("#lbletipo").text("Normal");
+                    if (data["label"].toString() == "no_etiquetable")
+                        jQuery("#lbletipo").text("No etiquetable");
+
+                    jQuery("#txtname").val(data["name"]);
+                    jQuery("#lblname").text(data["name"]);
+
+                    jQuery("#txtprecio").val(data["price"]);
+                    jQuery("#lblprecio").text(data["price"]);
+
+                    jQuery("#txtfecha").val(data["date"]);
+                    
+                    jQuery("#lblcantidad").text(data["quantity"]);
+
+                    if (data["assetType"].toString() != "") {
+                        jQuery("#assetSelect").val(data["assetType"]);
+                        if (data["assetType"] == "maintenance")
+                            jQuery("#lblassetType").text("Mantenimiento");
+                        if (data["assetType"] == "system")
+                            jQuery("#lblassetType").text("Sistemas");
+                        if (data["assetType"] == "sound")
+                            jQuery("#lblassetType").text("Proyección y Sonido");
+                    }
+
+                    if (data["department"].toString() != "")
+                        jQuery("#selectDepartamento").val(data["department"]);
+
+                    jQuery("#txtmarca").val(data["marca"]);
+                    jQuery("#lblmarca").text(data["marca"]);
+
+                    jQuery("#txtmodelo").val(data["modelo"]);
+                    jQuery("#lblmodelo").text(data["modelo"]);
+
+                    jQuery("#txtperfil").val(data["perfil"]);
+                    jQuery("#lblperfil").text(data["perfil"]);
+
+                    jQuery("#txtobject").val(data["object_id"]);
+                    jQuery("#lblobject_id").text(data["object_id"]);
+
+                    jQuery("#txtdemand").val(data["num_solicitud"]);
+                    jQuery("#lbldemand").text(data["num_solicitud"]);
+
+                    jQuery("#lblfolio").text(data["folio"]);
+                    jQuery("#lblfolio2").text(data["allmoves"]);
+                    jQuery("#lblfolio3").text(data["currentmove"]);
+
+                    if (typeof data["proveedor"] != "undefined") {
+                        if (data["proveedor"].toString() != "")
+                            jQuery("#selectProveedor").val(data["proveedor"]);
+                    }
+                    
+                    jQuery("#lblproveedor").text(data["proveedor"]);
+
+                    jQuery("#txtpedido").val(data["num_pedido"]);
+                    jQuery("#lblpedido").text(data["num_pedido"]);
+
+                    jQuery("#txtrecepcion").val(data["num_reception"]);
+                    jQuery("#lblrecep").text(data["num_reception"]);
+
+                    jQuery("#txterp").val(data["ERP"]);
+                    jQuery("#lblerp").text(data["ERP"]);
+
+                    jQuery("#txtserie").val(data["serie"]);
+                    jQuery("#seriename").text(data["serie"]);
+
+                    jQuery("#txtfactura").val(data["factura"]);
+                    jQuery("#lblfactura").text(data["factura"]);
+
+                    jQuery("#txtrh").val(data["rh"]);
+                    jQuery("#lblrh").text(data["rh"]);
+
+                }catch(ex){}
+                jQuery("#creatorUserProcess").text(data["username"]);
+                jQuery("#createDateProcess").text(data["CreatedDate"]);
+              //  jQuery("#locationobject").data("id", data["location"]);
+            //    jQuery("#locationobject").text(data["locationname"]);
+                jQuery("#EPCobject").text(data["EPC"]);
+             
+                jQuery('#titleProcess').html(data["name"] + " (<a href='/ObjectReference/Object'>ver referencia</a>)");
+                jQuery("#username").text(data["username"]);
+               // jQuery("[name=serieinput]").val(data["serie"]);
+                objectModal.loadProfileFieldsTitles2(data["category"]);
+                objectModal.loadProfileFields2(data["category"]);
+                jQuery("#seriechange").hide();
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+
+            }
+        });
+    }
+
+    jQuery.fn.reset = function () {
+        jQuery(this).each(function () { this.reset(); });
+    }
+
+    function ValidateLocationUser(idlocation) {
+        var user = "@Session["_id"].ToString()";
+        model.gerente = "0";
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/ValidateLocationUser",
+            type: "POST",
+            async:false,
+            data: { locationid: idlocation, userid: user },
+            success: function (data) {
+                model.gerente = "1";
+            },
+            error: function (data) {
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    var model = {
+        parentCategory: location.hash == "" ? "null" : location.hash.substring(1),
+
+        vertodo: "0",
+
+        gerente:"0",
+
+        indexpag: 0,
+        indextotal: 0,
+        idcurrent:"",
+        selectedID: null,
+
+        routeData: null,
+
+        prototypeData: null,
+
+        categoriesData: null,
+
+        objectsData: null,
+
+        tableobject: null,
+
+        init: function () {
+            ValidateLocationUser(model.parentCategory);
+            
+            if (model.gerente == 1) {
+                if (model.parentCategory == "null") {
+                    if ("@ViewData["userProfile"].ToString()" == "Administrador de sistema" || "@ViewData["userProfile"].ToString()" == "Otro") {
+                        model.vertodo = "1";
+                    } else {
+                        model.vertodo = "0";
+                    }
+                    
+                    jQuery.ajax({
+                        url: "/ObjectAdmin/ObjectAdmin/getData",
+                        type: "POST",
+                        data: { parentCategory: model.parentCategory, vertodo: model.vertodo},
+                        beforeSend: _loading(),
+                        success: function (data) {
+                            var data = JSON.parse(data);
+                            model.objectsData = data["objects"];
+                            try {
+                                model.indextotal = data["total"];
+
+                                model.idcurrent = model.parentCategory;
+                                var options = data["options"];
+                                jQuery("#pagination").html("");
+                                jQuery("#pagination").append(options);
+                                jQuery("#pagination").val("0");
+                                model.indexpag = 0;
+                                jQuery("#totalact").html("")
+                                jQuery("#totalact").text("Total de activos:"+model.indextotal)
+                            } catch (ex) {
+
+                            }
+                            objectsViewer.setData(model.objectsData);
+                            objectsViewer.printView();
+                            var objs = [{ type: "text" }];
+                            for (var i in options.columnShow) {
+                                if (options.columnShow[i] == 1) objs.push({ type: "text" });
+                            }
+
+                            _loading();
+                        },
+                        error: function (errorThrown) {
+                            _loading();
+                        }
+                    });
+
+                }
+                else if (model.parentCategory != "") {
+                    jQuery.ajax({
+                        url: "/ObjectAdmin/ObjectAdmin/GetHowToShowObjects",
+                        type: "POST",
+                        data: { idlocation: model.parentCategory },
+                        success: function (data) {
+                            model.vertodo = data;
+                            jQuery.ajax({
+                                url: "/ObjectAdmin/ObjectAdmin/getData",
+                                type: "POST",
+                                data: { parentCategory: model.parentCategory, vertodo: model.vertodo },
+                                beforeSend: _loading(),
+                                success: function (data) {
+                                    var data = JSON.parse(data);
+                                    model.objectsData = data["objects"];
+                                    try{
+                                        objectsViewer.setconfigColumns(options.columnNames);
+                                    } catch (ex) {
+
+                                    }
+                                    objectsViewer.setData(model.objectsData);
+                                    objectsViewer.printView();
+                                    try {
+                                        model.indextotal = data["total"];
+
+                                        model.idcurrent = model.parentCategory;
+                                        var options = data["options"];
+                                        jQuery("#pagination").html("");
+                                        jQuery("#pagination").append(options);
+                                        jQuery("#pagination").val("0");
+                                        model.indexpag = 0;
+                                        jQuery("#totalact").html("")
+                                        jQuery("#totalact").text("Total de activos:" + model.indextotal)
+                                    } catch (ex) {
+
+                                    }
+                                    _loading();
+                                },
+                                error: function (errorThrown) {
+                                    _loading();
+                                }
+                            });
+                        },
+                        error: function (data) {
+                            model.vertodo = "0";
+                            jQuery.ajax({
+                                url: "/ObjectAdmin/ObjectAdmin/getData",
+                                type: "POST",
+                                data: { parentCategory: model.parentCategory, vertodo: model.vertodo },
+                                beforeSend: _loading(),
+                                success: function (data) {
+                                    var data = JSON.parse(data);
+                                    model.objectsData = data["objects"];
+                                    objectsViewer.setData(model.objectsData);
+                                    objectsViewer.printView();
+                                    try {
+                                        model.indextotal = data["total"];
+
+                                        model.idcurrent = model.parentCategory;
+                                        var options = data["options"];
+                                        jQuery("#pagination").html("");
+                                        jQuery("#pagination").append(options);
+                                        jQuery("#pagination").val("0");
+                                        model.indexpag = 0;
+                                        jQuery("#totalact").html("")
+                                        jQuery("#totalact").text("Total de activos:" + model.indextotal)
+                                    } catch (ex) {
+
+                                    }
+                                    _loading();
+                                },
+                                error: function (errorThrown) {
+                                    _loading();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+
+        }
+    };
+
+        function changecolor() {
+            var rows = jQuery("#objectsTab_rvtable").find("tr[data-systemstatus=false]");
+            rows.each(function () {
+                jQuery(this).css("color", "red");
+            });
+        }
+
+        function changetiles() {
+            var tiles = jQuery(".tile[data-systemstatus='false']");
+            tiles.each(function () {
+                jQuery(this).find(".abaja").remove();
+                jQuery(jQuery(this).find(".btn-group")[0]).append("<a class='btn btn-mini abaja' data-original-title='Dado de baja' rel='tooltip' data-placement='top'><i class='icon-remove'></i></a>")
+            });
+        }
+
+    function LoadSubLocations() {
+        //var idlocat =  //jQuery("#locationobject").data("id");
+        jQuery.ajax({
+            url: "/ObjectAdmin/ObjectAdmin/loadLocations",
+            type: "POST",
+            async: false,
+            data: { conjunto: model.parentCategory },
+            success: function (data) {
+                jQuery("#selectLocation").html(data);
+            }
+        });
+    }
+    var objectModal = {
+        fillProfileFields: function () {
+            if (editingData != null) {
+                var obj = JSON.parse(editingData);
+                for (field in obj) {
+                    if (field == "profileFields") {
+                        jQuery("#name").val(obj["name"]);
+                        console.log(obj["profileFields"]);
+                        for (key in obj["profileFields"]) {
+                            if (jQuery("#" + key).attr("type") == "checkbox") {
+                                jQuery("#" + key).attr("checked", "checked");
+                            }
+                            else if (jQuery("#" + key).attr("type") == "radio") {
+                                jQuery("[name=" + key + "][value = " + obj["profileFields"][key].toString() + "]").attr("checked", "checked");
+                            }
+                            else {
+                                jQuery("#" + key).val(obj["profileFields"][key].toString());
+                            }
+                        }
+                    } else if (field != "pwd") {
+                        jQuery("#" + field).val(obj[field]);
+                    }
+                }
+                if (obj["ext"] != null) {
+                    if (obj["ext"].toString() == "null" || obj["ext"].toString() == "") {
+                        jQuery("#_HTKImagePreview").attr("src", "/Content/Images/planos/No-Imagen-Disponible-Ubicacion.png");
+                    } else {
+                        jQuery("#_HTKImagePreview").attr("src", "/Uploads/Images/ObjectReferences/" + obj["objectReference"] + "." + obj["ext"]);
+                    }
+                } else {
+                    jQuery("#_HTKImagePreview").attr("src", "/Content/Images/planos/No-Imagen-Disponible-Ubicacion.png");
+                }
+
+                // jQuery("#_HTKImagePreview").attr("src", "/Uploads/Images/ObjectReferences/" + obj["objectReference"] + "." + obj["ext"]);
+            }
+        },
+
+        loadProfileFields2: function (profileID) {
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getFormView2",
+                type: "POST",
+                data: { profile: profileID },
+                //  async: false,
+                success: function (data) {
+                    var newadata = data;
+                    jQuery("#process").nextAll().remove();
+                    jQuery("#tabContentDetalles").append(newadata);
+
+
+                    objectModal.fillProfileFields();
+
+                },
+                error: function (data) {
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        },
+
+        loadProfileFieldsTitles2: function (profileID) {
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getFormTitlesView",
+                type: "POST",
+                data: { profile: profileID },
+                //  async: false,
+                success: function (data) {
+                    jQuery("#tabProcess").nextAll().remove();
+                    jQuery("#tabDetalles").append(data);
+                    jQuery("#tabProcess a").click();
+                },
+                error: function (errorThrown) {
+                }
+            });
+        },
+
+        cleardata: function () {
+            jQuery("#nameProcess").text("");
+            jQuery("#createDateProcess").text("");
+            jQuery("#locationobject").text("");
+            jQuery("#EPCobject").text("");
+            jQuery("#seriename").text("");
+            jQuery('#titleProcess').html("");
+            jQuery("#username").text("");
+
+
+          //  jQuery("#selectLocation").val("null");
+            jQuery("#locationobject").text("");
+
+            jQuery("#txtname").val("");
+            jQuery("#lblname").text("");
+
+            jQuery("#txtprecio").val("");
+            jQuery("#lblprecio").text("");
+
+            jQuery("#txtfecha").val("");
+            jQuery("#lblfecha").text("");
+
+            jQuery("#selectDepartamento").val("null");
+
+            jQuery("#txtmarca").val("");
+            jQuery("#lblmarca").text("");
+
+            jQuery("#txtmodelo").val("");
+            jQuery("#lblmodelo").text("");
+
+            jQuery("#txtperfil").val("");
+            jQuery("#lblperfil").text("");
+
+            jQuery("#txtobject").val("");
+            jQuery("#lblobject_id").text("");
+
+            jQuery("#txtdemand").val("");
+            jQuery("#lbldemand").text("");
+
+            jQuery("#lblfolio").text("");
+            jQuery("#selectProveedor").val("null")
+            jQuery("#lblproveedor").text("");
+
+            jQuery("#txtpedido").val("");
+            jQuery("#lblpedido").text("");
+
+            jQuery("#txtrecepcion").val("");
+            jQuery("#lblrecep").text("");
+
+            jQuery("#txterp").val("");
+            jQuery("#lblerp").text("");
+
+            jQuery("#txtserie").val("");
+            jQuery("#seriename").text("");
+
+            jQuery("#txtfactura").val("");
+            jQuery("#lblfactura").text("");
+
+            jQuery("#txtrh").val("");
+            jQuery("#lblrh").text("");
+            //objectModal.loadProfileFieldsTitles2(data["category"]);
+            //objectModal.loadProfileFields2(data["category"]);
+        },
+
+        onEditAction: function (trObject) {
+            var id = trObject.data("id");
+            model.selectedID = id;
+            this.cleardata();
+           // LoadSubLocations();
+            getObjectInfo(id);
+            if ("@ViewData["userProfile"].ToString()" == "Administrador de sistema") {
+                jQuery(".etiq").hide();
+                jQuery(".edit").show();
+                jQuery("#selectDepartamento").attr("disabled", false);
+                jQuery("#selectProveedor").attr("disabled", false);
+                
+            } else {
+                jQuery(".etiq").show();
+                jQuery(".edit").hide();
+                jQuery("#selectDepartamento").attr("disabled", true);
+                jQuery("#selectProveedor").attr("disabled", true);
+                
+            }
+            
+            jQuery("#object_panel").modal("show");  
+        }
+    };
+
+    var profilemodal = {
+
+        asignarusuario: function () {
+            var userselected = jQuery("#UserSelecterTable tr label.selecter").closest("tr").data("id");
+            var activos = jQuery(".checker:checked");
+            var usuarios = [];
+
+            for (i = 0; i < activos.length; i = i + 1) {
+                var iduser = jQuery(activos[i]).closest("tr").data("id");
+                usuarios.push(iduser);
+            }
+            console.log(usuarios);
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/AsignarUsuario",
+                type: "POST",
+                data: { selectids: JSON.stringify(usuarios), iduser: userselected },
+                success: function (data) {
+                    model.init();
+                    jQuery(".result-selected").removeClass("result-selected");
+                    jQuery('#selectprofiles_chzn_o_0').addClass("result-selected");
+                    jQuery("#profilesPanel").modal("hide");
+                    _alert("success", "Han sido actualizados");
+
+                },
+                error: function (data) {
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        },
+        bindAll: function () {
+
+            jQuery("#UserSelecterTable tr").bind("click.select", function () {
+                jQuery("#UserSelecterTable tr").find("label.selecter").remove();
+                jQuery(this).find("td:first").append(
+                    jQuery("<label/>").addClass("selecter pull-right").append("<i class='icon-ok'></i>")
+                );
+            });
+
+            jQuery("#profilesPanel").bind("hide", function () {
+                jQuery("#UserSelecterTable tr").find("label.selecter").remove();
+            });
+
+            jQuery(".checker").bind("click", function (e) {
+                var activos = jQuery(".checker");
+                var flag = "0";
+                for (i = 0; i < activos.length; i = i + 1) {
+                    if (jQuery(this).is(":checked")) {
+                        flag = "1";
+                    }
+                }
+
+                if (flag == "0") {
+                    jQuery("#userpopup").hide();
+                }
+                else {
+                    jQuery("#userpopup").show();
+                }
+            });
+
+            jQuery(" .checkall").bind("click", function (e) {
+                var activos = jQuery(".checker");
+                var flag = "0";
+                for (i = 0; i < activos.length; i = i + 1) {
+                    if (jQuery(this).is(":checked")) {
+                        flag = "1";
+                    }
+                }
+
+                if (flag == "0") {
+                    jQuery("#userpopup").hide();
+                }
+                else {
+                    jQuery("#userpopup").show();
+                }
+            });
+        }
+    };
+
+
+    var route = {
+
+        onRouteElementClickAction: function () {
+            var liElement = jQuery(this).closest("li");
+            model.parentCategory = liElement.data("id") == null ? "null" : liElement.data("id");
+            location.hash = model.parentCategory;
+            liElement.nextAll().remove();
+
+            var liText = liElement.find("a").text();
+            liElement.addClass("active");
+            liElement.empty();
+            liElement.text(liText);
+
+            model.init();
+
+            var id = model.parentCategory;
+
+            //  tree.selectNode(id);
+            var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(id);
+            jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+        },
+
+        openCategoryFromThis: function (node) {
+            model.parentCategory = jQuery(node).data("id");
+            location.hash = model.parentCategory;
+            model.init();
+        },
+
+        appendNode: function (obj) {
+            try {
+                id = obj.id;
+            } catch (Exception) {
+                return null;
+            }
+            try {
+                name = obj.name;
+            } catch (Exception) {
+                return null;
+            }
+            var newCategoryElement = jQuery("<li/>").addClass("active").text(name).attr("data-id", id);
+
+            var lastElement = jQuery("#categoryRoute li:last");
+            lastElementText = lastElement.text();
+            lastElement.removeClass("active");
+            lastElement.empty();
+            lastElement.append(jQuery("<a/>").text(lastElementText).on("click", route.onRouteElementClickAction));
+            lastElement.append(
+                jQuery("<span/>")
+                    .addClass("divider")
+                    .text(">")
+            );
+            jQuery("#categoryRoute").append(newCategoryElement);
+        },
+
+        setFullRoute: function (object) {
+            var liElement = jQuery("#root");
+            liElement.nextAll().remove();
+            if (!liElement.hasClass("active")) {
+                var liText = liElement.find("a").text();
+                liElement.addClass("active");
+                liElement.empty();
+                liElement.text(liText);
+            }
+
+            for (var i = object.length - 1; i >= 0; i--) {
+                route.appendNode(object[i]);
+            }
+
+            var lastElement = jQuery("#categoryRoute li:last");
+            lastElementText = lastElement.text();
+            jQuery("#category_header").text(lastElementText);
+        }
+    };
+
+    jQuery(document).ready(function (jQuery) {
+        
+        operationModal.init();
+        jQuery("#pagination").unbind("change.pag");
+        jQuery("#pagination").bind("change.pag", function () {
+            var skip = jQuery("#pagination").val();
+            
+                    
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getData",
+                type: "POST",
+                data: { parentCategory: model.parentCategory, vertodo: 1 ,skip:skip},
+                beforeSend: _loading(),
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    model.objectsData = data["objects"];
+                    try {
+                     //   model.indextotal = data["total"];
+                      //  model.idcurrent = model.parentCategory;
+                      //  var options = data["options"];
+                      //  jQuery("#pagination").append(options);
+
+                    } catch (ex) {
+
+                    }
+                    objectsViewer.setData(model.objectsData);
+                    objectsViewer.printView();
+
+                    _loading();
+                },
+                error: function (errorThrown) {
+                    _loading();
+                }
+            });
+           // model.init();
+
+        });
+        function obtenerNodes(nodoid) {
+            var iduser="@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getNodeContent2",
+                type: "POST",
+                data: { id: nodoid,userid:iduser },
+                async: false,
+                success: function (data) {
+                    var locations = JSON.parse(data);
+
+                    datos = locations;
+
+                    if (datos.hijos.length > 0) {
+                        var dataItem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(nodoid);
+                        jQuery("#category_tree").data("kendoTreeView").append(datos.hijos, jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid));
+                    }
+
+                },
+                error: function (data) {
+                    //_alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+
+        function InitNodes(nodoid) {
+            var iduser="@Session["_id"].ToString()";
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getNodeContent2",
+                type: "POST",
+                data: { id: nodoid, userid: iduser },
+                success: function (data) {
+                    var result = JSON.parse(data);
+
+                    var locations = result.hijos;
+                    model.parentCategory = result.id;
+                    model.init();
+                    datos = locations;
+                    var objetos = {
+                        id: result.id, text: result.name, expanded: true, "spriteCssClass": "objectimg", "hasChildren": true, items: datos
+                    }
+                    jQuery("#category_tree").kendoTreeView({
+                        dataSource: [
+                            objetos
+                                //{
+                                //    id: "null", text: "Home", expanded: true, "spriteCssClass": "objectimg", "hasChildren": true, items: datos
+                                //}
+                        ]
+                ,
+                        dataTextField: "text",
+                        loadondemand: true,
+                        select: onSelect,
+                        expand: onExpand
+                    });
+                },
+                error: function (data) {
+                    //_alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+        profilemodal.bindAll();
+        jQuery("#object_panel").hide();
+        function onSelect(e) {
+            var dataItem = this.dataItem(e.node);
+            var id = dataItem.id;
+
+            location.hash = id;
+            model.parentCategory = id;
+
+            model.init();
+            if (jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid).children('.k-group').length == 0) {
+                obtenerNodes(dataItem.id);
+            }
+
+        }
+
+        function onExpand(e) {
+            //var dataItem = this.dataItem(e.node);
+            //$("#location_tree").data("kendoTreeView").findByUid(dataItem.uid).children('.k-group').remove();
+            //obtenerNodes(dataItem.id);
+            //if (datos.length > 0) {
+            //    $("#location_tree").data("kendoTreeView").append(datos, $("#location_tree").data("kendoTreeView").findByUid(dataItem.uid));
+            //}
+
+            //obtenerNodes(dataItem.id);
+            //$("#location_tree").data("kendoTreeView").append(datos, $("#location_tree").data("kendoTreeView").findByUid(dataItem.uid));
+        }
+
+
+        var nodo = "null";
+
+        InitNodes(nodo);
+
+        jQuery("#userpopup").on("click", function (e) {
+            jQuery("#profilesPanel").modal("show");
+
+            jQuery("#tablausers").hide();
+        });
+
+        jQuery("#selectprofiles").on('change', function () {
+            jQuery("#tablausers").show();
+            var prof = jQuery("#selectprofiles").val()
+            obtenerUsers(prof);
+
+        });
+
+        jQuery("#responnon_button").on('click', function () {
+            jQuery("#responmmodal").modal("hide");
+        });
+
+        jQuery("#responyes_button").on('click', function () {
+            var userselected = jQuery("#userSelect").val();
+            var nameuser = jQuery("#userSelect").find(":selected").text();
+            if (userselected == '0') {
+                _alert("error", "Debe elegir un usuario.");
+            } else {
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/AsignarUsuarioSelect",
+                    datatype: "json",
+                    type: "POST",
+                    traditional: true,
+                    data: { selectid: model.selectedID, iduser: userselected },
+                    success: function (data) {
+                        jQuery("#username").text(nameuser);
+                        jQuery("#responmmodal").modal("hide");
+                        _alert("success", "Han sido actualizados");
+                    },
+                    error: function (data) {
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                //  model.init();
+
+            }
+
+        });
+        jQuery("[name=seriebtn]").on('click', function () {
+
+            var serienew = jQuery("[name=serieinput]").val();
+            _confirm({
+                title: "Cambiar #Serie",
+                message: "Desea Cambiar el Campo Serie?",
+                action: function () {
+
+                if (serienew.length == 0) {
+
+                } else {
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/AsignarSerie",
+                    datatype: "json",
+                    type: "POST",
+                    traditional: true,
+                    data: { selectid: model.selectedID, serie: serienew },
+                    success: function (data) {
+                        jQuery("#seriename").text(serienew);
+                        jQuery("#seriechange").hide();
+                        _alert("success", "#Serie Actualizado");
+                    },
+                    error: function (data) {
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                //  model.init();
+
+            }
+                }
+            });
+
+        });
+        jQuery("#cancel_button").on('click', function () {
+            jQuery("#profilesPanel").modal("hide");
+        });
+
+        jQuery("#save_button").on('click', function () {
+            profilemodal.asignarusuario();
+
+        });
+        jQuery("[name=serieupdate]").on('click', function () {
+            jQuery("#seriechange").toggle()
+
+        });
+
+        
+
+        function setTree(id) {
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/getRoute",
+                data: { parentCategory: id },
+                type: "POST",
+                success: function (data) {
+                    var data = JSON.parse(data);
+
+                    for (i = data["route"].length - 1; i >= 0; i--) {
+                        var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(data["route"][i].id);
+                        if (jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid).children('.k-group').length == 0) {
+                            obtenerNodes(getitem.id);
+                            /*if (datos.length > 0) {
+                                jQuery("#category_tree").data("kendoTreeView").append(datos, jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+                            }*/
+
+                        }
+                        if (i == 0) { jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid)); }
+                    }
+
+
+                    //     tree.openRoute(data["route"]);
+                }, error: function () { _alert("error", "Ha ocurrido un error"); }
+            });
+        }
+
+        jQuery("#save_button3").on('click', function () {
+            var idlocat = jQuery("#ubicacionSelect").val();
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/updateLocation",
+                datatype: "json",
+                type: "POST",
+                data: { id: model.selectedID, newlocation: idlocat },
+                success: function (data) {
+                    jQuery("#locationobject").text(jQuery('#ubicacionSelect option:selected').text());
+                },
+                error: function (data) {
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+            //var locat = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory");
+
+                jQuery("#locationsPanel2").modal("hide");
+
+        });
+
+        jQuery("#savebutton").bind("click", function () {
+            var order = {};
+            order.objectID = model.selectedID;
+          //  order.idlocation = jQuery("#selectLocation").val();
+            order.name = jQuery("#txtname").val();
+            order.precio = jQuery("#txtprecio").val();
+            order.fecha = jQuery("#txtfecha").val();
+            order.departamento = jQuery("#selectDepartamento").val();
+            order.marca = jQuery("#txtmarca").val();
+            order.modelo = jQuery("#txtmodelo").val();
+            order.perfil = jQuery("#txtperfil").val();
+            order.object_id = jQuery("#txtobject").val();
+            order.solicitud = jQuery("#txtdemand").val();
+            order.folio = jQuery("#lblfolio").text();
+            order.proveedor = jQuery("#selectProveedor").val();
+            order.pedido = jQuery("#txtpedido").val();
+            order.recepcion = jQuery("#txtrecepcion").val();
+            order.erp = jQuery("#txterp").val();
+            order.serie = jQuery("#txtserie").val();
+            order.factura = jQuery("#txtfactura").val();
+            order.RH = jQuery("#txtrh").val();
+            order.assetType = jQuery("#assetSelect").val();
+            //Add extra fields to the order
+
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/saveObject",
+                method: "POST",
+                data: { objeto: JSON.stringify(order) },
+                beforeSend: function () { _loading() },
+                success: function (data) {
+                   jQuery("#object_panel").modal("hide");
+                   objectsViewer.printView();
+                 
+                    _alert("success", "Activo actualizado");
+                },
+                complete: function () { _loading() }
+            });
+        });
+
+        jQuery("#btncambiar").on('click', function () {
+            obtenerUsersSelect("null");
+        });
+
+        jQuery("#btncambiar2").on('click', function () {
+            LoadSubLocations();
+            jQuery("#locationsPanel2").modal("show");
+        });
+
+
+        jQuery("#globalSearch").on('keypress', function (e) {
+            if (e.which == 13) {
+                var cad = jQuery(this).val();
+                var listmailsf = [];
+                var id = "null";
+             @*   @foreach (var mails in (Dictionary<string, string>)ViewData["objsReference"])
+                    {
+                        @(new HtmlString("listmailsf.push('" + mails.Key + "|" + mails.Value + "');"))
+                    }*@
+
+                for (var i = 0; i < listmailsf.length; i++) {
+                    var cadenas = listmailsf[i].split('|');
+
+                    if (cadenas[1] == cad) {
+                        id = cadenas[0];
+                    }
+
+                }
+                jQuery(".k-state-selected").removeClass("k-state-selected");
+                if (id != "null") {
+                    jQuery.ajax({
+                        url: "/ObjectAdmin/ObjectAdmin/getDataByObjectReference",
+                        datatype: "json",
+                        type: "POST",
+                        traditional: true,
+                        data: { objectReference: id },
+                        beforeSend: _loading(),
+                        success: function (data) {
+                            var data = JSON.parse(data);
+                            model.objectsData = data["objects"];
+                            objectsViewer.setData(model.objectsData);
+                            objectsViewer.printView();
+               
+                            _loading();
+                        },
+                        error: function (data) {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                }
+                else {
+                    jQuery.ajax({
+                        url: "/ObjectAdmin/ObjectAdmin/getDataByTexto",
+                        datatype: "json",
+                        type: "POST",
+                        traditional: true,
+                        data: { texto: cad },
+                        beforeSend:_loading(),
+                        success: function (data) {
+                            var data = JSON.parse(data);
+                            model.objectsData = data["objects"];
+                            objectsViewer.setData(model.objectsData);
+                            objectsViewer.printView();
+                         
+                            _loading();
+                        },
+                        error: function (data) {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                }
+                //  setTree(id);
+
+            }
+        });
+        jQuery("#globalSearchButton").click(function () {
+            var cad = jQuery("#globalSearch").val();
+            var listmailsf = [];
+            var id = "null";
+           @* @foreach (var mails in (Dictionary<string, string>)ViewData["objsReference"])
+            {
+               @(new HtmlString("listmailsf.push('" + mails.Key + "|" + mails.Value + "');"))
+            }*@
+
+            for (var i = 0; i < listmailsf.length; i++) {
+                var cadenas = listmailsf[i].split('|');
+
+                if (cadenas[1] == cad) {
+                    id = cadenas[0];
+                }
+
+            }
+            jQuery(".k-state-selected").removeClass("k-state-selected");
+            if (id != "null") {
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/getDataByObjectReference",
+                    datatype: "json",
+                    type: "POST",
+                    traditional: true,
+                    data: { objectReference: id },
+                    beforeSend:_loading(),
+                    success: function (data) {
+                        var data = JSON.parse(data);
+                        model.objectsData = data["objects"];
+                        objectsViewer.setData(model.objectsData);
+                        objectsViewer.printView();
+                    
+                        _loading();
+                    },
+                    error: function (data) {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+            else {
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/getDataByTexto",
+                    datatype: "json",
+                    type: "POST",
+                    traditional: true,
+                    data: { texto: cad },
+                    beforeSend:_loading(),
+                    success: function (data) {
+                        var data = JSON.parse(data);
+                        model.objectsData = data["objects"];
+                        objectsViewer.setData(model.objectsData);
+                        objectsViewer.printView();
+                      
+                        _loading();
+                    },
+                    error: function (data) {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+
+        });
+
+        jQuery("#globalSearch2").on('keypress', function (e) {
+            if (e.which == 13) {
+                var cad = jQuery(this).val();
+                var listmailsf = [];
+                var id = "null";
+                @foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                {
+                    string value=mails.Value.Replace("'", "\'");
+                        @(new HtmlString("listmailsf.push('" + mails.Key + "|" + value + "');\n"))
+                  }
+                
+
+                for (var i = 0; i < listmailsf.length; i++) {
+                    var cadenas = listmailsf[i].split('|');
+
+                    if (cadenas[1] == cad) {
+                        id = cadenas[0];
+                    }
+
+                }
+                setTree(id);
+                location.hash = id;
+                model.parentCategory = id;
+
+                model.init();
+            }
+        });
+        @if (addc != null && addc != "")
+            {
+                           @(new HtmlString("addc = '" + addc + "';"))
+            }
+
+        @if (updc != null && updc != "")
+            {
+            @(new HtmlString("updc = '" + updc + "';"))
+            }
+        @if (delc != null && delc != "")
+            {
+
+            @(new HtmlString("delc ='" + delc + "';"))
+            }
+
+        if (updc == "" || upd == "") {
+            upd = "";
+        }
+
+        if (delc == "" || del == "") {
+
+            del = "";
+        }
+        if (addc == "" || add == "") {
+
+            add = "";
+        }
+
+    });
+
+    //----------------------------------------------------------------------------------------------
+
+    </script>
+}
+
+

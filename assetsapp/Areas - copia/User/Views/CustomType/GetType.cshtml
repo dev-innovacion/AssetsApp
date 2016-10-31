@@ -1,0 +1,151 @@
+﻿@{
+    ViewBag.Title = "Custom Fields" + ViewBag.TableName;
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="widgets_area">
+
+    <div class="span12 form_row ">
+
+        <button class="btn dark_green fileinput-button" id="addUserButton">
+            <i class="icon-plus icon-white"></i>
+            <span>Agregar Campo</span>
+        </button>
+        <button type="button" class="btn red delete">
+            <i class="icon-trash icon-white"></i>
+            <span>Borrar Usuarios</span>
+        </button>
+    </div>
+    <div id="TablePlace"> </div>
+</div>
+
+
+
+<div id="admin_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar CustomField .- @ViewBag.TableName </h3>
+    </div>
+    <form id="userForm" method="post" enctype="multipart/form-data">
+
+        <table width="100%">
+            <thead>
+                <tr>
+                    <td align="right">
+                        <label>Tipo de campo: </label>
+                    </td>
+                    <td>
+                        <div class="staticField">
+                            @Html.DropDownList("DataType", (List<SelectListItem>)ViewBag.Types)
+                        </div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody id="extrafields">
+
+            </tbody>
+        </table>
+
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <input value="Guardar" class="btn blue" type="submit" id="save_button">
+            <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+        </div>
+    </form>
+</div>
+
+<script id="AgregarCustomFields">
+    jQuery("#addUserButton").on("click", function () {
+        jQuery("#admin_panel").modal("show");
+    });
+
+    jQuery("#cancel_button").on("click", function () {
+        jQuery("#admin_panel").modal("hide");
+        //resetData();
+    });
+
+    jQuery("#DataType").on("change", function () {
+        jQuery.ajax({
+            url: '/CustomType/GetForm',
+            type: "GET",
+            data:{type: jQuery("#DataType").val()} ,
+            success: function (data) {
+                jQuery("#extrafields").html(data);
+                
+                var labels=jQuery("#extrafields .editor-label ");
+                var fields=jQuery( "#extrafields .editor-field ");
+                var htmlresult="";
+                for(var i=0;i<jQuery(labels,"div").length;i++)
+                {
+                    htmlresult+="<tr>";
+                    htmlresult+="<td align='right'>"+labels.eq(i).children()[0].outerHTML +"</td>";
+                    htmlresult+="<td>"+fields.eq(i).children()[0].outerHTML+fields.eq(i).children()[1].outerHTML+"</td>";
+                    htmlresult+="</tr>"
+                }
+                jQuery("#extrafields").html(htmlresult);
+                jQuery("#extrafields").find("input").addClass("staticField");
+
+            }
+        });
+
+    });
+
+    
+</script>
+
+<script id="LoadScript">
+
+    jQuery(document).ready(function () {
+        LoadWindow();
+        jQuery("#DataType").trigger("change");
+
+        function LoadWindow() {
+            jQuery.ajax({
+                url: '/CustomType/GetTable?table=@ViewData["tableid"]',
+                type: "GET",
+                success: function (data) {
+                    jQuery("#TablePlace").html(data);
+                    jQuery("#customFieldTable .btn").on("click", function () {
+                        var deleteid;
+                        var buttonid = jQuery(this, "tr .btn").index();
+                        var index = jQuery(this).parents("#customFieldTable tbody tr").index();
+                        deleteid = jQuery("#customFieldTable tbody tr").eq(index).find("input").attr("name");
+
+                        jQuery.ajax({
+                            url: "/CustomType/DeleteField",
+                            type: "POST",
+                            data: { id: deleteid, table: @ViewData["tableid"]},
+                            success: function () {
+                                _alert("success","Eliminado Correctamente");
+                                LoadWindow();
+                            }
+                        });
+                    });
+                    jQuery("#customFieldTable").dataTable({
+                        "sPaginationType": "bootstrap",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 10,
+                        "aoColumnDefs": [{
+                            'bSortable': false,
+                            'aTargets': [0]
+                        }]
+                    });
+
+                }});
+
+        }});
+</script>
+
+@section Scripts
+{
+    <script src="/Content/Scripts/library/jquery.dataTables.js"></script>
+    <script src="/Content/Scripts/datatables.js"></script>
+    <script src="/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+    <script src="/Content/Scripts/forms_advanced.js"></script>
+    <script src="/Content/Scripts/library/bootstrapSwitch.js"></script>
+    <script src="/Content/Scripts/library/bootstrap-datetimepicker.js"></script>
+    <script src="/Content/Scripts/library/bootstrap-timepicker.js"></script>
+    <script src="/Content/Scripts/library/bootstrap-datepicker.js"></script>
+    <script src="/Content/Scripts/library/bootstrap-fileupload.js"></script>
+    <script src="/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+    <script src="/Content/Scripts/library/bootstrapSwitch.js"></script>
+}

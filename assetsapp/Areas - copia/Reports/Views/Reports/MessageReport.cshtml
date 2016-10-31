@@ -1,0 +1,187 @@
+﻿@{Layout = null;}
+
+
+@{
+    ViewBag.Title = "MessageReport";
+    Dictionary<string, string> col = new Dictionary<string, string>();
+
+    col.Add("userName", "Creador");
+    col.Add("recipients", "Destinatario(s)");
+    col.Add("Subject", "Asunto");
+    col.Add("attachments", "Archivos");
+    col.Add("status", "Estado");
+   
+    col.Add("CreatedDate", "Fecha Envio");
+
+
+}
+
+<div class="well blue">
+
+
+
+    <div class="well-header">
+        <center> <h4 style="color:white;padding-top:10px;">Filtrar Reporte de Mensajes</h4></center>
+    </div>
+
+    <div class="well-content no_padding row-fluid">
+        <div class="float_margen">
+
+            <br />
+            <center>
+                <div id="optionsdiv" class="well white span12" style="padding-left:2%;">
+                    <div class="span3">
+                        <div class="well-header">
+                            <h4 style="color:white;padding-top:10px;">Filtrar:</h4>
+                        </div>
+                        <div id="NoWheelPropagation" class="contentHolder well-content no_padding row-fluid" style=" overflow:hidden">
+
+
+                            <div class="span12 no-search" style="padding-left:8px;padding-top:5px;">
+                                <p>
+                                    <strong>Elige Tipo Mensaje(s):</strong>
+                                    <select id="selectprofile" class="chosen">
+                                        <option value="0">Todos</option>
+                                        <option value="1">Activos</option>
+                                        <option value="2">En Papelera</option>
+                                        <option value="3">Borrados</option>
+
+
+                                    </select>
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                    <div class="span9" style="padding-right:10px;">
+                        <div class="well-header">
+                            <center> <h4 style="color:white;padding-top:10px;">Campos a visualizar</h4></center>
+                        </div>
+                        <div class="well-content no_padding row-fluid">
+                            <div class="float_margen">
+                                <center>
+                                    <div id="optionsdiv" class="well white span12" style="padding-left:2%;">
+                                        @foreach (var item in col)
+                                        {
+                                            <div class="float_left" style="padding: 10px 10px 0px 5px; max-height: 50px; ">
+
+                                                <label class="btn blue  float_left" style="min-width:210px;max-width:210px;max-height:50px; overflow-x:auto;padding-top:5px;color:white; border-radius:0px 0px 0px 0px;">
+                                                    <input type="checkbox" class="float_left" style="padding-left:0px;" value="@item.Key" name="options[]" data-option="@item.Value" checked>  @item.Value
+                                                </label>
+
+                                            </div>
+                                        }
+                                        <div class="float_left" style="padding: 10px 10px 0px 5px; max-height: 50px; ">
+                                            <label class="checkbox-inline btn blue  float_left" style="min-width:210px;max-width:210px;max-height:50px; overflow-x:auto;padding-top:5px;color:white; border-radius:0px 0px 0px 0px;">
+
+                                                <input id="all" type="checkbox" class="float_left" style="padding-left:0px;" value="all">Todos
+
+                                            </label>
+                                        </div>
+                                    </div>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+
+                    </div>
+                </div>
+            </center>
+
+
+        </div>
+    </div>
+    <div class="float_right">
+
+        <input type="submit" class="btn blue" id="generate" value="Generar Reporte" />
+    </div>
+</div>
+<script>
+
+
+
+    jQuery(document).ready(function ($) {
+
+
+
+        var valid = 0;
+        var checkboxValues = new Array();
+
+        $('#all').change(function () {
+
+
+
+            $('input[name="options[]"]').each(function () {
+                debugger;
+
+                if (valid == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid == 0) {
+                valid++;
+            } else {
+                valid = 0;
+            }
+        });
+
+        $('#generate').on('click', function () {
+
+
+            var startdate = $("#start").val();
+            var enddate = $("#end").val();
+            var profile = $("#selectprofile").val();
+
+            if (startdate == "" || startdate == null) {
+                startdate = "01/01/1900";
+
+            }
+            if (enddate == "" || enddate == null) {
+                enddate = "01/01/3000";
+            }
+            var index = 0;
+            $('input[name="options[]"]:checked').each(function () {
+                var objdata = new Object();
+                objdata.data = $(this).val();
+                objdata.value = $(this).data("option");
+                checkboxValues.push(objdata);
+                index++;
+            });
+
+
+
+            var jsondata = JSON.stringify(checkboxValues);
+
+            if(index>0){
+            jQuery.ajax({
+
+                url: "/Reports/Reports/GenerateMessageReport",
+                data: { profile: profile, startdate: startdate, enddate: enddate, col: jsondata },
+                beforeSend: _loading(),
+                type: "POST",
+                success: function (data) {
+                    $('#Report').html("");
+                    $('#Report').html(data);
+
+                    checkboxValues.length = 0;
+                    _loading();
+
+                }
+
+
+            });
+            } else {
+                alert("Elija por lo menos un Campo!!!");
+            }
+        });
+
+    });
+
+
+</script>

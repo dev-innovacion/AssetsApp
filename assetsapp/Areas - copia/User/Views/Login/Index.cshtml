@@ -1,0 +1,365 @@
+﻿@{Layout = null;
+  string passwordPattern = ".{6,}";
+  }
+@using System;
+@using System.Collections.Generic;
+@using System.Linq;
+@using System.Web;
+@using System.Web.Mvc;
+@model List<string>
+ @{
+     
+     string timeout = "";
+     try
+     {
+         timeout = ViewData["timeout"].ToString();
+     }
+     catch { }
+
+     string text = "Acceso a Assetsapp";
+     string logologin = "~/Content/Images/CinepolislogoLogin.png";
+     try
+     {
+         text = ViewData["text"].ToString();
+     }
+     catch { }
+     try
+     {
+         logologin = ViewData["logologin"].ToString();
+     }
+     catch { }
+ }            
+            
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>HTK - CAFI WEB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href=" ~/Content/css/bootstrap.css" rel="stylesheet">
+    <link href="~/Content/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="~/Content/css/stylesheet.css" rel="stylesheet">
+    <link href="~/Content/css/loginStyle.css" rel="stylesheet">
+    <link href="~/Content/css/design/loginform.css" rel="stylesheet">
+    <link href="~/Content/icon/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <script src="~/Content/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Content/Scripts/jquery-ui-1.10.3.js"></script>
+    <script src="~/Content/Scripts/bootstrap.js"></script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="~/Content/img/apple-touch-icon-144-precomposed.html">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="~/Content/img/apple-touch-icon-114-precomposed.html">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="~/Content/img/apple-touch-icon-72-precomposed.html">
+    <link rel="apple-touch-icon-precomposed" href="~/Content/img/apple-touch-icon-57-precomposed.html">
+    <link rel="shortcut icon" href="~/Uploads/Images/Design/Favicon/favicon.png">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="~/Content/Scripts/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <div class="login-container" id="gradiente1">
+        <div class="login-header">
+            <h4 style="text-align: center;"><img src="@logologin"></h4>
+            <p class="Login-text">@text</p>
+        </div>
+        @using (@Html.BeginForm("Login", "Login", FormMethod.Post))
+        {
+            <div class="login-field">
+               
+                <input type="text" name="username" id="username" placeholder="Usuario">
+                <i class="icon-user" style="margin-top:-25px;"></i>
+            </div>
+            <div class="login-field">
+                
+                <input type="password" name="password" id="password" placeholder="Contraseña">
+                <i class="icon-lock" style="margin-top:-25px;"></i>
+            </div>
+
+            if(ViewBag.Error==true)
+            { 
+               @(new HtmlString("<div class='alert alert-error'>" +
+               "<button type='button' class='close' data-dismiss='alert'><i class='icon-remove'></i>" +
+               "</button><strong>" +@ViewBag.Message +"</strong><br> vuelva intentarlo...</div>"));
+            }
+              <div class="forgot-password passCenter">
+                <a class="pass" href="#forgot-pw" role="button" data-toggle="modal">¿Olvidaste tu Contraseña?</a>
+            </div>
+
+            <div class="login-button clearfix">
+                <button type="submit" class="pull-right btn btn-large Login">INICIAR <i class="icon-arrow-right"></i></button>
+            </div>
+          
+        }
+        <div class="powered-by pull-right">
+            <div class="row-fluid">          
+                <label>Powered by</label>
+            </div> 
+            <div>   
+                <img class="login-htkLogo" src="/Content/Images/logo-htk.png">
+            </div>
+        </div>
+
+    </div>
+
+    <div id="forgot-pw" class="modal hide fade" tabindex="-1" data-width="760">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+            <h3>¿Olvidaste tu Contraseña?</h3>
+        </div>
+        <div class="modal-body">
+            <div class="row-fluid">
+                <div class="span9">
+                    <div class="form_row">
+                        <label class="field_name">Direccion Electronica:</label>
+                        <div class="field">
+                            <div class="row-fluid">
+                                <div class="span8">
+                                    <input  type="text" class="span12" name="email" placeholder="ejemplo@dominio.com">
+                                </div>
+                                <div class="span4">
+                                    <a id="sendmail" href="#" class="btn btn-block yellow">Enviar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* User days expired, change password - modal *@
+<div id="chgPasswordExp_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Cambio de contraseña</h3>
+    </div>
+    <form id="user-customer_Form" method="post" autocomplete="off">
+        <div class="modal-body">
+            <div id="firmaContent" class="staticField">
+                <table width ="100%">
+                    <tr>
+                        <td width ="50%"><h10>ID Usuario: </h10></td>
+                        <td><input type="text" id="userID" placeholder="ID Usuario"  data-original-title="El nombre de usuario sólo puede contener caracteres alfanuméricos y los caracteres (-, _, .)." rel="tooltip" data-placement="right" ></input></td>
+                    </tr>
+                    <tr>
+                        <td width ="50%"><h10>Contraseña actual: </h10></td>
+                        <td><input type="password" id="oldPassword" pattern=@passwordPattern placeholder="Contraseña actual" data-original-title="Mínimo seis caracteres." rel="tooltip" data-placement="right" ></input></td>
+                    </tr>
+                    <tr>
+                        <td width ="50%"><h10>Nueva contraseña: </h10></td>
+                        <td><input type="password" id="newPassword" pattern=@passwordPattern placeholder="Nueva contraseña" data-original-title="Mínimo seis caracteres." rel="tooltip" data-placement="right" ></input></td>
+                    </tr>
+                    <tr>
+                        <td width ="50%"><h10>Repetir nueva contraseña: </h10></td>
+                        <td><input type="password" id="repeatNewPassword" pattern=@passwordPattern placeholder="Repetir nueva contraseña" data-original-title="Mínimo seis caracteres." rel="tooltip" data-placement="right" ></input></td>
+                    </tr>
+                </table>
+                <div id="messagesModal"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span width="80%" class="error_msg"></span>
+            <input value="Aceptar" class="btn dark_green" type="button" id="save_chgPasswordExp">
+        </div>
+    </form>
+</div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="~/Content/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Content/Scripts/jquery-ui-1.10.3.js"></script>
+    <script src="~/Content/Scripts/bootstrap.js"></script>
+    <script src="/Content/Scripts/library/jquery.collapsible.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.mCustomScrollbar.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.mousewheel.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.uniform.min.js"></script>
+     <script src="~/Content/Scripts/library/jquery.collapsible.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.mCustomScrollbar.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.mousewheel.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.uniform.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.sparkline.min.js"></script>
+    <script src="~/Content/Scripts/library/chosen.jquery.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.easytabs.js"></script>
+    <script src="~/Content/Scripts/library/flot/excanvas.min.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.pie.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.selection.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.orderBars.js"></script>
+    <script src="~/Content/Scripts/library/maps/jquery.vmap.js"></script>
+    <script src="~/Content/Scripts/library/maps/maps/jquery.vmap.world.js"></script>
+    <script src="~/Content/Scripts/library/maps/data/jquery.vmap.sampledata.js"></script>
+    <script src="~/Content/Scripts/library/jquery.autosize-min.js"></script>
+    <script src="~/Content/Scripts/library/charCount.js"></script>
+    <script src="~/Content/Scripts/library/jquery.minicolors.js"></script>
+    <script src="~/Content/Scripts/library/jquery.tagsinput.js"></script>
+    <script src="~/Content/Scripts/library/footable/footable.js"></script>
+    <script src="~/Content/Scripts/library/footable/data-generator.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCL6XtCGot7S7cfxnO6tRfeZx9kLQQRMtA&amp;sensor=false"></script>
+    <script src="~/Content/Scripts/library/jquery.sparkline.min.js"></script>
+    <script src="~/Content/Scripts/library/chosen.jquery.min.js"></script>
+    <script src="~/Content/Scripts/library/jquery.easytabs.js"></script>
+    <script src="~/Content/Scripts/library/flot/excanvas.min.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.pie.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.selection.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/Scripts/library/flot/jquery.flot.orderBars.js"></script>
+    <script src="~/Content/Scripts/library/maps/jquery.vmap.js"></script>
+    <script src="~/Content/Scripts/library/maps/maps/jquery.vmap.world.js"></script>
+    <script src="~/Content/Scripts/library/maps/data/jquery.vmap.sampledata.js"></script>
+    <script src="~/Content/Scripts/library/jquery.autosize-min.js"></script>
+    <script src="~/Content/Scripts/library/charCount.js"></script>
+    <script src="~/Content/Scripts/library/jquery.minicolors.js"></script>
+    <script src="~/Content/Scripts/library/jquery.tagsinput.js"></script>
+    <script src="~/Content/Scripts/library/fullcalendar.min.js"></script>
+    <script src="~/Content/Scripts/library/footable/footable.js"></script>
+    <script src="~/Content/Scripts/library/footable/data-generator.js"></script>
+    <script src="~/Content/Scripts/library/bootstrap-fileupload.js"></script>
+    <script src="~/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+     @*<script src="~/Content/Scripts/library/bootstrap-datetimepicker.js"></script>
+    <script src="~/Content/Scripts/library/bootstrap-timepicker.js"></script>
+    <script src="~/Content/Scripts/library/bootstrap-datepicker.js"></script>
+    <script src="~/Content/Scripts/library/bootstrap-fileupload.js"></script>*@
+    <script src="~/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+    <script src="~/Content/Scripts/library/jquery.backstretch.min.js"></script>
+
+    <script src="~/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+
+    <script src="~/Content/Scripts/library/bootstrap-modal.js"></script>
+    <script src="~/Content/Scripts/library/bootstrap-modalmanager.js"></script>
+
+    <script src="~/Content/Scripts/flatpoint_core.js"></script>
+
+    <script src="~/Content/Scripts/forms.js"></script>
+
+    <script>
+        jQuery(document).ready(function ($) {
+            $('.uniform').uniform();
+        });
+
+        var statusPassword = '@ViewBag.Message';
+
+        if (statusPassword == "Timeout") {
+            jQuery("#chgPasswordExp_panel").modal("show");
+        }
+
+        //Change password Secction --------------------
+        jQuery("#save_chgPasswordExp").click(function () {
+            jQuery("#messagesModal").html("");
+            var inputsArray = jQuery("#chgPasswordExp_panel .modal-body input");
+
+            for (i = 0; i < inputsArray.length; i++) {
+                input = jQuery(inputsArray[i]);
+                var msg = input.closest("tr").find("h10").text().split(':')[0];
+
+                if (input.val() == "") {
+                    jQuery("#messagesModal").html("<br /><p style='Color: red;'>Introduzca \"" + msg + "\"</p>");
+                    return false;
+                }
+                regExp = new RegExp(input.attr("pattern"));
+                if (!input.val().match(regExp)) {
+                    jQuery("#messagesModal").html("<br /><p style='Color: red;'>Formato incorrecto para \"" + msg + "\"</p>");
+                    return false;
+                }
+                if (jQuery("#newPassword").val() != jQuery("#repeatNewPassword").val()) {
+                    jQuery("#messagesModal").html("<br /><p style='Color: red;'>Las contraseñas no coinciden</p>");
+                    return false;
+                }
+                if (jQuery("#newPassword").val() == jQuery("#oldPassword").val()) {
+                    jQuery("#messagesModal").html("<br /><p style='Color: red;'>La contraseña nueva debe ser diferente a la actual!</p>");
+                    return false;
+                }
+            }
+
+            var actualPass = jQuery("#oldPassword").val();
+            var username = jQuery("#userID").val();
+            var newpassword = jQuery("#newPassword").val();
+
+            jQuery.ajax({
+                url: "/User/Login/ChgPassword",
+                type: "POST",
+                data: { username: username, password: actualPass, newpassword: newpassword},
+                success: function (data) {
+                    if (data == "WrongPass") {
+                        jQuery("#messagesModal").html("<br /><p style='Color: red;'>Contraseña incorrecta, vuelva a intentarlo!</p>");
+                    } else {
+                        jQuery("#messagesModal").html("<br /><p style='Color: green;'>Contraseña cambiada correctamente!</p>");
+                        setTimeout(function () { window.location.href = data; }, 3000);
+                    }
+                },
+                error: function () {
+                    alert("Ocurrio un error");
+                }
+
+            });
+        });
+        //---------------------------------------------
+        jQuery("#sendmail").off("click.send");
+        jQuery("#sendmail").on("click.send", function () {
+            var email=jQuery("[name=email]").val();
+            if(email.length>0){
+                jQuery.ajax({
+                    url: "/User/Login/forgetPass",
+                    type: "POST",
+                    data: { email: email },
+                    success: function (data) {
+                        alert(data);
+                        jQuery("forgot-pw").modal("hide");
+
+                    },
+                    error: function () {
+                        alert("Ocurrio un error");
+                    }
+
+                });
+            }else{
+                alert("ingrese un correo electronico");
+            }
+
+        })
+    </script>
+
+    <script>
+        var images = "";
+        jQuery(document).ready(function ($) {
+            $('.uniform').uniform();
+
+
+        });
+
+        jQuery.backstretch([
+            @{int count = 0;}
+            @foreach(string url in Model){
+
+                if (count == 0)
+                {
+                 @(new HtmlString("'"+url+"'"));
+                 count++;
+                }
+                else { 
+               @(new HtmlString(",'"+url+"'"));
+                }
+            
+              }
+              /*  "/Content/Images/slider/slide_01.jpg",
+                "/Content/Images/slider/slide_03.jpg",
+                "/Content/Images/slider/slide_02.jpg",*/
+
+        ], {
+            duration: 4000, fade: 1000
+        });
+    </script>
+
+</body>
+</html>

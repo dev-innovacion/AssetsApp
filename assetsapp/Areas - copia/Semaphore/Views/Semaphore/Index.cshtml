@@ -1,0 +1,298 @@
+﻿ 
+@using MongoDB.Bson
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Dictionary<string, string> typemovements = new Dictionary<string, string>();
+    typemovements.Add("create", "Alta");
+    typemovements.Add("delete", "Baja");
+    typemovements.Add("movement", "Transferencia");
+    typemovements.Add("temporal", "Salida Temporal");
+    
+}
+<div id="admin_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar Semaforo</h3>
+    </div>
+    
+    <form id="userForm" method="post" autocomplete="off">
+        <div class="modal-body">
+
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="tabHeader1">
+                    <li class="active" id="staticFormHeader"><a href="#staticFieldsSection" data-toggle="tab">Inf Semaforo</a></li>
+                      </ul>
+            </div>
+            <div class="tab-content" id="tabContent1">
+                <div class="tab-pane active staticFieldsSection perfilMargen" id="staticFieldsSection">
+
+                    <table width="100%">
+                        <tr>
+                            <td width="50%">
+                            
+                                <label>Tipo de movimiento: </label>
+                                <div class="staticField">
+                                    <select id="typemov" name="typemov" style="width:90%;">
+                                        <option value="0">Elija Una opcion</option>
+                                        @foreach (var item in typemovements)
+                                        {
+                                         <option value="@item.Key">@item.Value</option>
+                                        }
+                                    </select>
+                                </div>
+                           
+                            </td>
+                            <td rowspan="2" width="50%" style="text-align:center">
+                                <img style="max-height: 200px;" id="img_pre" src="~/Content/Images/imgPerfil/semaphore.gif">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Color: </label>
+                                <div class="staticField">
+                                    <input type="color" id="color" name="color"   required="required"   data-original-title="Elige el color del semaforo." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Dias: </label>
+                                <div class="staticField">
+                                    <input type="number" id="days" name="days"   required="required"   data-original-title="Numero de dias" rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                          
+                        </tr>
+                    </table>
+                </div>
+           
+              
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <input value="Guardar" class="btn dark_green" type="button" id="save_button">
+            <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button">
+        </div>
+    </form>
+</div>
+
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Administrador de Semaforos</h3>
+                </div>
+                <div class="span4">
+                   @* <div class="search">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Semaforos</h5>
+                        <div class="btn-group">
+                            <button id="addSemaphore" class="btn btn-mini dark_green fileinput-button"  data-original-title="Agregar Semaforo" rel="tooltip" data-placement="top">
+                                <i class="icon-plus icon-white"></i>
+                            </button>
+                            <button id="refresh" class="btn btn-mini dark_green fileinput-button" data-original-title="Actualizar" rel="tooltip" data-placement="top">
+                                <i class="icon-refresh icon-white"></i>
+                            </button>
+
+                          
+                        </div>
+                    </div>
+
+                    <div id="deleteProfile" class="modal hide fade" data-backdrop="static">
+                        <div class="modal-header">
+                            <h3 class="modal-header-text">Borrar Semaforo</h3>
+                        </div>
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <input value="Borrar" class="btn red" type="submit" id="delete_button">
+                            <input value="Cancelar"  class="btn grey" type="button" id="cancel_button">
+                        </div>
+                    </div>
+
+
+                    <div class="well-content no-search" id="profilesTable">
+                  
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+ 
+<script>
+    var model = {
+
+        Semaphoreid: null,
+
+        init: function () {
+            model.bindAll();
+            model.table();
+        },
+
+        table: function () {
+        
+            jQuery.ajax({
+                url: "/Semaphore/Semaphore/GetSemaphoreTable",
+                type: "POST",
+                beforeSend: _loading(),
+                success: function (data) {
+                    jQuery("#profilesTable").html("");
+                    jQuery("#profilesTable").html(data);
+                    model.bindAll();
+                },
+                complete: _loading()
+            });
+
+        },
+        deleteS: function () {
+
+            var id = model.Semaphoreid;
+            jQuery.ajax({
+                url: "/Semaphore/Semaphore/deleteSemaphore",
+                type: "POST",
+                beforeSend: _loading(),
+                data: { id: model.Semaphoreid },
+                success: function (data) {
+                    if (data == "True") {
+                        _alert("success", "Semáforo Borrado Correctamente");
+                        model.table();
+                        model.Semaphoreid = null;
+                    } else {
+                        _alert("error", "Error al intentar Borrar el Semáforo");
+                    }
+                },
+                complete: _loading()
+            });
+        },
+        edit: function () {
+
+            var id = model.Semaphoreid;
+            jQuery.ajax({
+                url: "/Semaphore/Semaphore/EditSemaphore",
+                type: "POST",
+                beforeSend: _loading(),
+                data:{id:id},
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (typeof data == "object" && "_id" in data) {
+                        jQuery("[name=typemov] [value="+data.typeMovement+"]").attr("selected", "selected");
+                        jQuery("[name=color]").val(data.color);
+                        jQuery("[name=days]").val(data.days);
+                        jQuery("#admin_panel").modal("show");
+                    }
+                },
+                complete: _loading()
+            });
+
+        },
+        addSemaphore: function () {
+            jQuery("[name=typemov] option").first().attr("selected", "selected");
+            jQuery("[name=color]").val("#ffffff")
+            jQuery("[name=days]").val(5)
+            jQuery("#admin_panel").modal("show");
+               
+        },
+        save: function () {
+            var color = jQuery("[name=color]").val();
+            var typeMov =jQuery("[name=typemov]").val();
+            var days = parseInt(jQuery("[name=days]").val());
+            if (typeMov != 0 && days != NaN) {
+                jQuery.ajax({
+                    url: "/Semaphore/Semaphore/saveSemaphore",
+                    type: "POST",
+                    beforeSend: _loading(),
+                    data: { color: color, typemov: typeMov, days: days, id: model.Semaphoreid },
+                    success: function (data) {
+                        if (data == "True") {
+                            _alert("success", "Semáforo Guardado Correctamente");
+                            model.table();
+                            model.Semaphoreid = null;
+                            jQuery("#admin_panel").modal("hide");
+                        } else {
+                            _alert("error", "Error al intentar Guardar el Semáforo");
+                        }
+                    },
+                    complete: _loading()
+                });
+
+            } else {
+                if(typeMov==0)
+                    alert("Seleccione un Tipo de Movimiento");
+                if (days = NaN)
+                    alert("Introduzca el Numero de dias (Solo valores Numericos)");
+            }
+
+        },
+        bindAll: function () {
+
+            jQuery("#addSemaphore").unbind("click.addSemaphore");
+            jQuery("#addSemaphore").bind("click.addSemaphore", model.addSemaphore );
+
+            jQuery("#refresh").unbind("click.torefresh");
+            jQuery("#refresh").bind("click.torefresh", model.table);
+            jQuery(".edit").unbind("click.edit");
+            jQuery(".edit").bind("click.edit", function () {
+
+                model.Semaphoreid = jQuery(this).closest("tr").data("id");
+                model.edit();
+            });
+            jQuery(".delete").unbind("click.delete");
+            jQuery(".delete").bind("click.delete", function () {
+                var idd = jQuery(this).closest("tr").data("id");
+                _confirm({
+                    title: "Remover Semáforo",
+                    message: "¿Seguro que desea remover el Semáforo ?",
+                    action: function () {
+                        model.Semaphoreid = idd;
+                        model.deleteS();
+                    }
+                });
+               
+            });
+            jQuery("#save_button").unbind("click.save");
+            jQuery("#save_button").bind("click.save", model.save);
+
+           
+          /*  jQuery("#globalSearch").bind("keypress.checkSend", function (e) {
+                if (e.which == 13) {
+                    jQuery("#globalSearchButton").click();
+                }
+            });*/
+
+
+        }
+
+
+    };
+    $("document").ready(function () {
+       
+         debugger;
+        model.init();
+         
+   });
+
+
+
+
+    
+
+</script>

@@ -1,0 +1,65 @@
+﻿@{Layout = null;}
+
+@model string[]
+@{
+    ViewBag.Title = "GenerateMapWidget";
+    string[] widgetdata = Model;
+    string ts = DateTime.Now.ToString("yyyyMMddHHmmss");
+    string type = widgetdata[1];
+    string name = widgetdata[0];
+
+}
+<div class="well widgetid" data-idwidget="@ViewData["idwidget"].ToString()" data-type="@type">
+
+    <div id="@ts"></div>
+
+
+</div>
+<script src="~/Content/Scripts/library/maps/data/jquery.vmap.sampledata.js"></script>
+
+<script>
+
+
+    jQuery(document).ready(function ($) {
+
+        var idw = "";
+        var name = "";
+        @(new HtmlString("idw='"+ts+"';"))
+        @(new HtmlString("name='"+name+"';"))
+
+     function init() {
+
+     var type=jQuery(".widgetid").data("type");
+
+    
+         jQuery("#" + idw).vectorMap({
+             map: name,
+             backgroundColor: null,
+             borderWidth: 4,
+             borderColor: '#0066CC',
+             color: "#89c0f2",
+             hoverOpacity: .7,
+             selectedColor: "#2d91ef",
+             normalizeFunction: 'polynomial',
+             enableZoom: true,
+             showTooltip: 1,
+             values: sample_data,
+             scaleColors: ["#8cc3f6", "#5c86ac"],
+             normalizeFunction: "polynomial",
+             selectedRegion: "sn",
+
+             onRegionClick: function (elemento, code, region) {
+                 var mensaje = "" + region;//+ " con el codigo:" + code;
+                 window.location = "/Locations/Location";
+                 //  alert(mensaje);
+                 //  alert("This Region has " + (Math.floor(Math.random() * 10) + 1) + " users!")
+
+             }
+         });
+       
+
+     }
+     init();
+
+ });
+</script>

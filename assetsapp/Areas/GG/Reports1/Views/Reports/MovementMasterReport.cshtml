@@ -1,0 +1,1515 @@
+﻿@{Layout = null;}
+
+
+@{
+    ViewBag.Title = "CustomReport";
+    Dictionary<string, string> col = new Dictionary<string, string>();
+    Dictionary<string, string> statusdict = new Dictionary<string, string>();
+    statusdict.Add("3", "Pendiente");
+    statusdict.Add("6", "Aceptada");
+    statusdict.Add("7", "Denegada");
+   // statusdict.Add("8", "Salida Temporal");
+
+    int index = 0;
+    string idus = "";
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+        idus = Session["_id"].ToString();
+    }
+    int count = 0;
+}
+
+
+
+
+<div class="float_margen" style="padding-bottom: 9%; padding-top: 0%;">
+
+
+
+    <center>
+        <div id="optionsdiv" class="well white span11" style="padding-left: 2%; float: left; margin-top: 20px; ">
+
+            <div class="span12" style="padding-right:10px;">
+                
+                <div class="row-fluid">
+                    <div class="float_margen">
+                        <center>
+                            <div class="well white span12" style="padding-left:0%;">
+
+
+
+                                <div class="row-fluid" style="padding-right:20px;">
+                                    <div class="span4">
+                                        <div id="statusFilter">
+                                          
+                                            <div style="max-height:80px;overflow:auto">
+                                                <select multiple class="span11" style="width:100%">
+                                                    @foreach (var item in statusdict)
+                                                    {
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right;">
+                                                <input id="statuscheck" type="checkbox" style="right:5px;" />
+                                                Solicitudes
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="span4">
+                                        <div id="movFilter">
+                                           
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select multiple class="span11" style="width:100%">
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["movement"])
+                                                    {
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                <input id="movcheck" type="checkbox" style="right:5px;" />
+                                                Movimientos:  
+                                            </div>
+                                        </div>
+                                   
+                                    </div>
+
+                                    <div class="span4">
+                                        <div id="objFilter">
+                                           
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select multiple class="span11" style="width:100%">
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["obj"])
+                                                    {
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                <input id="objcheck" type="checkbox" style="right:5px;" />
+                                                ID Solicitud:  
+                                            </div>
+                                        </div>
+                                      
+                                    </div>
+
+                               
+
+                                 
+
+                                </div>
+                                <div class="row-fluid" style="padding-right:20px;">
+                                    <div class="span6">
+                                        <div id="userFilter">
+
+                                            <div style="max-height:80px;overflow:auto">
+                                                <select multiple class="span11" style="width:100%">
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["users"])
+                                                    {
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right;">
+                                                <input id="usercheck" type="checkbox" style="right:5px;" />
+                                                Usuarios
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="span6">
+                                        <div id="locsFilter">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select multiple class="span11" style="width:100%">
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["locs"])
+                                                    {
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                <input id="locscheck" type="checkbox" style="right:5px;" />
+                                                Conjuntos:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                               
+
+
+
+
+
+                                </div>
+                                <div class="row-fluid" style="padding-right:20px;">
+                                    <div class="span3">
+                                        <div id="dictFilter" style="display:none">
+
+                                            <div style="max-height:80px;overflow:auto">
+                                                <select class="span11" style="width:100%">
+
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Dictamen</option>
+                                                    <option value="2">Sin Dictamen</option>
+                                                    <option value="3">Ninguno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right;">
+                                                Dictamen
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="span3">
+                                        <div id="doFilter"  style="display:none">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select   class="span11" style="width:100%">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Acta de Hechos</option>
+                                                    <option value="2">Sin Acta de Hechos</option>
+                                                    <option value="3">Ninguno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                      Acta de Hechos:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="span3">
+                                        <div id="mpFilter" style="display:none">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select class="span11" style="width:100%">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Acta de M.P.</option>
+                                                    <option value="2">Sin Acta de M.P.</option>
+                                                    <option value="3">Ninguno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                Acta de M.P:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="span3">
+                                        <div id="destroyFilter" style="display:none">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select class="span11" style="width:100%">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Acta de Destrucción</option>
+                                                    <option value="2">Sin Acta de Destrucción.</option>
+                                                    <option value="3">Ninguno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                Acta de Destrucción:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+                                </div>
+                                <div class="row-fluid" style="padding-right:20px;">
+                                    <div class="span3">
+                                        <div id="autoFilter">
+
+                                            <div style="max-height:80px;overflow:auto">
+                                                <select class="span11" style="width:100%">
+
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Autorizadas</option>
+                                                    <option value="2">Con Falta de Autorización</option>
+
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right;">
+                                                     Autorizaciones
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="span3">
+                                        <div id="voboFilter">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select class="span11" style="width:100%">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Visto Bueno</option>
+                                                    <option value="2">Sin Visto Bueno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                      Visto Bueno:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="span3">
+                                        <div id="photoFilter" style="display:none">
+
+                                            <div style="max-height:80px;overflow:auto">
+
+                                                <select class="span11" style="width:100%">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Con Facturas</option>
+                                                    <option value="2">Sin Facturas</option>
+                                                    <option value="3">Ninguno</option>
+                                                </select>
+                                            </div>
+                                            <div class="hida" style="padding-left: 2%;float:right">
+                                                Facturas:
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    
+
+
+
+                                </div>
+                            </div>
+                         
+                        </center>
+                    </div>
+                </div>
+            </div>
+            <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+
+            </div>
+        </div>
+    </center>
+
+
+</div>
+
+<div class="float_right" style="padding-right: 4%">
+    <input type="submit" class="btn button_green" id="generate" value="Generar Reporte" />
+    <!--<input type="submit" class="btn blue" id="saver" value="Guardar Reporte" />-->
+
+
+</div>
+
+
+
+
+<script>
+
+
+
+    jQuery(document).ready(function ($) {
+
+        var idus = ""
+       
+        var list_movs = [];
+        var list_objs = [];
+        var list_users = [];
+        var list_locs = [];
+        var list_status = [];
+        var filterespecial = "alls";
+
+
+
+
+        @(new HtmlString("idus='" + idus + "';"))
+        $("#movFilter select").select2({
+            placeholder: "Mostrar todos los movimientos",
+            allowClear: true
+        });
+        $("#userFilter select").select2({
+            placeholder: "Mostrar todos los Usuarios",
+            allowClear: true
+        });
+        $("#locsFilter select").select2({
+            placeholder: "Mostrar todos los Conjuntos",
+            allowClear: true
+        });
+        $("#dictFilter select").select2({
+            placeholder: "Dictamen",
+            allowClear: true
+        });
+        $("#doFilter select").select2({
+            placeholder: "Actas de Hecho",
+            allowClear: true
+        });
+        $("#mpFilter select").select2({
+            placeholder: "Acta de Ministerio Publico",
+            allowClear: true
+        });
+        $("#destroyFilter select").select2({
+            placeholder: "Acta de Destrucción",
+            allowClear: true
+        });
+        $("#autoFilter select").select2({
+            placeholder: "Acta de Destrucción",
+            allowClear: true
+        });
+        $("#voboFilter select").select2({
+            placeholder: "Acta de Destrucción",
+            allowClear: true
+        });
+        $("#photoFilter select").select2({
+            placeholder: "Acta de Destrucción",
+            allowClear: true
+        });
+        $("#objFilter select").select2({
+            placeholder: "Buscar ID de solicitudes",
+            allowClear: true
+        });
+       
+        $("#statusFilter select").select2({
+            placeholder: "Mostrar Todas las solicitudes",
+            allowClear: true
+        });
+        $('#myCarousel').carousel({
+            interval: 200000
+        })
+
+        var valid = 1;
+        var checkboxValues = new Array();
+
+        jQuery("#addmov").click(function () {
+
+            addmov();
+
+
+        });
+        jQuery("#addobj").click(function () {
+
+            addobj();
+
+
+        });
+        jQuery("#addloc").click(function () {
+
+            addloc();
+
+
+        });
+        jQuery("#adduser").click(function () {
+
+            adduser();
+
+
+        });
+        jQuery("#movements").on('keypress', function (e) {
+            if (e.which == 13) {
+                addmov();
+            }
+        });
+        jQuery("#objs").on('keypress', function (e) {
+            if (e.which == 13) {
+                addobj();
+            }
+        });
+        jQuery("#locationsselect").on('keypress', function (e) {
+            if (e.which == 13) {
+                addloc();
+            }
+        });
+        jQuery("#usersselect").on('keypress', function (e) {
+            if (e.which == 13) {
+                adduser();
+            }
+        });
+
+        function removemov() {
+
+            jQuery(this).closest(".vM").remove();
+            var remove = jQuery(this).closest(".vM").data("id");
+
+            for (var i = 0; i < list_movs.length; i++) {
+
+                if (list_movs[i].value == remove) {
+
+                    list_movs.splice(i, 1);
+                }
+
+            }
+        }
+        function removeobj() {
+
+            jQuery(this).closest(".vM").remove();
+            var remove = jQuery(this).closest(".vM").data("id");
+
+            for (var i = 0; i < list_objs.length; i++) {
+
+                if (list_objs[i].value == remove) {
+
+                    list_objs.splice(i, 1);
+                }
+
+            }
+        }
+   
+     
+      
+
+
+        function addmov() {
+            var movementsel = jQuery("#movements").val()
+            var listmailsf = [];
+            var objresult = {};
+
+            var validate = 0;
+            var reply = 0;
+
+
+
+            @foreach (var mails in (Dictionary<string, string>)ViewData["movement"])
+        {
+            @(new HtmlString("var objdata={};"))
+
+            @(new HtmlString("objdata.id='" + mails.Key + "';"))
+             @(new HtmlString("objdata.value='" + mails.Value + "';"))
+          @(new HtmlString("listmailsf.push(objdata);"))
+        }
+            var st = 0;
+            for (var i = 0; i < listmailsf.length; i++) {
+
+                if (listmailsf[i].value == movementsel) {
+
+                    objresult.id = listmailsf[i].id;
+                    objresult.value = movementsel;
+                    validate = 1;
+
+                    for (var j = 0; j < list_movs.length; j++) {
+                        if (list_movs[j].id == objresult.id) {
+                            reply = 1;
+                            st = 0;
+                            break;
+                        } else {
+                            reply = 0;
+                            st = 1;
+
+                        }
+                    }
+                }
+
+                if (st == 1) {
+                    break;
+                }
+
+
+            }
+
+            if (validate == 0 || reply == 1) {
+                jQuery("#movements").val("")
+
+                if (validate == 0) {
+                    alert("El Movimiento " + movementsel + " es invalido");
+                }
+                if (reply == 1) {
+                    alert("El Movimiento " + movementsel + " ya se encuantra agregado!!!");
+                }
+                movementsel = "";
+            }
+            if (movementsel != null && movementsel != "" && validate == 1) {
+
+
+
+                var div = jQuery("<div  class='vM' style='padding-bottom:5px;'>", { class: "vM" }).attr('data-id', movementsel).append(
+                                         jQuery("<span>", { class: "" }).html("<strong>" + movementsel + "</strong>")
+
+
+                                     ).append(jQuery("<div class='vN' style='vertical-align: text-bottom;'>", { class: "vN" }).on('click', removemov));
+
+                jQuery("#listmovement").append(div);
+
+                list_movs.push(objresult);
+                jQuery("#movements").val("");
+            }
+
+        }
+        function addobj() {
+            var movementsel = jQuery("#objs").val()
+            var listmailsf = [];
+
+            var objresult = {};
+
+            var validate = 0;
+            var reply = 0;
+
+
+
+            @foreach (var mails in (Dictionary<string, string>)ViewData["obj"])
+        {
+            @(new HtmlString("var objdata={};"))
+
+            @(new HtmlString("objdata.id='" + mails.Key + "';"))
+             @(new HtmlString("objdata.value='" + mails.Value + "';"))
+          @(new HtmlString("listmailsf.push(objdata);"))
+        }
+
+            var st = 0;
+            for (var i = 0; i < listmailsf.length; i++) {
+
+                if (listmailsf[i].value == movementsel) {
+
+                    objresult.id = listmailsf[i].id;
+                    objresult.value = movementsel;
+                    validate = 1;
+
+                    for (var j = 0; j < list_objs.length; j++) {
+                        if (list_objs[j].id == objresult.id) {
+                            reply = 1;
+                            st = 0;
+                            break;
+                        } else {
+                            reply = 0;
+                            st = 1;
+
+                        }
+                    }
+                }
+
+                if (st == 1) {
+                    break;
+                }
+
+
+            }
+
+            if (validate == 0 || reply == 1) {
+                jQuery("#objs").val("")
+
+                if (validate == 0) {
+                    alert("El Objeto " + movementsel + " es invalido");
+                }
+                if (reply == 1) {
+                    alert("El Objeto " + movementsel + " ya se encuantra agregado!!!");
+                }
+                movementsel = "";
+            }
+            if (movementsel != null && movementsel != "" && validate == 1) {
+
+
+
+                var div = jQuery("<div  class='vM' style='padding-bottom:5px;'>", { class: "vM" }).attr('data-id', movementsel).append(
+                                         jQuery("<span>", { class: "" }).html("<strong>" + movementsel + "</strong>")
+
+
+                                     ).append(jQuery("<div class='vN' style='vertical-align: text-bottom;'>", { class: "vN" }).on('click', removeobj));
+
+                jQuery("#listobj").append(div);
+
+                list_objs.push(objresult);
+                jQuery("#objs").val("");
+            }
+
+        }
+
+        function addallobj() {
+
+            var listmailsf = [];
+
+
+            @foreach (var mails in (Dictionary<string, string>)ViewData["obj"])
+               {
+                   @(new HtmlString("var objdata={};"))
+
+                   @(new HtmlString("objdata.id='" + mails.Key + "';"))
+                    @(new HtmlString("objdata.value='" + mails.Value + "';"))
+                 @(new HtmlString("listmailsf.push(objdata);"))
+               }
+
+
+            for (var i = 0; i < listmailsf.length; i++) {
+
+                var objresult = {};
+                objresult.id = listmailsf[i].id;
+                objresult.value = listmailsf[i].value;
+                validate = 1;
+                list_objs.push(objresult);
+
+            }
+
+        }
+        function addallmovs() {
+
+            var listmailsf = [];
+
+
+            @foreach (var mails in (Dictionary<string, string>)ViewData["movement"])
+                       {
+                           @(new HtmlString("var objdata={};"))
+
+                           @(new HtmlString("objdata.id='" + mails.Key + "';"))
+                            @(new HtmlString("objdata.value='" + mails.Value + "';"))
+                         @(new HtmlString("listmailsf.push(objdata);"))
+                       }
+
+
+            for (var i = 0; i < listmailsf.length; i++) {
+
+                var objresult = {};
+                objresult.id = listmailsf[i].id;
+                objresult.value = listmailsf[i].value;
+                validate = 1;
+                list_movs.push(objresult);
+
+            }
+
+        }
+        function addallusers() {
+
+            var listmailsf = [];
+
+
+           @foreach (var mails in (Dictionary<string, string>)ViewData["users"])
+            {
+                          @(new HtmlString("var objdata={};"))
+
+                          @(new HtmlString("objdata.id='" + mails.Key + "';"))
+                           @(new HtmlString("objdata.value='" + mails.Value + "';"))
+                        @(new HtmlString("listmailsf.push(objdata);"))
+        }
+
+
+        for (var i = 0; i < listmailsf.length; i++) {
+
+            var objresult = {};
+            objresult.id = listmailsf[i].id;
+            objresult.value = listmailsf[i].value;
+            validate = 1;
+            list_users.push(objresult);
+
+        }
+
+    }
+        function addalllocs() {
+
+            var listmailsf = [];
+
+
+          @foreach (var mails in (Dictionary<string, string>)ViewData["locs"])
+            {
+                         @(new HtmlString("var objdata={};"))
+
+                         @(new HtmlString("objdata.id='" + mails.Key + "';"))
+                          @(new HtmlString("objdata.value='" + mails.Value + "';"))
+                       @(new HtmlString("listmailsf.push(objdata);"))
+        }
+
+
+        for (var i = 0; i < listmailsf.length; i++) {
+
+            var objresult = {};
+            objresult.id = listmailsf[i].id;
+            objresult.value = listmailsf[i].value;
+            validate = 1;
+            list_locs.push(objresult);
+
+        }
+
+    }
+        function addallstatus() {
+
+
+            var listmailsf = [];
+
+
+            @foreach (var mails in statusdict)
+                      {
+                 @(new HtmlString("var objdata={};"))
+
+                 @(new HtmlString("objdata.id='" + mails.Key + "';"))
+                  @(new HtmlString("objdata.value='" + mails.Value + "';"))
+               @(new HtmlString("listmailsf.push(objdata);"))
+                  }
+
+
+            for (var i = 0; i < listmailsf.length; i++) {
+
+                var objresult = {};
+                objresult.id = listmailsf[i].id;
+                objresult.value = listmailsf[i].value;
+                validate = 1;
+                list_status.push(objresult);
+
+            }
+
+
+        }
+        function filtermovs(type) {
+
+            var valuet = (type != "undefined") ? type : "0";
+            var movlist = jQuery("#movFilter select").select2("data");
+            if (movlist.length > 0) {
+                var list_movs1 = [];
+                for (i = 0; i < movlist.length; i++) {
+                    var objresult = {};
+                    objresult.id = movlist[i].id;
+
+                    list_movs1.push(objresult);
+
+                }
+                var jsonmovs1 = JSON.stringify(list_movs1);
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/checkFilters",
+                    data: { data: jsonmovs1, type: valuet },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+
+                        if (data == "limit") {
+
+                            jQuery("#dictFilter").hide();
+                            jQuery("#doFilter").hide()
+                            jQuery("#mpFilter").hide()
+                            jQuery("#destroyFilter").hide()
+                            jQuery("#photoFilter").hide()
+                        } else {
+                            jQuery("#dictFilter").show();
+                            jQuery("#doFilter").show()
+                            jQuery("#mpFilter").show()
+                            jQuery("#destroyFilter").show()
+                            jQuery("#photoFilter").show()
+                        }
+                        list_movs1.length = 0;
+                        filterespecial = data;
+                        bindselect();
+                        _loading();
+
+                    }
+
+
+                });
+            }
+        }
+        function bindselect() {
+            $("#movFilter .select2-container li a").unbind("remove.select");
+            $("#movFilter .select2-container li a").bind("remove.select", function () {
+                debugger;
+                //$("#movFilter").trigger("change")
+                filtermovs(1);
+            })
+        }
+
+        $("#dictFilter select").change(
+            function () {
+                if ($(this).val() == "1" || $(this).val() == "2") {
+                    jQuery("#doFilter select").prop("disabled", true);
+                    jQuery("#mpFilter select").prop("disabled", true);
+                } else {
+                    jQuery("#doFilter select").prop("disabled", false);
+                    jQuery("#mpFilter select").prop("disabled", false);
+                }
+            });
+
+        $('#movFilter').on("change",function () {
+           
+            filtermovs(0);
+          
+        });
+        $('#movcheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#movFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#movFilter select").select2("val", alls);
+            } else {
+                $("#movFilter select").select2("val", null);
+            }
+
+        });
+        $('#usercheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#userFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#userFilter select").select2("val", alls);
+            } else {
+                $("#userFilter select").select2("val", null);
+            }
+
+        });
+        $('#locscheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#locsFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#locsFilter select").select2("val", alls);
+            } else {
+                $("#locsFilter select").select2("val", null);
+            }
+
+        });
+        $('#objcheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#objFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#objFilter select").select2("val", alls);
+            } else {
+                $("#objFilter select").select2("val", null);
+            }
+
+        });
+       
+        $('#statuscheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#statusFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#statusFilter select").select2("val", alls);
+            } else {
+                $("#statusFilter select").select2("val", null);
+            }
+
+        });
+        $('#generate').unbind('click.generate');
+        $('#generate').bind('click.generate', function () {
+            var startdate = $("#start").val();
+            var enddate = $("#end").val();
+            list_status = [];
+
+
+            if (startdate == "" || startdate == null) {
+                startdate = "01/01/1900";
+
+            }
+            if (enddate == "" || enddate == null) {
+                enddate = "01/01/3000";
+            }
+
+            debugger;
+            var movObj = jQuery("#movFilter select").select2("data");
+            for (i = 0; i < movObj.length; i++) {
+                var objresult = {};
+                objresult.id = movObj[i].id;
+                objresult.value = movObj[i].text;
+                list_movs.push(objresult);
+
+            }
+            var objObj = jQuery("#objFilter select").select2("data");
+            for (i = 0; i < objObj.length; i++) {
+                var objresult = {};
+                objresult.id = objObj[i].id;
+                objresult.value = objObj[i].text;
+                list_objs.push(objresult);
+
+            }
+           
+         
+            var statusObj = jQuery("#statusFilter select").select2("data");
+            for (i = 0; i < statusObj.length; i++) {
+                var objresult = {};
+                objresult.id = statusObj[i].id;
+                objresult.value = statusObj[i].text;
+                list_status.push(objresult);
+
+            }
+            var userObj = jQuery("#userFilter select").select2("data");
+            for (i = 0; i < userObj.length; i++) {
+                var objresult = {};
+                objresult.id = userObj[i].id;
+                objresult.value = userObj[i].text;
+                list_users.push(objresult);
+
+            }
+            var locObj = jQuery("#locsFilter select").select2("data");
+            for (i = 0; i < locObj.length; i++) {
+                var objresult = {};
+                objresult.id = locObj[i].id;
+                objresult.value = locObj[i].text;
+                list_locs.push(objresult);
+
+            }
+
+            if (list_movs.length == 0) {
+                addallmovs();
+            }
+            if (list_users.length == 0) {
+                addallusers();
+            }
+            if (list_locs.length == 0) {
+             //   addalllocs();
+            }
+            if (list_objs.length == 0) {
+                addallobj();
+            }
+         
+
+            if (list_status.length == 0) {
+                addallstatus();
+            }
+            var dict = jQuery("#dictFilter select").select2("data");
+            var destroy = jQuery("#destroyFilter select").select2("data");
+            var done = jQuery("#doFilter select").select2("data");
+            var mp = jQuery("#mpFilter select").select2("data");
+            var auto = jQuery("#autoFilter select").select2("data");
+            var vobo = jQuery("#voboFilter select").select2("data");
+            var photo = jQuery("#photoFilter select").select2("data");
+            
+            var jsonmovs = JSON.stringify(list_movs);
+            var jsonobjs = JSON.stringify(list_objs);
+            var jsonstatus = JSON.stringify(list_status);
+            var jsonusers = JSON.stringify(list_users);
+            var jsonlocs = JSON.stringify(list_locs);
+            jQuery.ajax({
+
+                url: "/Reports/Reports/GenerateMovementMasterReport",
+                data: { startdate: startdate, enddate: enddate, movements: jsonmovs, objects: jsonobjs, status: jsonstatus, dict: dict.id, done: done.id, mp: mp.id, destroy: destroy.id, auto: auto.id, vobo: vobo.id, photo: photo.id, extrafilter: filterespecial, users: jsonusers, locs: jsonlocs },
+                beforeSend: _loading(),
+                type: "POST",
+                success: function (data) {
+                    $('#Report').html("");
+                    $('#Report').html(data);
+
+                    checkboxValues.length = 0;
+                    list_movs.length = 0;
+                       list_objs.length = 0;
+                       list_status.length = 0;
+                       list_users.length = 0;
+                       list_locs.length = 0;
+                    jQuery("#listobj").html("");
+                    jQuery("#listmovement").html("");
+                    if (jQuery(".header_actions a i").first().attr("Class") == "icon-chevron-right")
+                    { $(".header_actions a").first().click(); }
+                    _loading();
+
+                }
+
+
+            });
+
+        });
+
+
+        $('#saver').on('click', function () {
+
+            jQuery("#namereport").modal("show");
+
+
+        });
+        $('#save').unbind('click.save');
+        $('#save').bind('click.save', function () {
+
+
+
+            var startdate = $("#start").val();
+            var enddate = $("#end").val();
+
+            namereport = $("#getnamex").val();
+
+            if (namereport != "" && namereport != null) {
+
+                if (startdate == "" || startdate == null) {
+                    startdate = "Indefinida";
+
+                }
+                if (enddate == "" || enddate == null) {
+                    enddate = "Indefinida";
+                }
+                var index = 0;
+
+
+
+
+                $('input[name="optionsmovements[]"]:checked').each(function () {
+
+                    var objresult = {};
+                    objresult.id = $(this).val();
+                    objresult.value = $(this).data("option");
+
+
+                    list_movs.push(objresult);
+
+
+                });
+                $('input[name="optionsobjs[]"]:checked').each(function () {
+
+                    var objresult = {};
+                    objresult.id = $(this).val();
+                    objresult.value = $(this).data("option");
+
+
+                    list_objs.push(objresult);
+
+
+                });
+                
+              
+
+                if (list_movs.length == 0) {
+                    addallmovs();
+                }
+              
+                if (list_objs.length == 0) {
+                    addallobj();
+                }
+              
+                var jsonmovs = JSON.stringify(list_movs);
+                var jsonobjs = JSON.stringify(list_objs);
+                
+
+
+
+                var jsondata = JSON.stringify(checkboxValues);
+
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/SaveReportCustom",
+                    data: { namereport: namereport, movements: jsonmovs, objects: jsonobjs, startdate: startdate, enddate: enddate, type: "MovementMaster" },
+                    beforeSend: _loading(),
+
+                    type: "POST",
+                    success: function (data) {
+
+                        _alert("success", data);
+                        checkboxValues.length = 0;
+                        jQuery("#namereport").modal("hide");
+                        $("#getnamex").val("");
+
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementMasterReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            beforeSend: _loading(),
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                $(".header_actions a").first().click()
+                                _loading();
+
+                            }
+                        });
+
+
+                        _loading();
+                    }
+
+
+
+                });
+
+            } else {
+                alert("Escriba un Nombre!!!");
+            }
+        });
+        $('#selectreport').on('change', function () {
+
+            var value = $('#selectreport').val();
+
+            if (value != 0) {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/GetReport",
+                    data: { id: value },
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+
+
+
+                        if (data != "" && data != null) {
+                            var data = JSON.parse(data);
+                            var jsondatafilter = data["filter"];
+                            var startdate = data["startdate"];
+                            var enddate = data["enddate"];
+                            var jsondata = data["cols"];
+
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GenerateMovementMasterReport",
+                                data: { startdate: startdate, enddate: enddate, col: jsondata },
+                                type: "POST",
+                                success: function (data) {
+                                    $('#Report').html("");
+                                    $('#Report').html(data);
+
+                                    checkboxValues.length = 0;
+                                    $('#selectreport').val("0");
+                                    _loading();
+
+                                }
+
+
+                            });
+
+                        } else {
+                            alert("Error Al Generar el Reporte!!!");
+                        }
+
+
+                    }
+
+
+                });
+            }
+        });
+        //-------------multi dropdowns
+
+        $("#movementselect1 .dropdown dt a").on('click', function () {
+
+            $("#movementselect1 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#movementselect1 .dropdown dd ul li a").on('click', function () {
+            $("#movementselect1 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#movementselect1 .dropdown dd ul").hide();
+        });
+
+
+        $('#movementselect1 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#movementselect1 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#movementselect1 .multiSel').append(html);
+                $("#movementselect1 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#movementselect1 .hida");
+                $('#movementselect1 .dropdown dt a').append(ret);
+
+            }
+        });
+
+        //objects dropdown
+        $("#objselect1 .dropdown dt a").on('click', function () {
+
+            $("#objselect1 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#objselect1 .dropdown dd ul li a").on('click', function () {
+            $("#objselect1 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#objselect1 .dropdown dd ul").hide();
+        });
+
+
+        $('#objselect1 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#objselect1 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#objselect1 .multiSel').append(html);
+                $("#objselect1 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#objselect1 .hida");
+                $('#objselect1 .dropdown dt a').append(ret);
+
+            }
+        });
+
+        //locations
+
+        $("#locationsselect1 .dropdown dt a").on('click', function () {
+
+            $("#locationsselect1 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#locationsselect1 .dropdown dd ul li a").on('click', function () {
+            $("#locationsselect1 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#locationsselect1 .dropdown dd ul").hide();
+        });
+
+
+        $('#locationsselect1 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#locationsselect1 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#locationsselect1 .multiSel').append(html);
+                $("#locationsselect1 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#locationsselect1 .hida");
+                $('#locationsselect1 .dropdown dt a').append(ret);
+
+            }
+        });
+
+        //users
+
+        $("#usersselect1 .dropdown dt a").on('click', function () {
+
+            $("#usersselect1 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#usersselect1 .dropdown dd ul li a").on('click', function () {
+            $("#usersselect1 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#usersselect1 .dropdown dd ul").hide();
+        });
+
+
+        $('#usersselect1 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#usersselect1 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#usersselect1 .multiSel').append(html);
+                $("#usersselect1 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#usersselect1 .hida");
+                $('#usersselect1 .dropdown dt a').append(ret);
+
+            }
+        });
+
+        // estatus
+        $("#statusselect1 .dropdown dt a").on('click', function () {
+
+            $("#statusselect1 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#statusselect1 .dropdown dd ul li a").on('click', function () {
+            $("#statusselect1 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#statusselect1 .dropdown dd ul").hide();
+        });
+
+
+        $('#statusselect1 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#statusselect1 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#statusselect1 .multiSel').append(html);
+                $("#statusselect1 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#statusselect1 .hida");
+                $('#statusselect1 .dropdown dt a').append(ret);
+
+            }
+        });
+
+        var valid1 = 1;
+        var valid2 = 1;
+        var valid3 = 1;
+        var valid4 = 1;
+        $('#allmovs').change(function () {
+
+
+
+            $('input[name="optionsmovements[]"]').each(function () {
+
+                if (valid == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid == 0) {
+                valid++;
+            } else {
+                valid = 0;
+            }
+
+            jQuery('#movementselect1 .hida').css("display", "initial");
+            jQuery('#movementselect1 .multiSel').html("");
+
+        });
+        $('#allobjs').change(function () {
+
+
+
+            $('input[name="optionsobjs[]"]').each(function () {
+
+                if (valid1 == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid1 == 0) {
+                valid1++;
+            } else {
+                valid1 = 0;
+            }
+
+            jQuery('#objselect1 .hida').css("display", "initial");
+            jQuery('#objselect1 .multiSel').html("");
+
+        });
+        $('#allusers').change(function () {
+
+            $('input[name="optionsusers[]"]').each(function () {
+
+                if (valid2 == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid2 == 0) {
+                valid2++;
+            } else {
+                valid2 = 0;
+            }
+
+            jQuery('#usersselect1 .hida').css("display", "initial");
+            jQuery('#usersselect1 .multiSel').html("");
+
+        });
+        $('#alllocs').change(function () {
+
+
+
+            $('input[name="optionslocations[]"]').each(function () {
+
+                if (valid3 == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid3 == 0) {
+                valid3++;
+            } else {
+                valid3 = 0;
+            }
+            jQuery('#locationsselect1 .hida').css("display", "initial");
+            jQuery('#locationsselect1 .multiSel').html("");
+
+
+        });
+        $('#allstatus').change(function () {
+
+
+
+            $('input[name="optionsstatus[]"]').each(function () {
+
+                if (valid4 == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid4 == 0) {
+                valid4++;
+            } else {
+                valid4 = 0;
+            }
+            jQuery('#statusselect1 .hida').css("display", "initial");
+            jQuery('#statusselect1 .multiSel').html("");
+
+
+        });
+        $("#fieldcheck").click();
+    });
+
+
+</script>
+
+

@@ -1,0 +1,346 @@
+﻿@{
+    ViewBag.Title = "GetObjectModal";
+    Layout = null;
+}
+
+<div id="object_panel" class="modal modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar Objetos de Referencia</h3>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span4">
+                    <div class="span12">
+                        <div class="light_blue set_color">
+                            <div class="well-header widgetclient titleclient">
+                                <h5>Categorías</h5>
+                            </div>
+                            <div class="well-content no-search">
+                                <div class=" k-header">
+                                    <div id="category_tree"></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="span8">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <div class="light_blue set_color">
+                                <div class="well-header widgetclient titleclient">
+                                    <h5 id="category_header">Objetos de Referencia</h5>
+                                </div>
+                                <div class="well-content no_padding" style="max-height: 400px; overflow: auto">
+                                    <table id="object_table" class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 10%">
+                                                    <input type="checkbox" id="checkall" /></th>
+                                                <th>Nombre</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="2" style="text-align: center">No hay objetos de Referencias </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <span width="80%" id="final_msg" class="error_msg"></span>
+        <input value="Agregar" class="btn blue" type="submit" id="save_button">
+        <input value="Cancelar" class="btn grey" type="button" id="cancel_button" data-dismiss="modal">
+    </div>
+</div>
+
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+<script>
+    var tree = new RivkaTree("category_tree", {
+        method: RivkaTree.METHODS.AJAX,
+        url: "/ObjectReference/Category/getNodeContent",
+        idKey: "_id",
+        nameKey: "name",
+        onNodeSelectAction: function () {
+            var id = jQuery(this).closest("li").data("idcategory");
+            location.hash = id;
+            model.parentCategory = id;
+            model.init();
+        }
+    });
+
+    var userList = function(){
+        var userSelect = jQuery("<select>", {
+            class:"chosen chz-done", 
+            name: "user"
+        });
+        userSelect.append("<option value='0'>Relacionar Usuario</option>");
+        //Getting the source
+        @{ <text>var userSource = @Html.Raw(ViewData["users"].ToString())</text> }
+        {}
+        //Filling the User List
+        for(var user in userSource){
+            userSelect.append(
+                jQuery("<option>",{value: user}).html(userSource[user])
+            );
+        }
+
+        return userSelect;
+    }
+   
+    var locationList = function(){
+        var locationSelect = jQuery("<select>", { class: "chosen chz-done", name: "location" });
+        locationSelect.append("<option value='0'>Relacionar Ubicación</option>");
+        //Getting the source 
+        @{ <text>var locationSource = @Html.Raw(ViewData["locations"].ToString())</text> }
+        {}
+        //Filling the Location List
+        for(var locationId in locationSource){
+            locationSelect.append(
+                jQuery("<option>",{value: locationId}).html(locationSource[locationId])
+            );
+        }
+
+        return locationSelect;
+    }
+
+    var objectList = function( selected ){
+        var objectSelect = jQuery("<select>", { class: "chosen chz-done", name: "object" });
+        //Getting the source 
+        @{ <text>var objectSource = @Html.Raw(ViewData["objects"].ToString())</text> }
+        {}
+        //Filling the Location List
+        for (var objectId in objectSource) {
+            objectSelect.append(
+                jQuery("<option>", { value: objectId }).html(objectSource[objectId])
+            );
+        }
+
+        objectSelect.val(selected);
+
+        return objectSelect;
+    }
+    
+
+    var objectTable = {
+        // JQuery Table instance
+        table: jQuery("#object_table tbody"),
+
+        // Returns the selected items
+        getSelectedObjects: function () {
+            return this.table.find("input:checked").closest("tr");
+        },
+
+        // Fills the 
+        fillTable: function (objects) {
+            this.table.html("");
+            if (objects != "[]" && objects != null) {
+                var objectList = JSON.parse(objects);
+                for (var obj in objectList) {
+                    this.table.append(
+                        jQuery("<tr>", { id: objectList[obj]["_id"] }).append(jQuery("<td>")
+                                .append(jQuery("<input>", { type: "checkbox" })
+                                    .on("click", function (event) {
+                                        //return false;
+                                    })
+                                ))
+                            .append(jQuery("<td>", {"class":"name"}).html(objectList[obj]["name"]))
+                            .on("click", function (event) {
+                                //jQuery(this).find("input").prop("checked", true);
+                            })
+                    );
+                }
+            }
+            else
+                this.table.html("<tr><td colspan='2' style='text-align:center'>No hay objetos de referencia</td></tr>");
+        },
+
+        bind: function () {
+            jQuery("#object_table #checkall").on("click", function () {
+                if (jQuery(this).prop("checked")) {
+                    objectTable.table.find("input").prop("checked", true);
+                }
+                else
+                    objectTable.table.find("input").prop("checked", false);
+
+            });
+        }
+
+    };
+
+    // Object to control the main modal
+    var objectModal = {
+        // Modal window
+        modal: jQuery("#object_panel"),
+
+        // Open the modal window
+        openModal: function () {
+            this.modal.modal("show");
+        },
+
+        closeModal: function(){
+            this.modal.modal("hide");        
+        },
+
+        init: function () {
+            this.openModal();
+
+            //Binding the events
+            this.modal.find("#save_button").on("click", function () {
+                var selected = objectTable.getSelectedObjects();
+                if (selected.length > 0) {
+
+                    // Verify the selected Devices
+                    var printerClass = "";
+                    var antennaClass = "";
+
+                    if (devices.group == "antenna") 
+                        printerClass = "printerOptionHide";
+                    else
+                        antennaClass = "antennaOptionHide"
+
+                    selected.each(function () {
+                        var objectId = this.id;
+                        jQuery("#objectTable").find("tbody").append(
+                        jQuery("<tr>").append(jQuery("<td>",{"style":"text-align:center"}).html("<input type='checkbox'/>"))
+                            .append(jQuery("<td>", { "class": "referenceobjtd", "data-idobj": this.id }).html(objectList(objectId)))
+                            .append(jQuery("<td>", { "class": "usertd" }).html( userList() ))
+                            .append(jQuery("<td>", { "class": "locationtd" }).html( locationList() ))
+                            .append(jQuery("<td>", { "class": "quantitytd" }).html(
+                                "<input type='number' name='quantity' value='1' class='mini printerOption "+printerClass+"'/>" + 
+                                "<input type='text' name='epc' value='' class='antennaOption "+antennaClass+"' disabled/>"))
+                            .append(jQuery("<td>").append(
+                                    jQuery('<a>', { class: "btn btn-mini blue antennaOption " + antennaClass, href: "#", title: "Leer", rel: "tooltip", "data-placement": "top" })
+                                            .html('<i class="icon-rss"></i>')
+                                            .on("click", function () {
+                                                var epcField = jQuery(this).closest("tr").find("input[name=epc]");
+                                                // Scan and return an array with the found EPCs
+                                                jQuery.ajax({
+                                                    url: "/Tags/Labeling/ScanAntenna",
+                                                    type: "POST",
+                                                    data: { "ip": devices.selected },
+                                                    beforeSend: function () { },
+                                                    success: function (data) {
+                                                        var tags = [];
+
+                                                        try {
+                                                            tags = JSON.parse(data);
+                                                        } catch (Exception) { }
+
+                                                        //tags = ["12345678912345678945612", "789025805c3e481000000002", "789025805c3e480000000001"];
+
+                                                        if (tags.length > 0) {
+                                                            var epcs = epcList();
+                                                            var duplicated;
+                                                            //Check for every found tag
+                                                            for (var tag in tags) {
+                                                                duplicated = false;
+                                                                //Check for every tag in the table
+                                                                if (epcs.indexOf(tags[tag]) >= 0) {
+                                                                    duplicated = true;
+                                                                }
+
+                                                                if (!duplicated) {
+                                                                    epcField.val(tags[tag]);
+                                                                    _alert("success", "EPC detectado");
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (duplicated)
+                                                                _alert("error", "EPCs duplicados");
+                                                            
+                                                        }
+                                                        else
+                                                            _alert("error","No se encontró ningún EPC");
+                                                    },
+                                                    error: function () { },
+                                                    complete: function () { }
+                                                });
+                                                return false;
+                                            })
+                            
+                                ).append(
+                                    jQuery('<a>', { class: "btn btn-mini orange antennaOption " + antennaClass, href: "#", title: "Limpiar EPC", rel: "tooltip", "data-placement": "top" })
+                                        .html('<i class="icon-eraser"></i>')
+                                        .on("click", function () {
+                                            jQuery(this).closest("tr").find("[name=epc]").val("");
+                                            return false;
+                                        })
+                                ).append(
+                                    jQuery('<a>', { class: "btn btn-mini red", href: "#", title: "Borrar", rel: "tooltip", "data-placement": "top" })
+                                        .html('<i class="icon-trash"></i>')
+                                        .on("click", function () {
+                                            var remove = this;
+                                            _confirm({
+                                                title: "Remover Objeto de Referencia",
+                                                message: "Desea remover el objeto de referencia de la lista?",
+                                                action: function () {
+                                                    jQuery(remove).closest("tr").remove();
+                                                    _alert("success", "Borrado con éxito");
+                                                    return false;
+                                                }
+                                            });
+                                            return false;
+                                        })
+                                )
+                            )
+                        );// End of the Row
+
+                    });// End of iteration "each"
+
+                    jQuery(".chosen").chosen({"width": "200px"});
+                    jQuery("[rel=tooltip]").tooltip();
+
+                    objectModal.closeModal();
+                    _alert("success", "Agregados Satisfactoriamente");
+                }
+                else
+                    _alert("danger","Seleccione al menos 1 objeto de referencia");
+            });
+        }
+
+    };
+
+    // Modeling the objects data
+    var model = {
+        parentCategory: location.hash == "" ? "null" : location.hash.substring(1),
+
+        selectedObjects: [],
+
+        objectsData: null,
+
+        init: function () {
+            jQuery.ajax({
+                url: "/ObjectReference/Object/getData",
+                type: "POST",
+                data: { parentCategory: model.parentCategory },
+                beforeSend: _loading(),
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    model.objectsData = data["objects"];                    
+                    objectTable.fillTable(model.objectsData);
+                    _loading();
+                },
+                error: function (errorThrown) {
+                    _loading();
+                }
+            });
+        }
+    };
+
+    jQuery(document).ready(function(){
+        tree.init({ id: "null", name: "Home" });
+        objectModal.init();
+        objectTable.bind();
+    });
+</script>

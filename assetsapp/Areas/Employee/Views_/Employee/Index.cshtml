@@ -1,0 +1,1016 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Index";
+    string userPattern = "([a-zA-Z0-9-_.]){4,}";
+    string namePattern = "[A-ZÁÉÍÓÚÑa-záéíóúñ]+(\\s[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,2}";
+    string lastNamePattern = "[A-ZÁÉÍÓÚÑa-záéíóúñ]+(\\s[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,4}";
+
+    //var datos = Session["Permissions"].ToString();
+    //JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    //foreach (string x in allp["employee"]["grant"])
+    //{
+    //    if (x.Contains("u"))
+    //    {
+    upd = "u";
+    //    }
+    //    if (x.Contains("d"))
+    //    {
+    del = "d";
+    //    }
+    //    if (x.Contains("c"))
+    //    {
+    add = "c";
+    //    }
+    //}
+    //var dataclient = Session["PermissionsClient"].ToString();
+    //JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    //foreach (string x in dataclientjo["employee"]["grant"])
+    //{
+    //    if (x.Contains("u"))
+    //    {
+    updc = "u";
+    //    }
+    //    if (x.Contains("d"))
+    //    {
+    delc = "d";
+    //    }
+    //    if (x.Contains("c"))
+    //    {
+    addc = "c";
+    //    }
+    //}
+
+    //var isAdmin = (bool)ViewData["signalMasive"];
+    var isAdmin = false;
+}
+
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Administrar Personal</h3>
+            </div>
+            <div class="span4">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="light_blue set_color">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Lista de Empleado</h5>
+                    <div class="btn-group">
+                        @if (add == "c" && addc == "c")
+                        {
+                            <button class="btn btn-mini dark_green fileinput-button" id="addEmployeeButton" data-original-title="Agregar Empleado" rel="tooltip" data-placement="top">
+                                <i class="icon-plus icon-white"></i>
+                            </button>
+                        }
+                        @if (del == "d" && delc == "d")
+                        {
+                            <button type="button" class="btn btn-mini red delete" id="deleteEmployeeButton" data-original-title="Eliminar Empleado" rel="tooltip" data-placement="top">
+                                <i class="icon-trash icon-white"></i>
+                            </button>
+                        }
+                        @if (add == "c" && addc == "c")
+                        {
+                            <span style="position: relative; float: none; display: inline-block;">
+                                <button id="importbtn" class="btn btn-mini purple  fileinput-button" data-idcat="0" data-original-title="Importar Empleados" rel="tooltip" data-placement="top">
+                                    <i class="icon-cloud-upload icon-white"></i>
+                                    <span>Importar</span>
+                                        <input class="browse-inpt" type="file" id="T9" />
+                                </button>
+                                
+                            </span>
+                            @*<input type="file" id="T9" />*@
+                        }
+                        <button class="btn btn-mini dark_green" id="toTileViewButton" data-original-title="Mosaicos" rel="tooltip" data-placement="top">
+                            <i class=" icon-th-large icon-white"></i>
+                            <span></span>
+                        </button>
+                        <button class="btn btn-mini orange" id="toSliderViewButton" data-original-title="Slider" rel="tooltip" data-placement="top">
+                            <i class=" icon-resize-horizontal icon-white"></i>
+                            <span></span>
+                        </button>
+                        <button class="btn btn-mini light_blue" id="toTableViewButton" data-original-title="Tabla" rel="tooltip" data-placement="top">
+                            <i class=" icon-th-list icon-white"></i>
+                            <span></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="well-content no-search" id="employeesTable">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="excelTable" class="modal hide fade" data-backdrop="static" style="min-width: 1000px; left: 35%; display: block;">
+</div>
+<div id="resultImport_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Resultado de la importación</h3>
+    </div>
+    <div class="modal-body">
+        <div id="importresultContent">
+            <table width="100%">
+                <tr>
+                    <td width="80%"><h10>Cantidad de Empleados importados: </h10></td>
+                    <td><label id="employeeSuccess"></label></td>
+                </tr>
+                <tr>
+                    <td width="80%"><h10>Cantidad de errores al importar Empleados: </h10></td>
+                    <td><label id="employeeError"></label></td>
+                </tr>
+                <tr>
+                    <td width="80%"><h10>Cantidad de imágenes importados: </h10></td>
+                    <td><label id="imgSuccess"></label></td>
+                </tr>
+                <tr>
+                    <td width="80%"><h10>Cantidad de errores al importar imágenes: </h10></td>
+                    <td><label id="imgError"></label></td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" class="error_msg"></span>
+    </div>
+</div>
+<div id="admin_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="cancel_buttonx"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar Empleado</h3>
+    </div>
+
+    <form id="employeeForm" method="post" autocomplete="off">
+        <div class="modal-body">
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="tabHeader1">
+                    <li class="active" id="staticFormHeader"><a href="#staticFieldsSection" data-toggle="tab">Inf. General</a></li>
+                </ul>
+            </div>
+
+
+
+
+            <div class="tab-content" id="tabContent1">
+                <div class="tab-pane active staticFieldsSection perfilMargen" id="staticFieldsSection">
+
+                    <table width="100%">
+                        <tr>
+                            <td width="50%">
+                                <label>Nombre(s): </label>
+                                <div class="staticField">
+                                    <input type="text" id="name" name="name" maxlength="30" pattern="@namePattern" required="required" placeholder="Nombre(s)" data-original-title="El nombre sólo puede contener caracteres alfabéticos (Máximo 3 nombres)." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                            <td rowspan="2" width="50%" style="text-align: center">
+                                <img style="max-height: 200px;" id="img_pre" src="~/Content/Images/imgPerfil/avatar_06.png">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Apellido Paterno: </label>
+                                <div class="staticField">
+                                    <input type="text" id="lastname" name="lastname" maxlength="15" pattern="@lastNamePattern" required="required" placeholder="Apellido Paterno" data-original-title="El apellido paterno sólo puede contener caracteres alfabético (Máximo 5 apellidos)." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <label>Apellido Materno: </label>
+                                <div class="staticField">
+                                    <input type="text" id="motherlastname" maxlength="15" name="motherlastname" pattern="@lastNamePattern" required="required" placeholder="Apellido Materno" data-original-title="El apellido materno sólo puede contener caracteres alfabético (Máximo 5 apellidos)." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                            <td>
+                                <span class="btn btn-file" style="margin-left:94px">
+                                    <span class="fileupload-new">Explorar</span>
+                                    <input type="file" id="file" name="file" value="Default" />
+                                </span>
+                            </td>
+                        </tr>
+
+
+
+                        <tr>
+                            <td>
+                                <label>ID Empleado: </label>
+
+                                <div class="staticField">
+                                    <input type="text" id="employee" name="employee" pattern=@userPattern required="required" placeholder="Nombre de Empleado" data-original-title="El nombre de empleado sólo puede contener caracteres alfanuméricos y los caracteres (-, _, .)." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Perfil: </label>
+                                <div class="staticField">
+
+                                    <select id="profileId" name="profileId" style="width: 90%;">
+                                        @ViewData["profileList"]
+                                    </select>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Tipo de Empleado: </label>
+                                <div class="staticField">
+
+                                    <select id="type" name="type" style="width: 90%;">
+                                        <option value='null' selected> Elija una opción</option>
+                                        <option value="Responsable">Responsable</option>
+                                        <option value="Empleado">Empleado</option>
+
+                                    </select>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Área: </label>
+                                <div class="staticField">
+
+                                    <select id="area" name="area">
+                                        @*
+                                        <option value='null' selected> Elija una opción</option>
+                                        <option value="Finanzas">Finanzas</option>
+                                        <option value="Operaciones">Operaciones</option>*@
+                                        @ViewData["areaList"]
+                                    </select>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <input value="Guardar" class="btn grey" type="submit" id="save_button">
+            <input value="Guardar y Continuar" class="btn blue" type="submit" id="save_continue_button">
+            <input value="Cancelar" class="btn dark_blue" type="button" id="cancel_button">
+        </div>
+    </form>
+</div>
+
+
+
+@section scripts{
+    @*User Scripts*@
+
+    <script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+    <script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+    <script type="text/javascript">
+
+
+        var selectedId = null;
+        var editingEmployeeData = null;
+        var ContinueId = null;
+        var selectedProfile = null;
+
+        var upd = "";
+        var del = "";
+        var viewer = new RivkaViewer("employeesTable");
+        jQuery.fn.reset = function () {
+            jQuery(this).each(function () { this.reset(); });
+        }
+        var model = {
+
+            employeesData: null,
+
+            init: function () {
+                jQuery.ajax({
+                    url: "/Employee/Employee/getEmployeeTable",
+                    type: "POST",
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        var data = JSON.parse(data);
+                        model.employeesData = JSON.stringify(data["employees"]);
+                        var dataOptions = { id: "_id", name: "employee", image: "image", permissions: [upd, del] };
+                        viewer.setData(model.employeesData, dataOptions);
+                        table.print();
+                    },
+                    complete: _loading()
+                });
+            },
+
+            restart: function () {
+                selectedId = null;
+                editingEmployeeData = null;
+                ContinueId = null;
+                var selectedProfile = null;
+            }
+        };
+
+
+
+
+
+
+        var EmplopyeeModal = {
+            imageArray: {},
+
+            message: null,
+
+            init: function () {
+                EmplopyeeModal.bindAll();
+            },
+
+            readURL: function (input, previewDivID) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+
+                        jQuery('#' + previewDivID).attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            },
+
+            fillProfileFields: function () {
+
+                if (editingEmployeeData != null) {
+                    var obj = JSON.parse(editingEmployeeData);
+                    for (field in obj) {
+                        if (field == "ImgUrl") {
+                            var picurl = obj.ImgUrl;
+                            jQuery("#img_pre").attr("src", picurl)
+                        }
+                        if (field == "profileFields") {
+                            jQuery("#name").val(obj["name"]);
+                            for (key in obj["profileFields"]) {
+
+
+
+                                if (jQuery("#" + key).attr("type") == "checkbox") {
+                                    jQuery("#" + key).attr("checked", "checked");
+                                }
+                                else if (jQuery("#" + key).attr("type") == "radio") {
+                                    jQuery("[name=" + key + "][value = " + obj["profileFields"][key].toString() + "]").attr("checked", "checked");
+                                }
+                                else if (jQuery("#" + key).prop("tagName") == "SELECT" && jQuery("#" + key).prop("multiple")) {
+                                    var values = obj["profileFields"][key].toString().split(",");
+                                    for (value in values) {
+                                        jQuery("#" + key + " option[value = " + values[value] + "]").attr("selected", "selected");
+                                    }
+                                }
+                                else if (jQuery("#" + key).prop("type") == "file") {
+                                    userModal.imageArray["" + key] = obj["profileFields"][key].toString();
+                                    jQuery("#" + key + "Preview").attr("src", "/Uploads/Images/User/CustomImages/" + obj["profileFields"][key].toString());
+                                }
+                                else {
+                                    jQuery("#" + key).val(obj["profileFields"][key].toString());
+                                }
+                            }
+                        }
+                        if (jQuery("#" + field).prop("tagName") == "SELECT" && jQuery("#" + field).siblings().hasClass("select2-container")) {
+                            jQuery("#" + field).select2("val", obj[field]);
+
+                        } else {
+                            if (field != "profileId") {
+                                jQuery("#" + field).val(obj[field]);
+                            }
+
+                        }
+                    }
+                }
+            },
+
+            loadProfileFields: function (profileID) {
+                jQuery.ajax({
+                    url: "/Employee/Employee/getFormView",
+                    type: "POST",
+                    data: { profile: profileID },
+                    async: false,
+                    success: function (data) {
+                        jQuery("#staticFieldsSection").nextAll().remove();
+                        jQuery("#tabContent1").append(data);
+                        selectedProfile = profileID;
+                        if (selectedId != null) {
+                            EmplopyeeModal.fillProfileFields();
+                        }
+
+
+                    },
+                    error: function (data) {
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            },
+
+            loadProfileFieldsTitles: function (profileID) {
+                jQuery.ajax({
+                    url: "/Employee/Employee/getFormTitlesView",
+                    type: "POST",
+                    data: { profile: profileID },
+                    async: false,
+                    success: function (data) {
+                        jQuery("#staticFormHeader").nextAll().remove();
+                        jQuery("#tabHeader1").append(data);
+                        jQuery("#staticFormHeader a").click();
+                    },
+                    error: function (errorThrown) {
+                    }
+                });
+            },
+
+            cleanMessages: function () {
+                jQuery("#final_msg").text("");
+            },
+
+            bindAll: function () {
+
+
+
+                jQuery("#admin_panel input[type=file][id!=img_pre]").unbind("change.changeCustomFiles");
+                jQuery("#admin_panel input[type=file][id!=img_pre]").bind("change.changeCustomFiles", function () {
+                    var inputID = jQuery(this).attr("id");
+                    var id = inputID + "Preview";
+                    var formData = new FormData();
+
+                    EmplopyeeModal.readURL(this, id);
+
+                    formData.append("selectedID", selectedId);
+                    formData.append("name", inputID);
+                    formData.append("file", jQuery(this)[0].files[0]);
+                    formData.append("lastSaved", EmplopyeeModal.imageArray[inputID]);
+                    jQuery.ajax({
+                        url: "/Employee/Employee/SaveCustomFile",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: _loading,
+                        success: function (data) {
+                            EmplopyeeModal.imageArray[inputID] = data;
+                            _loading();
+                            console.log(EmplopyeeModal.imageArray)
+                        },
+                        error: function (errorThrown) {
+                            _loading();
+                        }
+                    });
+                });
+
+
+                // Add or Save the changes on an User
+                jQuery("#addEmployeeButton").unbind("click.save");
+                jQuery("#addEmployeeButton").bind("click.save", function () {
+                    jQuery("#employeeForm").reset();
+                    jQuery("#name").val("");
+                    jQuery("#lastname").val("");
+                    jQuery("#motherlastname").val("");
+                    jQuery("#employee").val("");
+                    jQuery("#profileId").val("null");
+                    jQuery("#type").val("null");
+                    jQuery("#area").val("null");
+                    jQuery("#staticFieldsSection").nextAll().remove();
+                    jQuery("#staticFormHeader").nextAll().remove();
+                    jQuery("#staticFormHeader a").click();
+                    EmplopyeeModal.cleanMessages();
+                    jQuery(".modal-header-text").text("Agregar Empleado");
+                    jQuery("#admin_panel").modal("show");
+
+                });
+
+                // Cancel the current Adding-Editing action of an User
+                jQuery("#cancel_button,#cancel_buttonx").unbind("click.cancel");
+                jQuery("#cancel_button,#cancel_buttonx").bind("click.cancel", function () {
+                    jQuery("#admin_panel").modal("hide");
+                    jQuery("#img_pre").attr("src", "/Content/Images/imgPerfil/avatar_06.png");
+                    editingEmployeeData = null;
+                    model.restart();
+                });
+
+                jQuery("#profileId").unbind("change.fill");
+                jQuery("#profileId").bind("change.fill", function () {
+                    selectedProfile = jQuery(this).val();
+                    EmplopyeeModal.loadProfileFields(selectedProfile);
+                    EmplopyeeModal.loadProfileFieldsTitles(selectedProfile);
+
+                });
+
+                jQuery("#save_button").unbind("click.validate");
+                jQuery("#save_button").bind("click.validate", function () {
+                    var pass = "";
+                    var inputsArray = jQuery("#admin_panel .tab-content input[type!=file]");
+
+                });
+                jQuery("#save_continue_button").unbind("click.validate");
+                jQuery("#save_continue_button").bind("click.validate", function () {
+                    var pass = "";
+                    var inputsArray = jQuery("#admin_panel .tab-content input[type!=file]");
+                    ContinueId = 1;
+
+                });
+                jQuery("#employeeForm").unbind("submit.send");
+                jQuery("#employeeForm").bind("submit.send", function () {
+                    EmplopyeeModal.editProfileAction();
+                    return false;
+                });
+            },
+
+            editProfileAction: function () {
+                if (EmplopyeeModal.message == null) {
+
+                    var formString = "employeeID=" + selectedId + "&" + jQuery("#employeeForm").serialize();
+                    var fd = new FormData();
+
+                    var keys = Object.keys(EmplopyeeModal.imageArray);
+                    for (i = 0; i < keys.length; i++) {
+                        formString += "&" + keys[i] + "=" + EmplopyeeModal.imageArray[keys[i]];
+                    }
+
+                    fd.append('data', formString);
+                    fd.append('file', jQuery('#file')[0].files[0]);
+                    _loading();
+
+                    jQuery.ajax({
+                        url: "/Employee/Employee/saveEmployee",
+                        type: "POST",
+                        data: fd,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            if (data != null) {
+                                data = JSON.parse(data);
+                                if (data["status"] == "error") {
+                                    _loading();
+                                    _alert("error", data["msg"]);
+                                    return false;
+                                }
+                                else if (data["status"] == "success") {
+                                    jQuery("#employeeForm").reset();
+                                    if (ContinueId != 1) {
+                                        jQuery("#admin_panel").modal("hide");
+                                    }
+                                    else {
+                                        jQuery("#img_pre").attr("src", "/Content/Images/imgPerfil/avatar_06.png");
+                                    }
+
+                                    model.init();
+                                    model.restart();
+
+                                    _loading();
+
+                                }
+                            } else { _loading(); _alert("error", "Ha ocurrido un error"); }
+
+                        },
+                        error: function () {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                } else {
+                    jQuery("#final_msg").text(EmplopyeeModal.message);
+                }
+
+            }
+        };
+
+        jQuery(document).ready(function ($) {
+            model.init();
+            table.init();
+            EmplopyeeModal.init();
+
+            @if (upd != null && upd != "")
+            {
+            @(new HtmlString("upd = '" + upd + "';"))
+            }
+            @if (del != null && del != "")
+            {
+
+            @(new HtmlString("del ='" + del + "';"))
+            }
+            @if (updc != null && updc != "")
+            {
+            @(new HtmlString("updc = '" + updc + "';"))
+            }
+            @if (delc != null && delc != "")
+            {
+
+            @(new HtmlString("delc ='" + delc + "';"))
+            }
+
+            ////START - Import Section
+            jQuery("#T9").bind("change.changeImage", function () {
+
+                var fa = new FormData();
+                //var idcateg = jQuery("#importbtn").data("idcat");
+
+                fa.append('file', jQuery('#T9')[0].files[0]);
+                //fa.append('idcategory', idcateg);
+                var fileup = jQuery('#T9')[0].files[0]
+                var format = fileup.name.split('.');
+
+                var ext = format[format.length - 1];
+                ext = ext.toLowerCase();
+
+                if (ext == "xlsx") {
+
+                    jQuery.ajax({
+                        url: "/Employee/Employee/ImpExcel",
+                        contentType: false,
+                        processData: false,
+                        data: fa,
+                        type: "POST",
+                        beforeSend: _loading(),
+
+                        success: function (data) {
+                            if (data != null) {
+                                jQuery('#excelTable').html("");
+                                jQuery('#excelTable').html(data);
+                                jQuery('#excelTable').modal("show");
+                                jQuery("#T9").val("");
+                                _loading();
+                            } else {
+                                alert("Ocurrio un error, Verifique el Archivo Fuente");
+                                jQuery("#T9").val("");
+                                _loading();
+                            }
+                        },
+                        error: function (errorThrown) {
+                            alert("Ocurrio un error, intenta más tarde.");
+                            jQuery("#T9").val("");
+                            _loading();
+                        }
+                    });
+
+                } else {
+                    alert("Elija Un Archivo de Excel(solo Formato xlsx)");
+                    jQuery("#T9").val("");
+                }
+                return null;
+            });
+            //END - Import Section
+
+            if (updc == "" || upd == "") {
+                upd = "";
+            }
+
+            if (delc == "" || del == "") {
+
+                del = "";
+            }
+
+        });
+        var content = {
+
+
+
+            onDeleteRowAction: function () {
+                model.restart();
+                var id = null;
+                var name = null;
+                if (table.display == "table") {
+                    id = jQuery(this).closest("tr").data("id");
+                    name = jQuery("table tr[data-id=" + id + "] .user").text();
+                } else {
+                    id = jQuery(this).closest("div.tile").data("id");
+                    name = jQuery(".line .tile[data-id=" + id + "] .tileName").text();
+                }
+
+
+                _confirm({
+                    title: "Eliminar Empleado",
+                    message: "¿Seguro que desea eliminar el empleado " + name + "?",
+                    action: function () {
+
+                        _loading();
+                        jQuery.ajax({
+                            url: "/Employee/Employee/deleteEmployee",
+                            type: "POST",
+                            data: { selectedID: id },
+                            success: function (data) {
+                                model.init();
+                                _loading();
+                                _alert("success", "Eliminado Correctamente");
+                                model.restart();
+                            },
+                            error: function (data) {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    }
+                });
+            },
+
+            onEditRowAction: function (tr) {
+                jQuery("#employeeForm").reset();
+                jQuery("#name").val("");
+                jQuery("#motherlastname").val("");
+                jQuery("#employee").val("");
+                jQuery("#profileId").val("null");
+                jQuery("#type").val("null");
+                selectedId = tr.data("id");
+
+                jQuery("#staticFieldsSection").nextAll().remove();
+                jQuery("#staticFormHeader").nextAll().remove();
+                jQuery("#staticFormHeader a").click();
+                EmplopyeeModal.cleanMessages();
+                jQuery(".modal-header-text").text("Modificar Empleado");
+                jQuery("#admin_panel").modal("show");
+                _loading();
+                jQuery.ajax({
+                    url: "/Employee/Employee/getEmployee",
+                    data: { employeeID: selectedId },
+                    type: "POST",
+                    success: function (data) {
+                        _loading();
+                        var valuesemployee = JSON.parse(data)
+                        jQuery("#admin_panel .modal-header-text").text("Modificar Empleado: " + valuesemployee.employee);
+
+                        jQuery("#profileId").val(valuesemployee.profileId);
+                        EmplopyeeModal.loadProfileFields(valuesemployee.profileId);
+                        EmplopyeeModal.loadProfileFieldsTitles(valuesemployee.profileId);
+
+
+                        editingEmployeeData = data;
+                        EmplopyeeModal.fillProfileFields();
+
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+                jQuery("#admin_panel").modal("show");
+            },
+        };
+        var table = {
+
+            display: "tile",
+
+            init: function () {
+                table.bindAll();
+            },
+
+            print: function () {
+                switch (table.display) {
+                    case "table":
+                        table.printTable();
+                        break;
+                    case "tile":
+                        table.printTiles();
+                        break
+                    case "slider":
+                        table.printSlider();
+                        break;
+                }
+            },
+
+            printTable: function () {
+                table.display = "table";
+
+                var tableOptions = {
+                    headers: { "employee": "ID Empleado", "name": "Nombre", "profilename": "Perfil", "type": "Tipo de empleado", "area": "Área", "Creator": "Creador", "CreatedDate": "Fecha de Creación", "LastmodDate": "Última Modificación" },
+                    showSelecters: true,
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteRowAction: content.onDeleteRowAction,
+                    onSelectRowAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.employeesData);
+                for (i = 0; i < users.length; i++) {
+                   
+                   jQuery("table tr[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                }
+
+                 jQuery("[rel=tooltip]").closest("a").tooltip();
+
+                //Add pagination functions
+                try {
+                    var table1 = jQuery(".table").dataTable({
+                        "sPaginationType": "bootstrap",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 10,
+                        "sScrollY": "250px",
+                        "aoColumnDefs": [{
+                            'bSortable': false,
+                            'aTargets': [0]
+                        }],
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Filtro"
+                        }
+                    });
+                    jQuery('.dataTables_length select').chosen();
+                    setTimeout(function () {
+                        table1.fnAdjustColumnSizing();
+
+                    }, 2000);
+                } catch (Exception) { console.log(); }
+
+            },
+
+            printTiles: function () {
+                table.display = "tile";
+
+                var tileOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteTileAction: content.onDeleteRowAction,
+                    onSelectTileAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.TILE, tileOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.employeesData);
+                for (i = 0; i < users.length; i++) {
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-email", users[i].email);
+                }
+
+                jQuery("[rel=tooltip]").closest("a").tooltip();
+            },
+
+            printSlider: function () {
+                table.display = "slider";
+                var sliderOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        content.onEditRowAction(tr);
+                    },
+                    onDeleteTileAction: content.onDeleteRowAction,
+                    onSelectTileAction: null
+                };
+                viewer.setDisplayMethod(RivkaViewer.METHODS.SLIDER, sliderOptions);
+                viewer.print();
+
+                var users = JSON.parse(model.employeesData);
+                for (i = 0; i < users.length; i++) {
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-idprofile", users[i].profileId);
+                    jQuery(" .tile[data-id=" + users[i]._id + "]").attr("data-email", users[i].email);
+                }
+
+                jQuery("[rel=tooltip]").closest("a").tooltip();
+            },
+
+            bindAll: function () {
+
+                jQuery("#toSliderViewButton").unbind("click.toSliderView");
+                jQuery("#toSliderViewButton").bind("click.toSliderView", table.printSlider);
+
+                jQuery("#toTableViewButton").unbind("click.toTableView");
+                jQuery("#toTableViewButton").bind("click.toTableView", table.printTable);
+
+                jQuery("#toTileViewButton").unbind("click.toTileView");
+                jQuery("#toTileViewButton").bind("click.toTileView", table.printTiles);
+
+                jQuery("#globalSearchButton").unbind("click.search");
+                jQuery("#globalSearchButton").bind("click.search", table.onSearchAction);
+
+                jQuery("#globalSearch").unbind("keypress.checkSend");
+                jQuery("#globalSearch").bind("keypress.checkSend", function (e) {
+                    if (e.which == 13) {
+                        jQuery("#globalSearchButton").click();
+                    }
+                });
+
+                jQuery("#deleteEmployeeButton").unbind('click.delete');
+                jQuery("#deleteEmployeeButton").bind('click.delete', function () {
+                    var selecteds = jQuery(".checker:checked");
+                    if (selecteds.length == 0) {
+                        _alert("error", "Debe de seleccionar empleados primero para eliminarlos!");
+                        return;
+                    }
+
+                    _confirm({
+                        title: "Eliminar Registros",
+                        message: "¿Seguro que desea eliminar los registros seleccionados?",
+                        action: function () {
+                            var selectedIdArray = [];
+                            for (i = 0; i < selecteds.length; i = i + 1) {
+
+                                selectedIdArray.push(jQuery(selecteds[i]).closest("tr").data("id"));
+                            }
+                            _loading();
+                            jQuery.ajax({
+                                url: "/Employee/Employee/deleteEmployees",
+                                datatype: "json",
+                                type: "POST",
+                                data: { array: selectedIdArray },
+                                traditional: true,
+                                success: function (data) {
+                                    model.init();
+                                    _loading();
+                                    _alert("success", "Eliminado Correctamente");
+                                    model.restart();
+                                }
+                            });
+                        }
+                    });
+                });
+            },
+
+            onSearchAction: function () {
+                var stringToSearch = jQuery("#globalSearch").val();
+                if (stringToSearch.trim() == "") {
+                    model.init();
+                } else {
+                    jQuery.ajax({
+                        url: "/Employee/Employee/globalSearch",
+                        type: "POST",
+                        data: { data: stringToSearch },
+                        beforeSend: _loading,
+                        success: function (data) {
+                            model.employeesData = data;
+                            var dataOptions = { id: "_id", name: "employee", image: "image", permissions: [upd, del] };
+                            viewer.setData(model.employeesData, dataOptions);
+                            table.print();
+                            _loading();
+                        },
+                        error: function (errorThrown) {
+                            _alert("error", "Ha ocurrido un error");
+                            _loading();
+                        }
+                    });
+                }
+            }
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //ImagePreview----------------------------------------------------
+
+        var input = document.getElementById("file"),
+            formdata = false;
+
+        function showUploadedItem(source) {
+
+            jQuery('#img_pre').attr('src', source);
+
+        }
+
+        function addPhoto(source) {
+            if (window.FileReader) {
+                reader = new FileReader();
+                reader.onloadend = function (e) {
+                    showUploadedItem(e.target.result);
+                };
+                reader.readAsDataURL(source);
+            }
+        }
+
+        if (window.FormData) {
+            formdata = new FormData();
+        }
+
+        input.addEventListener('change', function (evt) {
+            var file = this.files[0];
+
+            if (!!file.type.match(/image.*/)) {
+                addPhoto(file);
+            }
+
+        }, false);
+        //EndImagePreview-------------------------------------
+    </script>
+}

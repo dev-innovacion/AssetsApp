@@ -1,0 +1,172 @@
+﻿<h3>Permisos</h3>
+
+<div class="float_margen" id="htk_permissions">
+</div>
+
+<script>
+    var _modules = {
+        "users": { name: "Usuarios" },
+        "profiles": { name: "Perfiles" },
+        "custom_fields": { name: "Campos Custom" },
+        "objects": { name: "Objetos" },
+        "objectsreference": { name: "Objetos de Referencia" },
+        "demand": { name: "Solicitudes" },
+        "hardware": { name: "Hardware" },
+        "location": { name: "Ubicacion" },
+        "processes": { name: "Procesos" },
+        "circuits": { name: "Circuitos" },
+        "movement": { name: "Movimientos" },
+        "rules": { name: "Reglas" },
+        "inventory": { name: "Inventario" },
+        "lists": { name: "Listas" },
+        "messages": { name: "Mensajes" },
+        "tickets": { name: "Tickets" },
+        "designs": { name: "Diseños" },
+        "edgeware": { name: "Edgeware" },
+        "reports": { name: "Reportes" },
+        "conexionext": { name: "Conexiones Ext" },
+        "support": { name: "soporte" },
+         "help": { name: "Ayuda" },
+    }
+</script>
+
+<script>
+    var pForm = '<div class="float_margen">';
+
+    for (pElement in _modules) {
+        pForm += '<div class="well light_blue">' +
+                    '<div class="well-header">' +
+                        '<label class="checkbox">' +
+                            '<div class="checker">' +
+                                '<span>' +
+                                    '<input data-ref="'+pElement+'"type="checkbox" class="uniform" name="checkTitle"></span>' +
+                            '</div>' +
+                            '<strong>' + _modules[pElement].name + '</strong>' +
+                        '</label>' +
+                    '</div>'+
+                    '<div class="well-content">'+
+                    '<ul class="message_center" id="'+pElement+'">' +
+                        //'<li class="marsub">' +
+                        //    '<label class="checkbox">' +
+                        //        '<div class="checker">' +
+                        //            '<span>' +
+                        //                '<input type="checkbox" class="uniform" name="checkbox1"></span>' +
+                        //        '</div>' +
+                        //        'Submódulo Usuarios' +
+                        //    '</label>' +
+                        //'</li>' +
+                        '<li>' +
+                            '<div class="marsub2" id="m_'+pElement+'">' +
+                                '<label class="checkbox">' +
+                                    '<div class="checker">' +
+                                        '<span>' +
+                                            '<input type="checkbox" class="uniform" name="c"></span>' +
+                                    '</div>' +
+                                    'Agregar' +
+                                '</label>' +
+                                '<label class="checkbox">' + 
+                                    '<div class="checker">' +
+                                        '<span>' +
+                                            '<input type="checkbox" class="uniform" name="u"></span>' +
+                                    '</div>' +
+                                    'Editar' +
+                                '</label>' +
+                                '<label class="checkbox">' +
+                                    '<div class="checker">' +
+                                        '<span>' +
+                                            '<input type="checkbox" class="uniform" name="d"></span>' +
+                                    '</div>' +
+                                    'Borrar' +
+                                '</label>' +
+                                '<label class="checkbox">' +
+                                    '<div class="checker">' +
+                                        '<span>' +
+                                            '<input type="checkbox" class="uniform" name="r"></span>' +
+                                    '</div>' +
+                                    'Ver' +
+                                '</label>' +
+                                 '<label class="checkbox">' +
+                                    '<div class="checker">' +
+                                        '<span>' +
+                                            '<input type="checkbox" class="uniform" name="a"></span>' +
+                                    '</div>' +
+                                    'Ver Todo' +
+                                '</label>' +
+                            '</div>' +
+                        '</li>' +
+                    '</ul></div></div>';
+    }
+    pForm += '</div>';
+
+    $("#htk_permissions").append(pForm);
+
+    function getPermissions() {
+        _permissionsHTK = {};
+
+        for (element in _modules) {
+
+            _permissionsHTK[element] = {};
+            _permissionsHTK[element]["grant"] = [];
+            jQuery("#" + element).find("input:checked").each(function () {
+                _permissionsHTK[element]["grant"].push(jQuery(this).attr("name"));
+            });
+        }
+    }
+
+    function setPermissionsHTK() {
+        for (module in _permissionsHTK) {
+            permissions = _permissionsHTK[module]["grant"];
+            if (permissions.length >= 1) {
+                jQuery("input[data-ref='" + module + "']").click();
+                for (p in permissions) {
+                    jQuery("#m_" + module).find("input[name=" + permissions[p] + "]").click();
+                }
+            }
+        }
+    }
+
+    function setEvents() {
+        jQuery("#htk_permissions").find("input[name=checkTitle]").bind("click.checks", function () {
+            if (jQuery(this).prop("checked")) {
+                activateChecks(jQuery(this).data("ref"), 1);
+            }
+            else
+                activateChecks(jQuery(this).data("ref"), 0);
+        })
+    }
+
+    function offEvents() {
+        jQuery("#htk_permissions").find("input[name=checkTitle]").unbind("click.checks");
+    }
+
+    function activateChecks(checks, set) {
+        debugger;
+        checks = jQuery("#" + checks).find("input");
+        if (set == 1) {
+            for (var x = 0; x < checks.length; x++) {
+                if (!jQuery(checks[x]).prop("checked"))
+                    jQuery(checks[x]).click();
+            }
+        }
+        else {
+            for (var x = 0; x < checks.length; x++) {
+                if (jQuery(checks[x]).prop("checked"))
+                    jQuery(checks[x]).click();
+            }
+        }
+    }
+
+    function checkAll() {
+        jQuery("#htk_permissions input[name=checkTitle]").each(function () {
+            jQuery(this).click();
+        });
+    }
+
+    function uncheckAll() {
+        jQuery("#htk_permissions input[name=checkTitle]").each(function () {
+            if (jQuery(this).prop("checked"))
+                jQuery(this).click();
+        });
+    }
+
+    </script>

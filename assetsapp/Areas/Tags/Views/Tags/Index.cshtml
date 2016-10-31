@@ -1,0 +1,282 @@
+﻿@{
+    ViewBag.Title = "index";
+    string iduserthis = "";
+    try
+    {
+        iduserthis = Session["_id"].ToString();
+    }
+    catch (Exception ex)
+    {
+        if (Request.Cookies["_id2"] != null)
+        {
+            Session["_id"] = Request.Cookies["_id2"].Value;
+            iduserthis = Session["_id"].ToString();
+        }
+    }
+}
+<div id="modalSdfs" class="modal hide fade" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Generar Archivos Sdf</h3>
+    </div>
+    <div class="modal-body" >
+        <div class="row-fluid">
+            <div class="span7">
+             
+                        <div class="light_blue set_color ">
+                            <div class="well-header widgetclient">
+                                <h5>Elige una Ubicacion:</h5>
+                            </div>
+                            <div class="well-content no-search overOn" style="overflow: hidden; position: relative;  padding: 0px 20px 25px 0px; max-height: 200px;">
+                                <div class="portlet-body fuelux">
+                                    <ul class="tree" id="category_tree"></ul>
+                                </div>
+                            </div>
+                        </div>
+             </div>
+            <div class="span5">
+                <div id="locFilter">
+                    <div style="max-height: 70px;overflow: auto">
+                        <select class="span11" style="width:100%;margin-top:4.5%">
+                            @{var countc = 0;}
+
+                            @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                            {
+                                <option value="@item.Key">@item.Value</option>
+
+                            }
+                        </select>
+                    </div>
+                </div>
+                </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input value="Generar" class="btn button_green" type="submit" id="generate_sdfs">
+        <input value="Cancelar" class="btn red" type="button" id="cancel_button" >
+    </div>
+</div>
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Etiquetado</h3>
+            </div>
+            <div class="span4">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="well">
+        <div class="well-header widgetclient"> <h5>Etiquetado</h5></div>
+        <div class="well-content no_padding">
+
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="span10 float_right">
+                        <br />
+                        <button class="btn blue topbarclient fileinput-button" data-original-title="Sube el Archivo Sdf" rel="tooltip" data-placement="top">
+                            <i class="icon-upload icon-white"></i>
+                            <span>Subir Archivo...</span>
+                            <input type="file" id="T9" />
+                        </button>
+                    </div>
+                    <div class="span2 float_left">
+                        <br />
+                        <button id="createCatalog" class="btn blue topbarclient fileinput-button" data-original-title="Generar Sdfs" rel="tooltip" data-placement="top">
+                            <i class="icon-download icon-white"></i>
+                            <span>Generar Sdf...</span>
+                           
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+            <br />
+            <div class="row-fluid">
+                <div class="span12">
+                    <div id="result">
+
+                    </div>
+                  
+                    </div>
+                </div>
+           
+
+                </div>
+            </div>
+        </div>
+<script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+<script>
+    jQuery('.overOn').perfectScrollbar({ wheelSpeed: 10 });
+
+    var idlocation = "";
+    var tree = new RivkaTree("category_tree", {
+        method: RivkaTree.METHODS.AJAX,
+        url: "/Tags/Tags/getNodeContent",
+        idKey: "_id",
+        nameKey: "name",
+        onNodeSelectAction: function () {
+            var id = jQuery(this).closest("li").data("idcategory");
+            idlocation=id;
+            setTree(id);
+            
+        }
+    });
+    function setRoute(id) {
+        jQuery.ajax({
+            url: "/Inventory/Inventory/getRoute",
+            data: { parentCategory: id },
+            type: "POST",
+            success: function (data) {
+                var data = JSON.parse(data);
+                tree.openRoute(data["route"]);
+                try{
+                    jQuery('#modalSdfs .overOn').animate({
+                        scrollTop: jQuery("[data-idcategory=" + id + "]").offset().top
+                    }, 1000);
+                } catch (ex) {
+                    console.log(ex.toString());
+                }
+            }, error: function () { _alert("error", "Ha ocurrido un error"); }
+        });
+    }
+    function search(id) {
+        var rootdata = { id: "null", name: "Home" }
+        tree.init(rootdata)
+        setRoute(id);
+    }
+    function setTree(id) {
+        jQuery.ajax({
+            url: "/Tags/Tags/getNodeContent",
+            data: { parentCategory: id },
+            type: "POST",
+            async: false,
+            beforeSend: _loading(),
+            success: function (data) {
+                try{
+                    var data = JSON.parse(data);
+                    tree.openRoute(data["route"]);
+                    _loading();
+                } catch (ex) { _loading(); }
+               
+            }, error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+    jQuery(document).ready(function () {
+        jQuery("#locFilter select").select2();
+        tree.init({ id: "null", name: "Home" });
+        jQuery("#createCatalog").unbind("click.createcatal");
+        jQuery("#createCatalog").bind("click.createcatal", function () {
+            jQuery("#modalSdfs").modal("show");
+
+        });
+        jQuery("#cancel_button").unbind("click.cancel");
+        jQuery("#cancel_button").bind("click.cancel", function () {
+            jQuery("#modalSdfs").modal("hide");
+            tree.init({ id: "null", name: "Home" });
+
+        });
+        jQuery("#generate_sdfs").unbind("click.generate");
+        jQuery("#generate_sdfs").bind("click.generate", function () {
+            jQuery.ajax({
+                url: "/Tags/Tags/generateSdfs",
+                data: {iduser:"@iduserthis", idlocation: idlocation },
+                type: 'POST',
+                beforeSend: _loading(),
+                success: function (data) {
+
+                    debugger;
+                    if (data == null || data == "") {
+                        _loading();
+                        _alert("error", "Selecciona datos!");
+                        return false;
+                    }
+                    try {
+                        data = JSON.parse(data);
+                        jQuery("#modal_SQL").modal('hide');
+                        _loading();
+                        if (data["type"] == "compress") {
+                            window.location.href = data["url"].toString() + data["data"].toString();
+                        }
+                    } catch (ex) {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error,intente mas tarde!!!");
+                    }
+                    //reset();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        });
+        jQuery("#locFilter").unbind("change.search");
+        jQuery("#locFilter").bind("change.search", function () {
+
+           var idselected= jQuery("#locFilter select").select2("val");
+           search(idselected);
+        });
+        jQuery("#T9").unbind("change.changeImage");
+        jQuery("#T9").bind("change.changeImage", function () {
+
+
+            var fa = new FormData();
+
+            var imgx = jQuery('#T9')[0].files[0];
+
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length - 1];
+            var extx = extx.toLowerCase();
+
+            fa.append('sdfFile', jQuery('#T9')[0].files[0]);
+
+
+            if (extx == "sdf") {
+
+                jQuery.ajax({
+
+                    url: "/Tags/Tags/getSdf",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                       
+                        jQuery('#result').html("");
+                        jQuery('#result').html(data);
+                        _loading();
+                       jQuery("#T9").val("");
+                      
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+               
+            } else {
+
+                alertblue("Elige un archivo con Formato SDF!!!");
+            }
+
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+
+    });
+</script>

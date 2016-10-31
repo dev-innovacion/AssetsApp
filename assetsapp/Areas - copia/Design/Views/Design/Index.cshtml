@@ -1,0 +1,1186 @@
+﻿@using MongoDB.Bson
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JObject
+
+@{
+ ViewBag.Title = "index";
+
+ int count = 0;
+ string logo = "";
+ string logoext = "";
+ string logologin = "";
+ string logologinext = "";
+ string logomenu = "";
+ string logomenuext = "";
+ string favicon = "";
+ string faviconext = "";
+ string topbarcolor = "#000000";
+ string widgetcolor = "#ABABAB";
+ string titlecolor = "#ffffff";
+   
+ string color1 = "#003773";
+ string color2 = "#01509b";
+ string color3 = "#003773";
+ string textologin = "Acceso a Business App";
+ string slider = "checked";
+ string slider2 = "";
+ List<string> backs = new List<string>();
+ 
+ // Aqui se cargan los backgrounds
+ try { 
+     foreach (string x in Model["backgrounds"])
+     {
+             
+         backs.Add(x);
+         count++; 
+     }
+ }catch (Exception ex) { }
+ 
+ //Aqui se carga el Favicon
+ try
+ {
+     favicon = Model["favicon"].ToString().Split('.').First(); //getting the extension
+     faviconext = Model["favicon"].ToString().Split('.').Last();
+
+ }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el Logo
+ try
+ {
+     logo = Model["logo"].ToString().Split('.').First(); //getting the extension
+     logoext = Model["logo"].ToString().Split('.').Last();
+
+ }
+ catch (Exception ex) { }
+ //Aqui se carga el Logo del menu
+ try
+ {
+     logomenu = Model["logomenu"].ToString().Split('.').First(); //getting the extension
+     logomenuext = Model["logomenu"].ToString().Split('.').Last();
+
+ }
+ catch (Exception ex) { }
+ //Aqui se carga el Logo del login
+ try
+ {
+     logologin = Model["logologin"].ToString().Split('.').First(); //getting the extension
+     logologinext = Model["logologin"].ToString().Split('.').Last();
+
+ }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de la topbar
+ try { topbarcolor = Model["topbar"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de widget
+ try { widgetcolor = Model["widget"].ToString(); } 
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de title
+ try {titlecolor=Model["title"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de 
+ try { color1 = Model["color1"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de 
+ try { color2 = Model["color2"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el color de 
+ try { color3 = Model["color3"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga el texto del login
+ try { textologin = Model["text"].ToString(); }
+ catch (Exception ex) { }
+ 
+ //Aqui se carga la opcion del slider
+ try { 
+     
+    string value = Model["slider"].ToString();
+    slider = (value == "1") ? "" : slider;
+    slider2 = (value == "1") ? "checked" : slider2;
+ }
+ catch (Exception ex) { } 
+        
+ }
+
+<div class="widgets_area">
+    <!------------------Barra superior------------------------------------------------------------>
+    @*<div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Administrar Diseño</h3>
+            </div>
+            <div class="span4">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <br />*@
+    <div class="well">
+        <div class="well-header widgetclient"> 
+            <h5>Personalización de tema</h5>
+        </div>
+        <div class="well-content no_padding">
+        <!--------------Area del Texto de Saludo en Login --- Slide-------------------------------->
+            <div class="row-fluid">
+                <div class="span12" style="text-align: center;">
+                    <div class="span6" style="margin: 0;">
+                        <div class="span10" style="padding-left: 10%;">
+                            <br />
+                            <div class="row-fluid">
+                                <div class="span12 content" style="padding-left:20px;padding-right:10px;">
+                                    <h4>Texto de Saludo en Login:</h4>
+                                </div>
+                                <div class="span12">
+                                    <div class="span6" style="padding: 2%;">
+                                        <input id="textlogin" type="text" value="@textologin">
+                                    </div>
+                                    <div class="span6" style="padding: 2%;">
+                                        <input value="Guardar Texto" class="btn blue" type="button" id="savetext">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!----------------------------------------------------------------------------------->
+                    <div class="span6" style="margin: 0;">
+                        <div class="span10" style="padding-left: 10%;">
+                            <br />
+                            <div class="row-fluid">
+                                <div class="span12 content" style="padding-left:20px;padding-right:10px;">
+                                    <h4>Slider:</h4>
+                                </div>
+                                <div class="span6">
+                                    <div class="span12">
+                                        Imagenes Centradas:
+                                        <input name="slider" type="radio" value="0" @slider>
+                                    </div>
+                                    <div class="span12">
+                                        Imagenes Expandidas:
+                                        <input name="slider" type="radio" value="1" @slider2>
+                                    </div>
+                                </div>
+                                <div class="span5" style="margin-top:2%">
+                                    <input value="Guardar Cambios" class="btn blue" type="button" id="saveslider">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <hr />
+        <!--------------Logo Menu -- Logo Login--------------------------------------------------->
+            <div class="row-fluid">
+                <div class="span12" style="text-align: center;">
+                    <div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4> Logo Menu:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div id=" nowheelpropagation4" style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+                            <div id="attach3" style="">
+                                <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                <br />
+                                @if (logomenu != "")
+                            {
+                                    <div id="noneattach3" style="padding-left: 45%;"><strong></strong></div>
+                                    <center>
+                                        <div id="attachup3" class="">
+
+                                            <div class="" id="@logomenu">
+                                                <img class="atach3" style="width: 150px; height: 100px;padding-bottom:15px;" src="/Uploads/Images/Design/Logomenu/@Model["logomenu"].ToString()">
+                                                <div data-iddelete="@logomenu" class="vN del" onclick="removelogomenu('@logomenu')"></div>
+                                            </div>
+                                        </div>
+                                    </center>
+
+
+                            }
+                            else{
+                                    <div id="noneattach3" style="padding-left: 45%;"><strong> Ningun Logo Subido ...</strong></div>
+                                    <center>
+                                        <div id="attachup3" class="">
+                                            <img id="categoryImagePreview3" src="" />
+                                        </div>
+                                    </center>
+
+                            }
+                            </div>
+                        </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <button class="btn blue  fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Cargar</span>
+                                <input type="file" id="T93" />
+                            </button>
+                        </div>
+                    </div>
+                    <!------------------------------------------------------------------------------>
+                    <div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4> Logo Login:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div id=" nowheelpropagation2" style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+                            <div id="attach1" style="">
+                                <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                <br />
+                                @if (logologin == "")
+                                {
+                                    <div id="noneattach2" style="padding-left: 45%;"><strong> Ningun Logo Subido ...</strong></div>
+                                    <center>
+                                        <div id="attachup2" class="">
+                                            <img id="categoryImagePreview2" src="" />
+                                        </div>
+                                    </center>
+                                }
+                                else
+                                { <div id="noneattach2" style="padding-left: 45%;"><strong></strong></div>
+                                    <center>
+                                        <div id="attachup2" class="">
+
+                                            <div class="" id="@logologin">
+                                                <img class="atach2" style="width: 150px; height: 100px;padding-bottom:15px;" src="/Uploads/Images/Design/Logologin/@Model["logologin"].ToString()">
+                                                <div data-iddelete="@logologin" class="vN del" onclick="removelogologin('@logologin')"></div>
+                                            </div>
+                                        </div>
+                                    </center>
+
+                                }
+                            </div>
+                        </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <button class="btn blue  fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Cargar</span>
+                                <input type="file" id="T92" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!--------------Backgrounds - Logo -- Favicon----------------------------------------------------------->
+            <div class="row-fluid">
+                <div class="span12" style="text-align: center;">
+                    <div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4>Backgrounds:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div id="NoWheelPropagation" style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+
+                                <div id="attach" style="">
+                                    <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                    <br />
+                                    @if (count == 0)
+                                    {
+                                    <div id="noneattach" style="padding-left: 45%;"><strong> Ninguno...</strong></div>
+                                    <div id="attachup" class="">
+
+                                        <img id="categoryImagePreview" src="" />
+                                    </div>
+                                    }
+                                    else
+                                    {
+                                    <div id="noneattach" style="padding-left: 45%;"><strong></strong></div>
+                                    <div id="attachup" class="">
+
+                                        @foreach (string nameimg in backs)
+                                            {
+                                                string name = nameimg.Split('.').First(); //getting the extension
+
+                                            <div class="float_left" style="padding-left:3%;" id="@name">
+                                                <img class="atach" style="width: 150px; height: 100px;padding-bottom:15px;" src="/Uploads/Images/Design/Backgrounds/@nameimg">
+                                                <div data-iddelete="@name" class="vN del float_left" onclick="removebg('@name')"></div>
+                                            </div>
+                                            }
+                                    </div>
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <button class="btn blue  fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Agregar Fondo...</span>
+                                <input type="file" id="T9" />
+                            </button>
+                        </div>
+                    </div>
+                    <!--------------------------------------------------------------------------------->
+                    @*<div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4>Logo:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div id="NoWheelPropagation1" style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+                                <div id="attach1" style="">
+                                    <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                    <br />
+                                    @if (logo == "")
+                                {
+                                    <div id="noneattach1" style="padding-left: 45%;"><strong> Ningun Logo Subido ...</strong></div>
+                                    <center>
+                                        <div id="attachup1" class="">
+                                            <img id="categoryImagePreview1" src="" />
+                                        </div>
+                                    </center>
+                                }
+                                else
+                                { <div id="noneattach1" style="padding-left: 45%;"><strong></strong></div>
+                                    <center>
+                                        <div id="attachup1" class="">
+
+                                            <div class="" id="@logo">
+                                                <img class="atach" style="width: 150px; height: 100px;padding-bottom:15px;" src="/Uploads/Images/Design/Logo/@Model["logo"].ToString()">
+                                                <div data-iddelete="@logo" class="vN del" onclick="removelogo('@logo')"></div>
+                                            </div>
+                                        </div>
+                                    </center>
+
+                                }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <button class="btn blue  fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Cargar</span>
+                                <input type="file" id="T91" />
+                            </button>
+                        </div>
+                    </div>*@
+                    <!--------------------------------------------------------------------------------->
+                    <div class="span6" style="margin: 0;">
+                        <div class=" span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4>Favicon:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+                                <div id="attach4" style="">
+                                    <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                    <br />
+                                    @if (favicon == "")
+                                    {
+                                    <div id="noneattach4" style="padding-left: 45%;"><strong> Ningun Favicon Subido ...</strong></div>
+                                    <center>
+                                        <div id="attachup4" class="">
+                                            <img id="categoryImagePreview1" src="" />
+                                        </div>
+                                    </center>
+                                    }
+                                    else
+                                    { <div id="noneattach4" style="padding-left: 45%;"><strong></strong></div>
+                                    <center>
+                                        <div id="attachup4" class="">
+                                            <div class="" id="@favicon" style="width: 150px; height: 115px;">
+                                                <br/>
+                                                <br/>
+                                                <img class="atach" style="padding-bottom:15px;" src="/Uploads/Images/Design/Favicon/@Model["favicon"].ToString()">
+                                                <div style="display:none;" data-iddelete="@favicon" class="vN del" onclick="removelogo('@favicon')"></div>
+                                            </div>
+                                        </div>
+                                    </center>
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <button class="btn blue  fileinput-button">
+                                <i class="icon-plus icon-white"></i>
+                                <span>Cargar</span>
+                                <input type="file" id="T94" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!--------------Backgrounds--------------------------------------------------------------->
+            @*<div class="row-fluid">
+                <div class="span12">
+                    <div class="span1">
+                        <div class="content" style="padding-left:20px;padding-right:10px;">
+                            <br />
+                            <h5>Backgrounds:</h5>
+                        </div>
+                    </div>
+                    <div class="span9" style="padding-left:25px;">
+                        <div id="NoWheelPropagation" style="border: #999 solid 3px; overflow: hidden; position: relative; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px; max-height: 150px;">
+
+                            <div id="attach" style="">
+                                <div style="padding-left: 40%; background:#0072c6;color:white;width:60%;"></div>
+                                <br />
+                                @if (count == 0)
+                                {
+                                    <div id="noneattach" style="padding-left: 45%;"><strong> Ninguno...</strong></div>
+                                    <div id="attachup" class="">
+
+                                        <img id="categoryImagePreview" src="" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="noneattach" style="padding-left: 45%;"><strong></strong></div>
+                                    <div id="attachup" class="">
+
+                                        @foreach (string nameimg in backs)
+                                        {
+                                            string name = nameimg.Split('.').First(); //getting the extension
+
+                                            <div class="float_left" style="padding-left:3%;" id="@name">
+                                                <img class="atach" style="width: 150px; height: 100px;padding-bottom:15px;" src="/Uploads/Images/Design/Backgrounds/@nameimg">
+                                                <div data-iddelete="@name" class="vN del float_left" onclick="removebg('@name')"></div>
+                                            </div>
+                                        }
+                                    </div>
+
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="span2">
+                        <br />
+                        <button class="btn blue  fileinput-button">
+                            <i class="icon-plus icon-white"></i>
+                            <span>Agregar Fondo...</span>
+                            <input type="file" id="T9" />
+                        </button>
+                    </div>
+                </div>
+            </div>*@
+        <!--------------Colores De Fondo Para Formulario Del Login-------------------------------->
+            <div class="row-fluid">
+                <div class="span12" style="text-align: center;">
+                    <div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4>Colores para el formulario de Login:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div style="border: #999 solid 3px; overflow-y: auto; max-height: 200px; min-height: 100px; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px">
+                                <div class="row-fluid" style="text-align: right;">
+                                    <br>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            <span>Esquina Superior Izquierda:</span>
+                                        </div>
+                                        <div class="span6">
+                                            <input id="colorvalue1" type="color" name="favcolor" value="@color1" onchange="javascript:document.getElementById('topbarvalue1').value = document.getElementById('colorvalue1').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none;  width:144px;" id="topbarvalue1" type="text" readonly="" value="@color1">
+                                    </div>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            <span>Centro:</span>
+                                        </div>
+                                        <div class="span6">
+                                            <input id="widgetcolor1" type="color" name="favcolor" value="@color2" onchange="javascript:document.getElementById('widgetvalue1').value = document.getElementById('widgetcolor1').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none; width:144px;" id="widgetvalue1" type="text" readonly="" value="@color2">
+                                    </div>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            <span>Esquina Inferior Derecha:</span>
+                                        </div>
+                                        <div class="span6">
+                                            <input id="titlecolor1" type="color" name="favcolor" value="@color3" onchange="javascript:document.getElementById('titlevalue1').value = document.getElementById('titlecolor1').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none; width:144px;" id="titlevalue1" type="text" readonly="" value="@color3">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <input value="Guardar Cambios" class="btn blue" type="button" id="savecolor1">
+                        </div>
+                    </div>
+                    <!--------------Colores------------------------------------------------------------------->
+                    <div class="span6" style="margin: 0;">
+                        <div class="span12">
+                            <div class="content" style="padding-left:20px;padding-right:10px;">
+                                <h4>Colores de la aplicación:</h4>
+                            </div>
+                        </div>
+                        <div class="span10" style="padding-left: 10%;">
+                            <div style="border: #999 solid 3px; overflow-y: auto; max-height: 200px; min-height: 100px; margin: 0px -15px 0px 0px; padding: 0px 20px 15px 0px">
+                                <div class="row-fluid" style="text-align: right;">
+                                    <br>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            <span>Top Bar:</span>
+                                        </div>
+                                        <div class="span6">
+                                            <input id="colorvalue" type="color" name="favcolor" value="@topbarcolor" onchange="javascript:document.getElementById('topbarvalue').value = document.getElementById('colorvalue').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none; width:144px;" id="topbarvalue" type="text" readonly="" value="@topbarcolor">
+                                    </div>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            <span>Widgets:</span>
+                                        </div>
+                                        <div class="span6">
+                                            <input id="widgetcolor" type="color" name="favcolor" value="@widgetcolor" onchange="javascript:document.getElementById('widgetvalue').value = document.getElementById('widgetcolor').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none; width:144px;" id="widgetvalue" type="text" readonly="" value="@widgetcolor">
+                                    </div>
+                                    <div class="span12" style="padding-left:20px;">
+                                        <div class="span6">
+                                            Titulos:
+                                        </div>
+                                        <div class="span6">
+                                            <input id="titlecolor" type="color" name="favcolor" value="@titlecolor" onchange="javascript:document.getElementById('titlevalue').value = document.getElementById('titlecolor').value;">
+                                        </div>
+                                        @*Codigo#:*@<input style="display:none; width:144px;" id="titlevalue" type="text" readonly="" value="@titlecolor">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <br />
+                            <input value="Guardar Cambios" class="btn blue" type="button" id="savecolor">
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+    </div>
+</div>
+
+<script>
+    var nonex = 0;
+    nonex=@count
+    function removebg(iddelete) {
+
+        var id=iddelete;
+        var remove=id;
+        if(id==null || id=='undefine'){
+            remove = jQuery(this).data("iddelete");
+        }
+      
+
+        jQuery("#" + remove).remove();
+        jQuery.ajax({
+
+            url: "/Design/Design/deletebackground",
+            // data: { maildata : jsonmail},
+           
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: {idimg:remove},
+            type: "POST",
+            beforeSend: _loading(),
+
+            success: function (data) {
+            
+
+                _loading();
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+                _loading();
+            }
+        });
+
+       
+
+    }
+    function removelogomenu(iddelete) {
+        var id = iddelete;
+        var remove = id;
+        if (id == null || id == 'undefine') {
+            remove = jQuery(this).data("iddelete");
+        }
+        jQuery("#" + remove).remove();
+        jQuery.ajax({
+
+            url: "/Design/Design/deleteLogo3",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: { idimg: remove },
+            type: "POST",
+            beforeSend: _loading(),
+
+            success: function (data) {
+
+                jQuery("#noneattach3").text("Ningun Logo Subido!!!");
+                _loading();
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+                _loading();
+            }
+        });
+
+
+
+    }
+    function removelogologin(iddelete) {
+        var id = iddelete;
+        var remove = id;
+        if (id == null || id == 'undefine') {
+            remove = jQuery(this).data("iddelete");
+        }
+        jQuery("#" + remove).remove();
+        jQuery.ajax({
+
+            url: "/Design/Design/deleteLogo2",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: { idimg: remove },
+            type: "POST",
+            beforeSend: _loading(),
+
+            success: function (data) {
+
+                jQuery("#noneattach2").text("Ningun Logo Subido!!!");
+                _loading();
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+                _loading();
+            }
+        });
+
+
+
+    }
+    //Aqui de remueve el Favicon
+    function removefavicon(iddelete) {
+        var id = iddelete;
+        var remove = id;
+        if (id == null || id == 'undefine') {
+            remove = jQuery(this).data("iddelete");
+        }
+        jQuery("#" + remove).remove();
+        jQuery.ajax({
+
+            url: "/Design/Design/deleteFavicon",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: { idimg: remove },
+            type: "POST",
+            beforeSend: _loading(),
+
+            success: function (data) {
+
+                jQuery("#noneattach2").text("Ningun Logo Subido!!!");
+                _loading();
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+                _loading();
+            }
+        });
+
+
+
+    }
+    function removelogo(iddelete) {
+        var id=iddelete;
+        var remove=id;
+        if(id==null || id=='undefine'){
+            remove = jQuery(this).data("iddelete");
+        }
+         jQuery("#" + remove).remove();
+        jQuery.ajax({
+
+            url: "/Design/Design/deleteLogo",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: { idimg: remove },
+            type: "POST",
+            beforeSend: _loading(),
+
+            success: function (data) {
+
+                jQuery("#noneattach1").text("Ningun Logo Subido!!!");
+                _loading();
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+                _loading();
+            }
+        });
+
+
+
+    }
+
+    jQuery(document).ready(function () {
+        // jQuery("#T9").unbind("change.changeImage");
+        jQuery('#NoWheelPropagation').perfectScrollbar({ wheelSpeed: 100, suppressScrollX: true });
+        jQuery('#NoWheelPropagation1').perfectScrollbar({ wheelSpeed: 100 });
+        jQuery('#NoWheelPropagation2').perfectScrollbar({ wheelSpeed: 100 });
+
+        jQuery("#T9").bind("change.changeImage", function () {
+
+           
+            var fa = new FormData();
+
+            var imgx = jQuery('#T9')[0].files[0];
+
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length-1];
+            var extx = extx.toLowerCase();
+            
+            fa.append('attachment', jQuery('#T9')[0].files[0]);
+
+
+            if(extx=="jpg" || extx=="png" || extx=="gif"){
+
+                jQuery.ajax({
+
+                    url: "/Design/Design/attachSet",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                        if (nonex == 0) {
+                            jQuery('#noneattach').html("");
+                            nonex++;
+                        }
+                   
+                        var format = data.split('.');
+
+                        var ext = format[format.length - 1];
+                        ext = ext.toLowerCase();
+                        var divcontent = jQuery("<div class='float_left' style='padding-left:3%;' id='" + format[0] + "'>");
+                        if (ext == "jpg" || ext == "png" || ext == "gif") {
+                            var  img = jQuery("<img  class='atach' style='width: 150px; height: 100px;padding-bottom:15px;' >", { class: "" }).attr('src', '/Uploads/Images/Design/Backgrounds/' + data);
+                            var divdel = jQuery("<div data-iddelete='" + format[0] + "' class='vN del float_left'>").on('click', removebg);
+                            divcontent.append(img).append(divdel);
+                            jQuery('#attachup').append(divcontent);
+                        }
+                
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+            } else {
+
+                alertblue("Elige una imagen con Formato valido!!!");
+            }
+
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+        jQuery("#T91").bind("change.changeImage", function () {
+
+          
+            var fa = new FormData();
+
+            var imgx = jQuery('#T91')[0].files[0];
+
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length - 1];
+            var extx = extx.toLowerCase();
+
+            fa.append('attachment', jQuery('#T91')[0].files[0]);
+
+
+
+            if (extx == "jpg" || extx == "png" || extx == "gif" || extx=="ico") {
+
+                jQuery.ajax({
+
+                    url: "/Design/Design/attachSetLogo",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                            jQuery('#noneattach1').html("");
+                        
+
+                        var format = data.split('.');
+
+                        var ext = format[format.length - 1];
+                        ext = ext.toLowerCase();
+                        var divcontent = jQuery("<div class='' id='" + format[0] + "'>");
+                        if (ext == "jpg" || ext == "png" || ext == "gif") {
+                            var img = jQuery("<img  class='atach1' style='width: 150px; height: 100px;padding-bottom:15px;' >", { class: "" }).attr('src', '/Uploads/Images/Design/Logo/' + data);
+                            var divdel = jQuery("<div data-iddelete='" + format[0] + "' class='vN del'>").on('click', removelogo);
+                            divcontent.append(img).append(divdel);
+                            jQuery('#attachup1').html("");
+                            jQuery('#attachup1').append(divcontent);
+                        }
+
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+            }
+            else {
+
+                alertblue("Elige una imagen con Formato valido!!!");
+            }
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+        jQuery("#T92").bind("change.changeImage2", function () {
+
+
+            var fa = new FormData();
+
+            var imgx = jQuery('#T92')[0].files[0];
+
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length - 1];
+            var extx = extx.toLowerCase();
+
+            fa.append('attachment', jQuery('#T92')[0].files[0]);
+
+
+
+            if (extx == "jpg" || extx == "png" || extx == "gif" || extx == "ico") {
+
+                jQuery.ajax({
+
+                    url: "/Design/Design/attachSetLogo2",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                        jQuery('#noneattach2').html("");
+
+
+                        var format = data.split('.');
+
+                        var ext = format[format.length - 1];
+                        ext = ext.toLowerCase();
+                        var divcontent = jQuery("<div class='' id='" + format[0] + "'>");
+                        if (ext == "jpg" || ext == "png" || ext == "gif") {
+                            var img = jQuery("<img  class='atach2' style='width: 150px; height: 100px;padding-bottom:15px;' >", { class: "" }).attr('src', '/Uploads/Images/Design/Logologin/' + data);
+                            var divdel = jQuery("<div data-iddelete='" + format[0] + "' class='vN del'>").on('click', removelogologin);
+                            divcontent.append(img).append(divdel);
+                            jQuery('#attachup2').html("");
+                            jQuery('#attachup2').append(divcontent);
+                        }
+
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+            }
+            else {
+
+                alertblue("Elige una imagen con Formato valido!!!");
+            }
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+        jQuery("#T93").bind("change.changeImage3", function () {
+
+
+            var fa = new FormData();
+
+            var imgx = jQuery('#T93')[0].files[0];
+
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length - 1];
+            var extx = extx.toLowerCase();
+
+            fa.append('attachment', jQuery('#T93')[0].files[0]);
+
+
+
+            if (extx == "jpg" || extx == "png" || extx == "gif" || extx == "ico") {
+
+                jQuery.ajax({
+
+                    url: "/Design/Design/attachSetLogo3",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                        jQuery('#noneattach3').html("");
+
+
+                        var format = data.split('.');
+
+                        var ext = format[format.length - 1];
+                        ext = ext.toLowerCase();
+                        var divcontent = jQuery("<div class='' id='" + format[0] + "'>");
+                        if (ext == "jpg" || ext == "png" || ext == "gif") {
+                            var img = jQuery("<img  class='atach3' style='width: 150px; height: 100px;padding-bottom:15px;' >", { class: "" }).attr('src', '/Uploads/Images/Design/Logomenu/' + data);
+                            var divdel = jQuery("<div data-iddelete='" + format[0] + "' class='vN del'>").on('click', removelogomenu);
+                            divcontent.append(img).append(divdel);
+                            jQuery('#attachup3').html("");
+                            jQuery('#attachup3').append(divcontent);
+                        }
+
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+            }
+            else {
+
+                alertblue("Elige una imagen con Formato valido!!!");
+            }
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+        //Aqui se cambia el favicon
+        jQuery("#T94").bind("change.changeImage4", function () {
+            var fa = new FormData();
+            var imgx = jQuery('#T94')[0].files[0];
+            var formatx = imgx.name.split('.');
+            var extx = formatx[formatx.length - 1];
+            var extx = extx.toLowerCase();
+
+            fa.append('attachment', jQuery('#T94')[0].files[0]);
+
+
+
+            if (extx == "jpg" || extx == "png" || extx == "gif" || extx == "ico") {
+
+                jQuery.ajax({
+
+                    url: "/Design/Design/attachSetFavicon",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                        jQuery('#noneattach4').html("");
+
+
+                        var format = data.split('.');
+
+                        var ext = format[format.length - 1];
+                        ext = ext.toLowerCase();
+                        var divcontent = jQuery("<div class='' id='" + format[0] + "'>");
+                        if (ext == "jpg" || ext == "png" || ext == "gif") {
+                            var img = jQuery("<img  class='atach2' style='width: 150px; height: 100px;padding-bottom:15px;' >", { class: "" }).attr('src', '/Uploads/Images/Design/Favicon/' + data);
+                            var divdel = jQuery("<div data-iddelete='" + format[0] + "' class='vN del'>").on('click', removefavicon);
+                            divcontent.append(img).append(divdel);
+                            jQuery('#attachup4').html("");
+                            jQuery('#attachup4').append(divcontent);
+                        }
+
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+            }
+            else {
+
+                alertblue("Elige una imagen con Formato valido!!!");
+            }
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        });
+        jQuery('#savetext').click(function () {
+
+
+            var text = document.getElementById('textlogin').value;
+            if (text == "") {
+                return false;
+            }
+            jQuery.ajax({
+
+                url: "/Design/Design/savetext",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                data: { text: text },
+                type: "POST",
+                beforeSend: _loading(),
+
+                success: function (data) {
+
+                    _alert("success", "Cambios Guardados Con Exito!!");
+                    _loading();
+
+                    
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error, intenta más tarde.");
+                    _loading();
+                }
+            });
+
+        });
+        jQuery('#saveslider').click(function () {
+
+
+             
+            var type = jQuery("[name=slider]:checked").val();
+            if (type == "") {
+                return false;
+            }
+            jQuery.ajax({
+
+                url: "/Design/Design/saveslider",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                data: { slider: type },
+                type: "POST",
+                beforeSend: _loading(),
+
+                success: function (data) {
+
+                    _alert("success", "Cambios Guardados Con Exito!!");
+                    _loading();
+
+                    
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error, intenta más tarde.");
+                    _loading();
+                }
+            });
+
+        });
+        jQuery('#savecolor1').click(function () {
+
+
+            var color1 = document.getElementById('colorvalue1').value;
+            var color2 = document.getElementById('widgetcolor1').value;
+            var color3 = document.getElementById('titlecolor1').value;
+            jQuery.ajax({
+
+                url: "/Design/Design/saveColorlogin",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                data: { color1: color1, color2: color2, color3: color3 },
+                type: "POST",
+                beforeSend: _loading(),
+
+                success: function (data) {
+
+                    _alert("success", "Cambios Guardados Con Exito!!");
+                    _loading();
+
+                    window.location.reload();
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error, intenta más tarde.");
+                    _loading();
+                }
+            });
+
+        });
+        jQuery('#savecolor').click(function () {
+           
+
+            var topbar = document.getElementById('colorvalue').value;
+            var widget = document.getElementById('widgetcolor').value;
+            var title = document.getElementById('titlecolor').value;
+            jQuery.ajax({
+
+                url: "/Design/Design/saveColor",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                data: { topbar: topbar,widget:widget,title:title },
+                type: "POST",
+                beforeSend: _loading(),
+
+                success: function (data) {
+
+                    _alert("success", "Cambios Guardados Con Exito!!");
+                    _loading();
+
+                    window.location.reload();
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error, intenta más tarde.");
+                    _loading();
+                }
+            });
+
+        });
+    });
+</script>

@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Selecciona Ubicación";
+    Layout = null;
+}
+<div id="locationsPanel" class="modal modal-mini hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Selecciona la ubicación:</h3>
+    </div>
+    <div class="modal-body">
+
+        <div id="tablausers">
+            <label class="lanelMargen">Ubicaciones </label>
+            <div class="divTree">
+                <div class="well-content no-search">
+                    <div class="portlet-body fuelux">
+                        <ul class="tree" id="location_tree"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input value="Guardar" type="button" class="btn blue" id="save_button1">
+        <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button">
+    </div>
+</div>
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+<script type="text/javascript">
+
+    var locatmodal = {
+        modal: jQuery("#locationsPanel"),
+        nodeselected:null,
+        tree : new RivkaTree("location_tree", {
+            method: RivkaTree.METHODS.AJAX,
+            url: "/Tags/Labeling/getNodeLocation",
+            idKey: "_id",
+            nameKey: "name",
+            onNodeSelectAction: function () {
+                nodeselected = jQuery(this).closest("li").data("idcategory");
+            }
+        }),
+
+        showModal: function () {
+            this.modal.modal("show");
+        },
+
+        hideModal: function () {
+            this.modal.modal("hide");
+        },
+
+        init: function () {
+            this.showModal();
+            this.tree.init({ id: "null", name: "Home" });
+        },
+
+        bindAll: function () {
+            jQuery("#save_button1").on('click', function () {
+               
+                var table = jQuery("#objectTable").find("tbody");
+                table.find("input:checked").each(function () {
+                  
+                            jQuery(this).closest("tr").find(".locationtd").data("location", nodeselected);
+                            jQuery(this).closest("tr").find(".locationtd").text(jQuery("#location_tree").find("label.selected").text());
+                            
+                 
+                });
+                locatmodal.hideModal();
+            });
+        }
+    }
+
+    locatmodal.init();
+    locatmodal.bindAll();
+</script>

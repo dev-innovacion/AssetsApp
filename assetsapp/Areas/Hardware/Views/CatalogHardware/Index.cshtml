@@ -1,0 +1,678 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["objects"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["objects"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+<!-- Common Kendo UI Web CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" />
+<!-- Default Kendo UI Web theme CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" />
+<!-- Kendo UI Web combined JavaScript -->
+<script src="~/Scripts/kendo/2014.1.318/kendo.web.min.js"></script>
+<script src="~/Scripts/kendo/2014.1.318/kendo.treeview.min.js"></script>
+<div class="widgets_area">
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span3">
+                <h4>Hardware</h4>
+            </div>
+            <div class="span9">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span3">
+                <div class="span12">
+                    <div class="light_blue set_color">
+                        <div class="well-header">
+                            <h5>Categorías</h5>
+                        </div>
+                        <div class="well-content no-search">
+                            <div class="k-header">
+                                <div id="category_tree">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span9">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div class="light_blue set_color">
+                            <div class="well-header">
+                                <h5 id="category_header">Categorías</h5>
+                                <div class="btn-group" id="thisCategoryOptions">
+                                    @if (add == "c" && addc == "c")
+                                    {
+                                        <button class="btn btn-mini dark_green fileinput-button" id="addHwButton" data-original-title="Agregar HH" rel="tooltip" data-placement="top">
+                                            <i class="icon-plus icon-white"></i>
+                                        </button>
+                                    }
+                                    <!-- View Buttons -->
+                                    <button class="btn btn-mini dark_green" id="toTileViewButton" data-original-title="Mosaicos" rel="tooltip" data-placement="top">
+                                        <i class=" icon-th-large icon-white"></i>
+                                        <span></span>
+                                    </button>
+                                    <button class="btn btn-mini orange" id="toSliderViewButton" data-original-title="Slider" rel="tooltip" data-placement="top">
+                                        <i class=" icon-resize-horizontal icon-white"></i>
+                                        <span></span>
+                                    </button>
+                                    <button class="btn btn-mini light_blue" id="toTableViewButton" data-original-title="Tabla" rel="tooltip" data-placement="top">
+                                        <i class=" icon-th-list icon-white"></i>
+                                        <span></span>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span12">
+                        <ul class="breadcrumb" id="categoryRoute">
+                            <li id="root" class="active" data-id="null">Home</li>
+                        </ul>
+                    </div>
+                    <div class="span12">
+                        <ul class="nav nav-tabs" id="myTab">
+                            <li class="active"><a href="#categoriesTab" data-toggle="tab">Categorías <span id="counterCategories" class="badge badge-info"></span></a></li>
+                            <li><a href="#objectsTab" data-toggle="tab">Objetos <span id="counterObjects" class="badge badge-info"></a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="categoriesTab">
+                            </div>
+                            <div class="tab-pane" id="objectsTab">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="object_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Datos del Hardware</h3>
+    </div>
+    <form id="objectForm" method="post" enctype="multipart/form-data" autocomplete="off">
+        <div class="modal-body">
+
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="tabHeader1">
+                    <li class="active" id="staticFormHeader"><a href="#staticFieldsSection" data-toggle="tab">Inf. General</a></li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tabContent1">
+                <div class="tab-pane active staticFieldsSection perfilMargen" id="staticFieldsSection">
+
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <img id="_HTKImagePreview" />
+                            </td>
+                            <td width="50%">
+                                <label>Serie: </label>
+                                <div class="staticField">
+                                    <label id="lblserie"></label>
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+
+            <input value="Cerrar" class="btn grey" type="button" id="cancel_button">
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+    <script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+    <script type="text/javascript">
+        var add = "";
+        var upd = "";
+        var del = "";
+        var categoriesViewer = new RivkaViewer("categoriesTab");
+        var objectsViewer = new RivkaViewer("objectsTab");
+
+        function obtenerNodes(nodoid) {
+            jQuery.ajax({
+                url: "/Hardware/Hardware/getNodeContent2",
+                type: "POST",
+                data: { id: nodoid },
+                async: false,
+                success: function (data) {
+                    var locations = JSON.parse(data);
+
+                    datos = locations;
+
+                },
+                error: function (data) {
+                    //_alert("error","Ha ocurrido un error");
+                }
+            });
+        }
+
+        jQuery.fn.reset = function () {
+            jQuery(this).each(function () { this.reset(); });
+        }
+
+        var model = {
+            parentCategory: location.hash == "" ? "null" : location.hash.substring(1),
+
+            selectedID: null,
+
+            routeData: null,
+
+            prototypeData: null,
+
+            categoriesData: null,
+
+            objectsData: null,
+
+            init: function () {
+
+                jQuery.ajax({
+                    url: "/Hardware/Hardware/getData",
+                    type: "POST",
+                    data: { parentCategory: model.parentCategory },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        var data = JSON.parse(data);
+                        model.routeData = data["route"];
+                        //  model.prototypeData = data["prototype"];
+                        model.categoriesData = data["categories"];
+                        model.objectsData = data["objects"];
+                        var validate = data["idcat"];
+
+                        route.setFullRoute(data["route"]);
+                        // tree.openRoute(data["route"]);
+
+                        var dataOptions = { id: "_id", name: "name", image: "image", permissions: [upd, del] };
+                        categoriesViewer.setData(model.categoriesData, dataOptions);
+
+                        //Count results, categories and objects
+                        jQuery("#myTab #counterCategories").text(JSON.parse(model.categoriesData).length);
+                        jQuery("#myTab #counterObjects").text(JSON.parse(model.objectsData).length);
+
+                        var objectsDataOptions = { id: "_id", name: "name", image: "image", permissions: [upd, del] };
+                        objectsViewer.setData(model.objectsData, objectsDataOptions);
+
+                        table.print();
+
+
+
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        _loading();
+                    }
+                });
+
+
+            }
+        };
+
+        var objectModal = {
+
+            imageArray: {},
+
+            init: function () {
+                objectModal.bindAll();
+            },
+
+            clearModal: function () {
+                jQuery("#objectForm").reset();
+                objectModal.imageArray = {};
+            },
+
+            onEditAction: function (trObject) {
+                var id = trObject.data("id");
+                model.selectedID = id;
+                jQuery.ajax({
+                    url: "/Hardware/Hardware/getObject",
+                    type: "POST",
+                    data: { id: id },
+                    async: false,
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        model.parentCategory = obj["parentCategory"];
+                        objectModal.loadForm();
+                        jQuery("#lblserie").text(obj["serie"]);
+                        jQuery("#name").val(obj["name"]);
+                        for (key in obj["profileFields"]) {
+                            if (jQuery("#" + key).attr("type") == "checkbox") {
+                                jQuery("#" + key).attr("checked", "checked");
+                            }
+                            else if (jQuery("#" + key).attr("type") == "radio") {
+                                jQuery("[name=" + key + "][value = " + obj["profileFields"][key].toString() + "]").attr("checked", "checked");
+                            }
+                            else if (jQuery("#" + key).prop("tagName") == "SELECT" && jQuery("#" + key).prop("multiple")) {
+                                var values = obj["profileFields"][key].toString().split(",");
+                                for (value in values) {
+                                    jQuery("#" + key + " option[value = " + values[value] + "]").attr("selected", "selected");
+                                }
+                            }
+                            else if (jQuery("#" + key).prop("type") == "file") {
+                                objectModal.imageArray["" + key] = obj["profileFields"][key].toString();
+                                jQuery("#" + key + "Preview").attr("src", "/Uploads/Images/ObjectReferences/CustomImages/" + obj["profileFields"][key].toString());
+                            }
+                            else {
+                                jQuery("#" + key).val(obj["profileFields"][key].toString());
+                            }
+                        }
+                        jQuery("#_HTKImagePreview").attr("src", "/Uploads/Images/Hardware/" + obj["idreference"] + "." + obj["ext"]);
+                        jQuery("#object_panel").modal("show");
+                    }
+                });
+
+
+            },
+
+            loadForm: function () {
+                if (model.parentCategory != "null") {
+                    jQuery.ajax({
+                        url: "/Hardware/Hardware/getObjectForm",
+                        type: "POST",
+                        async: false,
+                        data: { parentCategory: model.parentCategory },
+
+                        success: function (data) {
+                            var objectData = JSON.parse(data);
+                            jQuery("#staticFormHeader a").click();
+                            jQuery("#staticFieldsSection").nextAll().remove();
+                            jQuery("#staticFieldsSection").after(objectData.body);
+                            jQuery("#staticFormHeader").nextAll().remove();
+                            jQuery("#staticFormHeader").after(objectData.headers);
+                            objectModal.bindAll();
+
+                        },
+                        error: function (errorThrown) {
+
+                            _alert("error", "Ha ocurrido un error.");
+                        }
+                    });
+                }
+            },
+
+            readURL: function (input, previewDivID) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        jQuery('#' + previewDivID).attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            },
+
+            bindAll: function () {
+                jQuery("#objectForm").unbind("submit.save");
+                jQuery("#objectForm").bind("submit.save", objectModal.onSaveAction);
+
+                jQuery("#cancel_button").unbind("click.cancel");
+                jQuery("#cancel_button").bind("click.cancel", function () {
+                    jQuery("#object_panel").modal("hide");
+                    jQuery("#objectForm").reset();
+                });
+
+
+            }
+        };
+
+        var table = {
+
+            display: "tile",
+
+            init: function () {
+                table.bindAll();
+            },
+            print: function () {
+                switch (table.display) {
+                    case "table":
+                        table.printTable();
+                        break;
+                    case "tile":
+                        table.printTiles();
+                        break
+                    case "slider":
+                        table.printSlider();
+                        break;
+                }
+            },
+
+            printTable: function () {
+                table.display = "table";
+
+                var tableOptions = {
+                    headers: { "name": "Nombre", "objectCount": "#Objetos", "Creator": "Creador", "CreatedDate": "Fecha de Creación", "LastmodDate": "Última Modificación" },
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        objectModal.onEditAction(tr);
+                    }
+                    ,
+                    onDeleteRowAction: null,
+                    onSelectRowAction: function () {
+                        var newTr = jQuery(this);
+                        route.openCategoryFromThis(newTr);
+                        //  tree.selectNode(newTr.data("id"));
+
+                        var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(newTr.data("id"));
+                        jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+
+                        return false;
+                    }
+                };
+
+                categoriesViewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                categoriesViewer.print();
+
+
+
+                var objectsTableOptions = {
+                    headers: { "name": "Nombre", "Creator": "Creador", "CreatedDate": "Fecha de Creación", "LastmodDate": "Última Modificación" },
+                    onEditRowAction: function () {
+                        var tr = jQuery(this).closest("tr");
+                        objectModal.onEditAction(tr);
+                    },
+                    onDeleteRowAction: null,
+                    onSelectRowAction: null
+                };
+
+
+                objectsViewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, objectsTableOptions);
+                objectsViewer.print();
+            },
+
+            printTiles: function () {
+                table.display = "tile";
+                var categoriesOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        objectModal.onEditAction(tr);
+                    },
+                    onDeleteTileAction: null,
+                    onSelectTileAction: function () {
+                        var newTr = jQuery(this);
+                        route.openCategoryFromThis(newTr);
+                        //  tree.selectNode(newTr.data("id"));
+                        var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(newTr.data("id"));
+                        jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+
+                        return false;
+                    }
+                };
+                categoriesViewer.setDisplayMethod(RivkaViewer.METHODS.TILE, categoriesOptions);
+                categoriesViewer.print();
+
+
+                var objectsOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        objectModal.onEditAction(tr);
+                    },
+                    onDeleteTileAction: table.onDeleteObjectAction,
+                    onSelectTileAction: null
+                };
+                objectsViewer.setDisplayMethod(RivkaViewer.METHODS.TILE, objectsOptions);
+                objectsViewer.print();
+            },
+
+            printSlider: function () {
+                table.display = "slider";
+                var categoriesOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        objectModal.onEditAction(tr);
+                    },
+                    onDeleteTileAction: null,
+                    onSelectTileAction: function () {
+                        var newTr = jQuery(this);
+                        route.openCategoryFromThis(newTr);
+                        // tree.selectNode(newTr.data("id"));
+                        var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(newTr.data("id"));
+                        jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+
+                        return false;
+                    }
+                };
+                categoriesViewer.setDisplayMethod(RivkaViewer.METHODS.SLIDER, categoriesOptions);
+                categoriesViewer.print();
+
+                var objectsOptions = {
+                    onEditTileAction: function () {
+                        var tr = jQuery(this).closest("div.tile");
+                        objectModal.onEditAction(tr);
+                    },
+                    onDeleteTileAction: table.onDeleteObjectAction,
+                    onSelectTileAction: null
+                };
+                objectsViewer.setDisplayMethod(RivkaViewer.METHODS.SLIDER, objectsOptions);
+                objectsViewer.print();
+            },
+            onAddAction: function () {
+
+                objectModal.loadForm();
+            },
+            bindAll: function () {
+
+                jQuery("#toSliderViewButton").unbind("click.toSliderView");
+                jQuery("#toSliderViewButton").bind("click.toSliderView", table.printSlider);
+
+                jQuery("#toTableViewButton").unbind("click.toTableView");
+                jQuery("#toTableViewButton").bind("click.toTableView", table.printTable);
+
+                jQuery("#toTileViewButton").unbind("click.toTileView");
+                jQuery("#toTileViewButton").bind("click.toTileView", table.printTiles);
+
+                jQuery("#globalSearchButton").bind("click.search");
+                jQuery("#globalSearchButton").bind("click.search", table.onSearchAction);
+                
+                jQuery("#addHwButton").bind("click.add");
+                jQuery("#addHwButton").bind("click.add", table.onAddAction);
+
+                jQuery("#globalSearch").bind("keypress.checkSend", function (e) {
+                    if (e.which == 13) {
+                        jQuery("#globalSearchButton").click();
+                    }
+                });
+            }
+        };
+
+        var route = {
+
+            onRouteElementClickAction: function () {
+                var liElement = jQuery(this).closest("li");
+                model.parentCategory = liElement.data("id") == null ? "null" : liElement.data("id");
+                location.hash = model.parentCategory;
+                liElement.nextAll().remove();
+
+                var liText = liElement.find("a").text();
+                liElement.addClass("active");
+                liElement.empty();
+                liElement.text(liText);
+
+                model.init();
+
+                var id = model.parentCategory;
+
+                //  tree.selectNode(id);
+                var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(id);
+                jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+            },
+
+            openCategoryFromThis: function (node) {
+                model.parentCategory = jQuery(node).data("id");
+                location.hash = model.parentCategory;
+                model.init();
+            },
+
+            appendNode: function (obj) {
+                try {
+                    id = obj.id;
+                } catch (Exception) {
+                    return null;
+                }
+                try {
+                    name = obj.name;
+                } catch (Exception) {
+                    return null;
+                }
+                var newCategoryElement = jQuery("<li/>").addClass("active").text(name).attr("data-id", id);
+
+                var lastElement = jQuery("#categoryRoute li:last");
+                lastElementText = lastElement.text();
+                lastElement.removeClass("active");
+                lastElement.empty();
+                lastElement.append(jQuery("<a/>").text(lastElementText).on("click", route.onRouteElementClickAction));
+                lastElement.append(
+                    jQuery("<span/>")
+                        .addClass("divider")
+                        .text(">")
+                );
+                jQuery("#categoryRoute").append(newCategoryElement);
+            },
+
+            setFullRoute: function (object) {
+                var liElement = jQuery("#root");
+                liElement.nextAll().remove();
+                if (!liElement.hasClass("active")) {
+                    var liText = liElement.find("a").text();
+                    liElement.addClass("active");
+                    liElement.empty();
+                    liElement.text(liText);
+                }
+
+                for (var i = object.length - 1; i >= 0; i--) {
+                    route.appendNode(object[i]);
+                }
+
+                var lastElement = jQuery("#categoryRoute li:last");
+                lastElementText = lastElement.text();
+                jQuery("#category_header").text(lastElementText);
+            }
+        };
+
+        jQuery(document).ready(function (jQuery) {
+            model.init();
+            table.init();
+
+            function onSelect(e) {
+                var dataItem = this.dataItem(e.node);
+                // alert(dataItem.id);
+                var id = dataItem.id;
+
+                location.hash = id;
+                model.parentCategory = id;
+                model.init();
+
+                jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid).children('.k-group').remove();
+                obtenerNodes(dataItem.id);
+                if (datos.length > 0) {
+                    jQuery("#category_tree").data("kendoTreeView").append(datos, jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid));
+                }
+
+
+            }
+
+            function onExpand(e) {
+
+            }
+
+
+            @if ((upd != null && upd != "") && (updc != null && updc != ""))
+            {
+                <text>
+                    var nodo = "null";
+
+                    obtenerNodes(nodo);
+
+
+                    jQuery("#category_tree").kendoTreeView({
+                        dataSource: [
+                                {
+                                    id: "null", text: "Home", expanded: true, "spriteCssClass": "folder", "hasChildren": true, items: datos
+                                }
+                        ]
+                        ,
+                        dataTextField: "text",
+                        loadondemand: true,
+                        select: onSelect,
+                        expand: onExpand
+                    });
+
+                </text>
+
+                 @(new HtmlString("upd = '" + upd + "';"))
+            }
+
+            @if ((del != null && del != "") && (delc != null && delc != ""))
+            {
+                @(new HtmlString("del = '" + del + "';"))
+            }
+
+            @if ((add != null && add != "") && (addc != null && addc != ""))
+            { 
+                @(new HtmlString("add = '" + add + "';"))
+            }
+        });
+    </script>
+}

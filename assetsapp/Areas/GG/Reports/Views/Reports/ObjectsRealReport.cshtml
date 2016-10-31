@@ -1,0 +1,708 @@
+﻿@{Layout = null;}
+
+@model Dictionary<string, string>
+@{
+    ViewBag.Title = "ObjectRealReport";
+    Dictionary<string, string> col = new Dictionary<string, string>();
+    Dictionary<string, string> customFields = new Dictionary<string, string>();
+
+
+    col.Add("name", "Descripción");
+    col.Add("number", "U. Explotación");
+    col.Add("parent", "Conjunto");
+    col.Add("location", "Ubicacion");
+    col.Add("perfil", "ID perfil activo");
+    col.Add("EPC", "EPC");
+    col.Add("serie", "Serie");
+    col.Add("price", "Precio de Compra");
+    col.Add("proveedor", "Proveedor");
+    col.Add("marca", "Marca");
+    col.Add("modelo", "Modelo");
+    col.Add("object_id", "Id Articulo");
+    col.Add("num_ERP", "ERP");
+    col.Add("num_solicitud", "No Solicitud");
+    col.Add("num_pedido", "No Pedido");
+    col.Add("num_reception", "No Recepcion");
+    col.Add("factura", "No Factura");
+    col.Add("RH", "RH");
+    col.Add("label", "Tipo de Etiquetado");
+    col.Add("system_status", "Estatus");
+    col.Add("_id", "ID");
+ 
+   
+    col.Add("department", "Departamento");
+    col.Add("quantity", "Cantidad");
+    col.Add("CreatedDate", "Fecha Alta");
+
+    int index = 0;
+    string idus = "";
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+        idus = Session["_id"].ToString();
+    }
+
+}
+
+
+<br />
+<center>
+    <div id="optionsdiv1" class=" white span11" style="padding-left:2%;float:left">
+        <div class="span4">
+            <div id="locationsFilter">
+               
+                <div style="max-height:70px;overflow:auto">
+                    <select multiple class="span11" style="width:100%;margin-top:4.5%">
+                        @foreach (var item in Model)
+                        {
+                            <option value="@item.Key">@item.Value</option>
+
+                        }
+                    </select>
+                </div>
+                <div class="hida" style="padding-left: 2%;float:right">
+                    <input id="locationcheck" type="checkbox" style="right:5px;" />
+                    Mostrar Todos los Conjuntos:  
+                </div>
+            </div>
+
+         </div>
+
+        <div class="span4" style="padding-right:10px;">
+            <div id="fieldFilter">
+                <div style="max-height: 70px; overflow: auto">
+                    <select multiple class="span11" style="width:100%;margin-top:4.5%">
+                        @foreach (var item in col)
+                        {
+                            <option value="@item.Key">@item.Value</option>
+
+                        }
+                    </select>
+                </div>
+                <div class="hida" style="padding-left: 2%;float:right">
+                    <input id="fieldcheck" type="checkbox" style="right:5px;" />
+                    Campos A Visualizar: 
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <div id="statusFilter">
+
+                <div style="max-height: 70px;overflow: auto">
+                    <select class="span11" style="width:100%;margin-top:4.5%">
+                        <option value="0">Completo</option>
+                        <option value="1">Activos en inventario</option>
+                        <option value="2">Activos dados de baja</option>
+
+                    </select>
+                </div>
+                <div class="hida" style="padding-left: 2%;float:right">
+                    <input id="statuscheck" type="checkbox" style="right:5px;" />
+                    Estatus:
+                </div>
+            </div>
+        </div>
+        <div class="span4 hidden">
+            <div id="customFilter">
+               
+                <div style="max-height: 70px;overflow: auto">
+                    <select multiple class="span11" style="width:100%;margin-top:4.5%" >
+                        @{var countc = 0;}
+
+                        @foreach (var item in (Dictionary<string, string>)ViewData["customfields"])
+                        {
+                            <option value="@item.Key">@item.Value</option>
+
+                        }
+                    </select>
+                    </div>
+                <div class="hida" style="padding-left: 2%;float:right">
+                    <input id="customcheck" type="checkbox" style="right:5px;" />
+                    Campos Adicionales: 
+                </div>
+                </div>
+          </div>
+
+    </div>
+</center>
+
+
+<div class=" no_padding row-fluid" style="background-color:white !important">
+    <div class="float_right" style="padding-right:4%">
+        <input type="submit" class="btn button_green" id="generate" value="Generar Reporte" />
+
+        <!--<input type="submit" class="btn blue" id="saver" value="Guardar Reporte" />-->
+
+    </div>
+</div>
+
+
+<script>
+
+    var first = 0;
+
+    jQuery(document).ready(function ($) {
+
+
+        $("#fieldFilter select").select2({
+            placeholder: "Mostrar Todos los Campos",
+            allowClear: true
+        });
+        $("#locationsFilter select").select2({
+            placeholder: "Mostrar Todos Los Conjuntos",
+            allowClear: true
+        });
+        $("#customFilter select").select2({
+            placeholder: "Mostrar todos los Campos Adicionales",
+            allowClear: true
+        });
+        $("#statusFilter select").select2({
+            placeholder: "Mostrar todos",
+            allowClear: true
+        });
+        var idus = ""
+        @(new HtmlString("idus='"+idus+"';"))
+
+        $('#NoWheelPropagation').perfectScrollbar({ wheelSpeed: 1000 });
+
+        var valid = 1;
+        var valid1 = 1;
+        var checkboxValues = new Array();
+        var checkboxValuesfilter = new Array();
+        var checkboxValuescustom = new Array();
+        $('#myCarousel').carousel({
+            interval: 200000
+        })
+        $('#fieldcheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#fieldFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#fieldFilter select").select2("val", alls);
+            } else {
+                $("#fieldFilter select").select2("val", null);
+            }
+
+        });
+        
+        $('#locationcheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#locationsFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#locationsFilter select").select2("val", alls);
+            } else {
+                $("#locationsFilter select").select2("val", null);
+            }
+
+        });
+        $('#customcheck').change(function () {
+
+            if ($(this).is(":checked")) {
+                var alls = Array();
+                jQuery("#customFilter option").each(function () { alls.push(jQuery(this).val()) });
+                $("#customFilter select").select2("val", alls);
+            } else {
+                $("#customFilter select").select2("val", null);
+            }
+
+        });
+       /* $('#all2').change(function () {
+
+
+
+            $('input[name="optionscustom[]"]').each(function () {
+                debugger;
+
+                if (valid == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid == 0) {
+                valid++;
+            } else {
+                valid = 0;
+            }
+            jQuery('#profilescustomx3 .multiSel').html("");
+            jQuery('#profilescustomx3 .hida').css("display", "initial");
+
+        });
+        $('#all1').change(function () {
+
+
+
+            $('input[name="optionsprofile[]"]').each(function () {
+                debugger;
+
+                if (valid == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid == 0) {
+                valid++;
+            } else {
+                valid = 0;
+            }
+            jQuery('#profilesFiltersx3 .multiSel').html("");
+            jQuery('#profilesFiltersx3 .hida').css("display", "initial");
+
+        });
+        $('#all').change(function () {
+
+
+
+            $('input[name="options[]"]').each(function () {
+                debugger;
+
+                if (valid1 == 0) {
+                    this.checked = true;
+
+                } else {
+                    this.checked = false;
+                }
+
+            });
+
+            if (valid1 == 0) {
+                valid1++;
+            } else {
+                valid1 = 0;
+            }
+            jQuery('#optionsdivx3 .multiSel').html("");
+            jQuery('#optionsdivx3 .hida').css("display", "initial");
+
+        });*/
+
+        $('#generate').on('click', function () {
+
+
+            var startdate = $("#start").val();
+            var enddate = $("#end").val();
+            var profile = $("#selectprofile").val();
+
+            if (startdate == "" || startdate == null) {
+                startdate = "01/01/1900";
+
+            }
+            if (enddate == "" || enddate == null) {
+                enddate = "01/01/3000";
+            }
+            var fieldsObj = jQuery("#fieldFilter select").select2("data");
+            
+            for (i = 0; i < fieldsObj.length; i++) {
+                var objdata = new Object();
+                objdata.data = fieldsObj[i].id;
+                objdata.value = fieldsObj[i].text;
+                checkboxValues.push(objdata);
+
+            }
+            var locationsObj = jQuery("#locationsFilter select").select2("data");
+            for (i = 0; i < locationsObj.length; i++) {
+                var objdata = new Object();
+                objdata.data = locationsObj[i].id;
+                objdata.value = locationsObj[i].text;
+                checkboxValuesfilter.push(objdata);
+
+            }
+            var customObj = jQuery("#customFilter select").select2("data");
+            for (i = 0; i < customObj.length; i++) {
+                var objdata = new Object();
+                objdata.data = customObj[i].id;
+                objdata.value = customObj[i].text;
+                checkboxValuescustom.push(objdata);
+
+            }
+
+            var statusselect = jQuery("#statusFilter select").select2("val");
+           /* var index = 0;
+            $('input[name="options[]"]:checked').each(function () {
+                var objdata = new Object();
+                objdata.data = $(this).val();
+                objdata.value = $(this).data("option");
+                checkboxValues.push(objdata);
+                index++;
+
+            });
+            var index2 = 0;
+            $('input[name="optionsprofile[]"]:checked').each(function () {
+                var objdata = new Object();
+                objdata.data = $(this).val();
+                objdata.value = $(this).data("option");
+
+                checkboxValuesfilter.push(objdata);
+                index2++;
+
+            });
+            var index3 = 0;
+            $('input[name="optionscustom[]"]:checked').each(function () {
+                var objdata = new Object();
+                objdata.data = $(this).val();
+                objdata.value = $(this).data("option");
+
+                checkboxValuescustom.push(objdata);
+                index3++;
+
+            });*/
+
+
+
+            var jsondata = JSON.stringify(checkboxValues);
+            var jsondatafilter = JSON.stringify(checkboxValuesfilter);
+            var jsondatacustom = JSON.stringify(checkboxValuescustom);
+
+            if (checkboxValues.length > 0 && checkboxValuesfilter.length > 0) {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/GenerateObjectsRealReport",
+                    data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata,customfields:jsondatacustom,status:statusselect },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+                        $('#Report').html("");
+                        $('#Report').html(data);
+
+                        checkboxValues.length = 0;
+                        checkboxValuesfilter.length = 0;
+                        checkboxValuescustom.length = 0;
+                        if (jQuery(".header_actions a i").first().attr("Class") == "icon-chevron-right")
+                        { $(".header_actions a").first().click(); }
+                        _loading();
+
+                    }
+
+
+                });
+            } else {
+
+                if (checkboxValues.length == 0) {
+                    alert("Elija por lo menos un Campo!!!");
+                } else {
+                    alert("Elija por lo menos una Ubicacion!!!");
+                }
+            }
+        });
+        $('#selectreport').on('change', function () {
+
+            var value = $('#selectreport').val();
+
+            if (value != 0) {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/GetReport",
+                    data: { id: value },
+                    type: "POST",
+                    success: function (data) {
+
+
+
+                        if (data != "" && data != null) {
+                            var data = JSON.parse(data);
+                            var jsondatafilter = data["profiles"];
+                            var startdate = data["startdate"];
+                            var enddate = data["enddate"];
+                            var jsondata = data["cols"];
+
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GenerateObjectsRealReport",
+                                data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata },
+                                beforeSend: _loading(),
+                                type: "POST",
+                                success: function (data) {
+                                    $('#Report').html("");
+                                    $('#Report').html(data);
+
+                                    checkboxValues.length = 0;
+                                    checkboxValuesfilter.length = 0;
+                                    checkboxValuescustom.length = 0;
+                                    $('#selectreport').val("0");
+                                    _loading();
+
+                                }
+
+
+                            });
+
+                        } else {
+                            alert("Error Al Generar el Reporte!!!");
+                        }
+
+
+                    }
+
+
+                });
+            }
+        });
+        $('#saver').on('click', function () {
+
+            jQuery("#namereport").modal("show");
+
+
+        });
+        $('#save').unbind('click.save');
+        $('#save').bind('click.save', function () {
+
+
+            var startdate = $("#start").val();
+            var enddate = $("#end").val();
+            var profile = $("#selectprofile").val();
+            var namereport = "";
+            namereport = $("#getnamex").val();
+
+            if (namereport != "" && namereport != null) {
+                if (startdate == "" || startdate == null) {
+                    startdate = "Indefinida";
+
+                }
+                if (enddate == "" || enddate == null) {
+                    enddate = "Indefinida";
+                }
+              /*  var index = 0;
+                $('input[name="options[]"]:checked').each(function () {
+                    var objdata = new Object();
+                    objdata.data = $(this).val();
+                    objdata.value = $(this).data("option");
+                    checkboxValues.push(objdata);
+                    index++;
+
+                });
+                var index2 = 0;
+                $('input[name="optionsprofile[]"]:checked').each(function () {
+                    var objdata = new Object();
+                    objdata.data = $(this).val();
+                    objdata.value = $(this).data("option");
+
+                    checkboxValuesfilter.push(objdata);
+                    index2++;
+
+                });*/
+                var fieldsObj = jQuery("#fieldFilter select").select2("data");
+                for (i = 0; i < fieldsObj.length; i++) {
+                    var objdata = new Object();
+                    objdata.data = fieldsObj[i].id;
+                    objdata.value = fieldsObj[i].text;
+                    checkboxValues.push(objdata);
+
+                }
+                var locationsObj = jQuery("#locationsFilter select").select2("data");
+                for (i = 0; i < locationsObj.length; i++) {
+                    var objdata = new Object();
+                    objdata.data = locationsObj[i].id;
+                    objdata.value = locationsObj[i].text;
+                    checkboxValuesfilter.push(objdata);
+
+                }
+                var customObj = jQuery("#customFilter select").select2("data");
+                for (i = 0; i < customObj.length; i++) {
+                    var objdata = new Object();
+                    objdata.data = customObj[i].id;
+                    objdata.value = customObj[i].text;
+                    checkboxValuescustom.push(objdata);
+
+                }
+              
+
+
+
+                var jsondata = JSON.stringify(checkboxValues);
+                var jsondatafilter = JSON.stringify(checkboxValuesfilter);
+              //  var jsondatacustom = JSON.stringify(checkboxValuescustom);
+
+                if (checkboxValues.length > 0 && checkboxValuesfilter.length > 0) {
+
+
+                
+                    jQuery.ajax({
+
+                        url: "/Reports/Reports/SaveReport",
+                        data: { namereport: namereport, filter: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata, type: "Objetos_Reales" },
+                        beforeSend: _loading(),
+
+                        type: "POST",
+                        success: function (data) {
+
+                            _alert("success", data);
+
+                            checkboxValues.length = 0;
+                            checkboxValuesfilter.length = 0;
+                            jQuery("#namereport").modal("hide");
+                            $("#getnamex").val("");
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/ObjectsRealReport",
+                                data: { id: idus, datestart: startdate, dateend: enddate },
+                                beforeSend: _loading(),
+                                type: "POST",
+                                success: function (data) {
+                                    $('#Report1').html("");
+                                    $('#Report').html("");
+                                    $('#Report1').html(data);
+
+                                    checkboxValues.length = 0;
+                                    _loading();
+
+                                }
+                            });
+
+                            _loading();
+
+
+
+
+                        }
+
+
+                    });
+
+                } else {
+
+                    if (index == 0) {
+                        alert("Elija por lo menos un Campo!!!");
+                    } else {
+                        alert("Elija por lo menos una Ubicacion!!!");
+                    }
+                }
+
+            } else {
+                alert("Escriba un Nombre!!!");
+            }
+        });
+
+
+        /*Dropdowns multi*/
+        $("#profilesFiltersx3 .dropdown dt a").on('click', function () {
+          
+            $("#profilesFiltersx3 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#profilesFiltersx3 .dropdown dd ul li a").on('click', function () {
+            $("#profilesFiltersx3 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#profilesFiltersx3 .dropdown dd ul").hide();
+        });
+
+
+        $('#profilesFiltersx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#profilesFiltersx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#profilesFiltersx3 .multiSel').append(html);
+                $("#profilesFiltersx3 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#profilesFiltersx3 .hida");
+                $('#profilesFiltersx3 .dropdown dt a').append(ret);
+
+            }
+        });
+
+
+
+        $("#optionsdivx3 .dropdown dt a").on('click', function () {
+
+            $("#optionsdivx3 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#optionsdivx3 .dropdown dd ul li a").on('click', function () {
+            $("#optionsdivx3 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#optionsdivx3 .dropdown dd ul").hide();
+        });
+
+
+        $('#optionsdivx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#optionsdivx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#optionsdivx3 .multiSel').append(html);
+                $("#optionsdivx3 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#optionsdivx3 .hida");
+                $('#optionsdivx3 .dropdown dt a').append(ret);
+
+            }
+        });
+
+
+        $("#profilescustomx3 .dropdown dt a").on('click', function () {
+
+            $("#profilescustomx3 .dropdown dd ul").slideToggle('fast');
+        });
+
+        $("#profilescustomx3 .dropdown dd ul li a").on('click', function () {
+            $("#profilescustomx3 .dropdown dd ul").hide();
+        });
+
+        function getSelectedValue(id) {
+            return $("#" + id).find("dt a span.value").html();
+        }
+
+        $(document).bind('click', function (e) {
+            var $clicked = $(e.target);
+            if (!$clicked.parents().hasClass("dropdown")) $("#profilescustomx3 .dropdown dd ul").hide();
+        });
+
+
+        $('#profilescustomx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+            // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+            var title = $(this).closest('#profilescustomx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+            //title = $(this).val() + ",";
+            title = $(this).data("option") + ",";
+
+            if ($(this).is(':checked')) {
+                var html = '<span title="' + title + '">' + title + '</span>';
+                $('#profilescustomx3 .multiSel').append(html);
+                $("#profilescustomx3 .hida").hide();
+            }
+            else {
+                $('span[title="' + title + '"]').remove();
+                var ret = $("#profilescustomx3 .hida");
+                $('#profilescustomx3 .dropdown dt a').append(ret);
+
+            }
+        });
+        $("#fieldcheck").click();
+    });
+
+
+
+</script>

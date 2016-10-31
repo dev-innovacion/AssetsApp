@@ -1,0 +1,239 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+<link href="/Content/Scripts/library/gridster/jquery.gridster.css" rel="stylesheet" />
+
+@*  Main Options  *@
+<section id="selectDashboard" class="hide">
+    <button class="btn" rel="tooltip" data-placement="bottom" title="Agregar Widget" id="addWidget">
+        <i class="icon-plus"></i>
+    </button>
+    <select name="dashboard">
+        <option value="new">Nuevo Dashboard</option>
+    </select>
+</section>
+@* End :: Main Options  *@
+
+<div class="modal hide fade in" id="newWidgetModal">
+    <div class="modal-header">
+        <h3>Nuevo Widget</h3>
+        <button class="close" data-dismiss="modal">
+            <i class="icon-remove"></i> 
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="new_widgets">
+            <div class="row-fluid">
+                <div class="span6">
+                    <div class="new_widget" data-value="ObjectReal">
+                        <i class="icon-tags"></i>
+                        <span>Activos</span>
+                    </div>
+                </div>
+                <div class="span6">
+                    <div class="new_widget" data-value="Locations">
+                        <i class="icon-home"></i>
+                        <span>Ubicaciones</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <div class="new_widget" data-value="Users">
+                        <i class="icon-user"></i>
+                        <span>Usuarios</span>
+                    </div>
+                </div>
+                <div class="span6">
+                    <div class="new_widget" data-value="Demand">
+                        <i class="icon-random"></i>
+                        <span>Movimientos</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-fluid">
+               @* <div class="span6">
+                    <div class="new_widget" data-value="Reports">
+                        <i class="icon-bar-chart"></i>
+                        <span>Reportes</span>
+                    </div>
+                </div>*@
+                <div class="span6">
+                    <div class="new_widget" data-value="Notifications">
+                        <i class="icon-warning-sign"></i>
+                        <span>Notificaciones</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn red" data-dismiss="modal">Cancelar</button>
+    </div>
+</div>
+
+<div class="gridster">
+    <ul></ul>
+</div>
+<script src="/Content/Scripts/library/gridster/jquery.gridster.js"></script>
+<script src="/Content/Scripts/library/gridster/widget_back.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
+
+<script>
+    var Dashboard;
+    jQuery(function ($) { //DOM Ready
+
+        //Object to control the full dashboard
+        Dashboard = {
+            _id: null,
+            gridster: null,
+            widgets: [],
+            tmpWidget: null,
+            selected: null,
+            options: [],
+
+            // Function to create a new Widget
+            addWidget: function (widget) {
+                if (widget instanceof Widget) {
+                    var widgetHtml = widget.getWidgetHtml();
+                    
+                    this.gridster.add_widget(
+                        widgetHtml,
+                        widget.dimension[0],
+                        widget.dimension[1],
+                        widget.position[0],
+                        widget.position[1] 
+                    );
+                    this.widgets[widget.getId()] = widget;
+                    widget.loadInfo();
+
+                    $("[rel=tooltip]").tooltip();
+                }
+                else
+                    console.error("The parameter is not a Widget object");
+            },
+
+            //Function to remove a widget from the dashboard
+            removeWidget: function(widgetToRemove){
+                this.widgets[widgetToRemove.getId()] = null;
+                this.gridster.remove_widget(widgetToRemove.getWidgetHtml());
+            },
+
+            // Load a complete saved dashboard
+            loadDashboard: function (myDashboard) {
+                this._id = myDashboard._id;
+                var widgets = myDashboard.widgets;                
+
+                for (var wid in widgets) {
+                    var newWidget = new Widget(widgets[wid]);
+
+                    this.addWidget(newWidget);
+                }
+            },
+
+            //Push notificaction to the Notification Widgets
+            pushNotification: function(message){
+                for (var w in this.widgets) {
+                    if (this.widgets[w] != null && this.widgets[w].getModule() == "Notifications")
+                        this.widgets[w].pushNotification(message);
+                }
+            },
+
+            // Saves the widgets position and size
+            updatePositions: function () {
+                for (var w in this.widgets) {
+                    if(this.widgets[w] != null)
+                        this.widgets[w].updateWidget();
+                }
+            },
+
+            //Clears all widgets on the dashboard
+            clearWidgets: function () {
+                this.gridster.remove_all_widgets();
+                this.widgets = null;
+                this.widgets = [];
+            },
+
+            //Updates the dashboard list in the top bar
+            updateOptions: function () {
+                var dashboardSelect = $("select[name=dashboard]");
+                dashboardSelect.html("");
+                for (var option in this.options) {
+                    dashboardSelect.append(
+                        $("<option>", { value: this.options[option].id }).html(this.options[option].name)
+                    );
+                }
+                dashboardSelect.append(
+                    $("<option>", { value: "new" }).html("Nuevo Dashboard")
+                );
+            },
+
+            init: function () {
+
+                //Move the main options to the top bar
+                $(".select_dashboard").html(
+                    $("section#selectDashboard").removeClass("hide")
+                );
+
+                //Bind the add function event
+                $("#addWidget").on("click", function () {
+                    $("#newWidgetModal").modal("show");
+                });
+
+                $(".new_widget").on("click", function () {
+                    var module = $(this).data("value");
+
+                    Dashboard.tmpWidget = new Widget({
+                        dashboard: Dashboard._id,
+                        module: module
+                    });
+                    $("#newWidgetModal").modal("hide");
+                    setTimeout(function () {
+                        Dashboard.tmpWidget.editModal();
+                    }, 450);
+                    
+                });
+
+                this.updateOptions();
+
+                //Create Events
+                var resizedEvent = new Event("resized");
+                //var movedEvent = new Event("moved");
+
+                this.gridster =
+                    $(".gridster ul").gridster({
+                        widget_margins: [15, 15],
+                        widget_base_dimensions: [140, 140],
+                        draggable: {
+                            handle: ".dragg , .dragg>.icon-move",
+                            stop: function (e, ui) {
+                                Dashboard.updatePositions();
+                            }
+                        },
+                        resize: {
+                            enabled: true,
+                            stop: function (e, ui, $widget) {
+                                $widget[0].dispatchEvent(resizedEvent);
+                                Dashboard.updatePositions();
+                            }
+                        }
+                    }).data("gridster");
+
+                // Run the notification request
+                connection.client.newNotification = function (jsonMessage) {
+                    var message = JSON.parse(jsonMessage);
+                    Dashboard.pushNotification(message);
+                }
+            }
+        }// End of the Dashboard Object
+
+        /**********************************/
+        /* Initializes the required objects
+        /**********************************/
+        var myDashboard = @Html.Raw(ViewBag.myDashboard)
+        Dashboard.options = @Html.Raw(ViewBag.dashboardList)
+        Dashboard.init();        
+        Dashboard.loadDashboard(myDashboard);
+        myDashboard = null;
+    });
+</script>

@@ -1,0 +1,643 @@
+﻿@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@model JObject
+﻿@{
+    Layout = null;
+    JObject demand = Model["demand"] as JObject;
+    try {
+        ViewBag.Title = demand["staFolio"].ToString();
+    }
+    catch { }
+    JObject creator = Model["creator"] as JObject;
+    JObject voboUser = Model["voboUser"] as JObject;
+    JArray objects = demand["objects"] as JArray;
+    JArray returnedObjects = Model["returnedObjects"] as JArray;
+    JArray newObjects = demand["newobjects"] as JArray;
+    JObject location = Model["location"] as JObject;
+    JObject manager = Model["manager"] as JObject;
+}
+
+<itext creationdate="@DateTime.Now.ToString()" producer="RazorPDF">
+    <table width="100%" cellpadding="0.5" cellspacing="0.5" widths="30;70" borderwidth="1.0" left="false" right="false" top="false" bottom="false" red="0" green="0" blue="0">
+        <row>
+            <cell width="30%"></cell>
+            <cell width="40%">
+
+            </cell>
+            <cell width="30%" align="Center">
+                <image url="@Context.Server.MapPath("~/Content/Images/logo2.png")" plainwidth="44.64" plainheight="36.0" />
+            </cell>
+        </row>
+
+        <row>
+            <cell width="30%"></cell>
+            <cell width="40%">
+                <chunk font="Helvetica" size="13.0" fontstyle="bold" red="0" green="0" blue="255">
+                    Salida temporal de activo por reparación
+                </chunk>
+            </cell>
+            <cell width="30%" align="center">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Folio: @demand["folio"].ToString()
+                </chunk>
+            </cell>
+        </row>
+    </table>
+
+    <paragraph leading="18.0" font="unknown" align="Default">
+    </paragraph>
+
+    <table width="100%" columns="3" cellpadding="0.5" cellspacing="0.5" widths="35;30;35" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+        <row>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Nombre del conjunto
+                </chunk>
+            </cell>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    ID conjunto
+                </chunk>
+            </cell>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Gerente responsable
+                </chunk>
+            </cell>
+        </row>
+        <row>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" red="0" green="0" blue="0">
+                    @location["locationRoute"].ToString()
+                </chunk>
+            </cell>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" red="0" green="0" blue="0">
+                    @location["IDconjunto"].ToString()
+                </chunk>
+            </cell>
+            <cell align="Center" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" red="0" green="0" blue="0">
+                    @try
+                    {
+                        @manager["lastname"].ToString();
+                    }catch(Exception ex){}
+                    @try{
+                         @manager["name"].ToString()
+                    }
+                    catch (Exception ex) { }
+                </chunk>
+            </cell>
+        </row>
+    </table>
+
+    <paragraph leading="18.0" font="unknown" align="Default">
+        <newline />
+        <chunk font="Helvetica" size="15.0" fontstyle="normal" red="0" green="0" blue="255">Salida del activo</chunk>
+    </paragraph>
+
+    <table width="100%" columns="4" cellpadding="0.5" cellspacing="0.5" widths="10;50;20;20" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Cant.
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Descripción del equipo
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Serie
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    ID etiqueta activo
+                </chunk>
+            </cell>
+        </row>
+        @foreach (JObject obj in objects)
+        {
+            <row>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        
+                       @try{
+                        @obj["quantity"].ToString()
+                           }catch(Exception ex){}
+                  
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                       @try{
+                        @obj["name_old"].ToString()
+                           }catch(Exception ex){}
+                    
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                 
+                    @try{ @obj["serie_old"].ToString()
+                        }catch(Exception ex){}
+                   
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                       
+                      @try{
+                         @obj["epc"].ToString()
+                          }catch(Exception ex){}
+                  
+                    </chunk>
+                </cell>
+            </row>
+        }
+    </table>
+
+    <table width="100%" columns="2" cellpadding="0.5" cellspacing="0.5" widths="33.3333;33.3333;" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    ID reporte en máximo ó de soporte en sistemas
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Fecha salida del conjunto
+                </chunk>
+            </cell>
+            @*<cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    En su caso, indique número de guía de envío
+                </chunk>
+            </cell>*@
+        </row>
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                  
+                    @try{
+                    @demand["extras"]["report_id"].ToString()
+                        }catch(Exception ex){}
+                  
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    
+                    @try{
+                    @demand["AuthorizedDate"].ToString()
+                        }catch(Exception ex){}
+                  
+                </chunk>
+            </cell>
+            @*<cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    
+                    @try{
+                     @demand["extras"]["tracking_number"].ToString()
+                        }catch(Exception ex){}
+                   
+                </chunk>
+            </cell>*@
+        </row>
+    </table>
+
+    <table width="100%"  horizontalalign="Center" cellpadding="0.5" cellspacing="0.5" widths="33.3333;33.3333;" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Verifica Daño
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Solicita Reparación
+                </chunk>
+            </cell>
+            
+        </row>
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    Nombre :
+                    @try
+                    {
+                        @demand["extras"]["verify_name"].ToString()
+                    }
+                    catch (Exception ex) { }
+                </chunk>
+                    <newline />
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    Puesto :
+                    @try
+                    {
+                        @demand["extras"]["verify_position"].ToString()
+                    }
+                    catch (Exception ex) { }
+
+                </chunk>
+                    <newline />
+                </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                @try
+                {
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @creator["lastname"].ToString() @creator["name"].ToString()
+                    </chunk>
+                }
+                catch (Exception e)
+                {
+                    <newline />
+                }
+
+                @try
+                {
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                       
+                     @try{
+                         @creator["userKey"].ToString()
+                         }catch(Exception ex){}
+                   
+                    </chunk>
+                }
+                catch (Exception e)
+                {
+                    <newline />
+                }
+            </cell>
+           
+        </row>
+    </table>
+
+    <paragraph leading="18.0" font="unknown" align="Default">
+        <newline />
+        <chunk font="Helvetica" size="15.0" fontstyle="normal" red="0" green="0" blue="255"> Revisión/Reparación del activo:</chunk>
+        <newline />
+        <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">Proveedor y/o Personal que efectúa la revisión y/o reparación. Favor de llenar los campos de este segmento.</chunk>
+    </paragraph>
+    <table width="100%" cellpadding="0.5" cellspacing="0.5" borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+        <row>
+            <cell width="100%">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    Describa brevemente la reparación del activo o la razón por la cual no pudo ser reparado
+                    
+                </chunk>
+                <newline />
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    @try
+                    {
+                        @demand["description"].ToString()
+                    }
+                    catch (Exception ex) { }
+                </chunk>
+            </cell>
+        </row>
+        <row>
+            <cell width="100%">
+                
+            </cell>
+        </row>
+    </table>
+
+    <table width="100%" columns="2"  cellpadding="0.5" cellspacing="0.5" borderwidth="0.5">
+        <row>
+            <cell>
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" align="Center" red="0" green="0" blue="0">
+                    Revisa
+                </chunk>
+              
+            </cell>
+            <cell>
+
+            </cell>
+        </row>
+        <row>
+            <cell>
+                <table width="100%" widths="100" cellpadding="0.5" cellspacing="0.5" borderwidth="0.0" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+
+                    <row>
+                        <cell borderwidth="0.5" left="true" right="true" bottom="false" top="true" red="0" green="0" blue="0">
+                            <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                                Nombre: 
+                                @if (demand["status"].ToString() == "5" || demand["status"].ToString() == "6")
+                                {
+                                    try
+                                    { <text>@demand["extras"]["checker_name"].ToString()</text> }
+                                    catch { }
+                                }
+
+                            </chunk>
+                        </cell>
+                    </row>
+                    <row>
+                        <cell borderwidth="0.5" left="true" right="true" bottom="true" top="false" red="0" green="0" blue="0">
+                            <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                                Empresa: @if (demand["status"].ToString() == "5" || demand["status"].ToString() == "6")
+                                {
+                                    try
+                                    {  <text>@demand["extras"]["checker_company"].ToString()</text>}
+                                    catch { }
+                                }
+                            </chunk>
+                        </cell>
+                    </row>
+                </table>
+
+            </cell>
+            <cell>
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    SELLO PROVEEDOR
+                </chunk>
+            </cell>
+        </row>
+    </table>
+
+
+   
+    
+
+    <paragraph leading="18.0" font="unknown" align="Default">
+        <newline />
+        <chunk font="Helvetica" size="15.0" fontstyle="normal" red="0" green="0" blue="255">Ingreso del activo</chunk>
+    </paragraph>
+
+    <table width="100%" columns="5" cellpadding="0.5" cellspacing="0.5" widths="10;40;20;10;20">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Cant.
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Descripción del equipo
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Serie
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    ID etiqueta activo
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" colspan="2"  left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                   STATUS
+                </chunk>
+            </cell>
+        </row>
+        @foreach (JObject obj in newObjects)
+        {
+            <row>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try{
+                            @obj["quantity"].ToString()
+                        }catch(Exception e){}
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["name"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        { 
+                            @obj["serie"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        { 
+                            @obj["EPC"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            if (obj["repaired"].ToString()=="1"){
+                                <text>Reparado</text>
+                            }
+                            else { 
+                                <text>NO reparado</text>
+                            }
+
+
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            if (obj["entry"].ToString() == "1")
+                            {
+                                <text>Ingresa mismo activo</text>
+                            }
+                            else
+                            {
+                                <text>NO ingresa mismo activo</text>
+                            }
+
+
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+             </row>
+        }
+    </table>
+
+    <paragraph leading="18.0" font="unknown" align="Default">
+        <newline />
+        <chunk font="Helvetica" size="15.0" fontstyle="normal" red="0" green="0" blue="255">Ingreso de ACTIVOS DIFERENTES</chunk>
+    </paragraph>
+
+    <table width="100%" columns="5" cellpadding="0.5" cellspacing="0.5" widths="10;30;20;20;20">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Cant.
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Descripción del equipo
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Marca
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Modelo
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Serie
+                </chunk>
+            </cell>
+        </row>
+        @foreach (JObject obj in returnedObjects)
+        {
+            <row>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["quantity"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["name"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["marca"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["modelo"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                        @try
+                        {
+                            @obj["serie"].ToString()
+                        }
+                        catch (Exception e) { }
+                    </chunk>
+                </cell>
+            </row>
+        }
+        @*@if (demand["status"].ToString() != "5") {
+                <row>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                        <newline/>
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                        <newline />
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                        <newline />
+                    </chunk>
+                </cell>
+                <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                    <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                        <newline />
+                    </chunk>
+                </cell>
+            </row>
+            }*@
+    </table>
+
+
+    <table width="100%" columns="4" cellpadding="0.5" cellspacing="0.5" widths="33.3333;33.3333;33.3333">
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Fecha re-ingreso del activo:
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Re-ingreso firma
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="bold" red="0" green="0" blue="0">
+                    Re-ingreso nombre
+                </chunk>
+            </cell>
+        </row>
+        <row>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    @if(demand["status"].ToString() == "6"){ 
+                        <text>@demand["return_date"].ToString()</text>
+                    }
+                    else { 
+                        <newline/>}
+                
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                  
+                  @try{
+                     if (demand["status"].ToString() == "6"){ 
+                        <text>@voboUser["userKey"].ToString()</text>
+                    }
+                    else { 
+                        <newline/>
+                    }
+                      }catch(Exception ex){}
+                   
+                </chunk>
+            </cell>
+            <cell borderwidth="0.5" left="true" right="true" top="true" bottom="true" red="0" green="0" blue="0">
+                <chunk font="Helvetica" size="8.0" fontstyle="normal" red="0" green="0" blue="0">
+                    @if (demand["status"].ToString() == "6"){ 
+                       
+                    try{
+                        <text>@voboUser["lastname"].ToString() @voboUser["name"].ToString()</text>
+                        }catch(Exception ex){}
+              
+                    }
+                    else { 
+                        <newline/>
+                    }
+                </chunk>
+            </cell>
+        </row>
+    </table>
+</itext>

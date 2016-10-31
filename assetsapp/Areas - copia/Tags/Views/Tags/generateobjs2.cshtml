@@ -1,0 +1,329 @@
+﻿@using System;
+@using System.Dynamic;
+@{
+
+    Layout = null;
+}
+@{
+    List<dynamic> news = new List<dynamic>();
+    List<dynamic> epcs = new List<dynamic>();
+    List<dynamic> ids = new List<dynamic>();
+
+    try { 
+        news = ViewData["news"] as List<dynamic>;
+    }
+    catch { }
+    try
+    {
+        epcs = ViewData["epcs"] as List<dynamic>;
+    }
+    catch { }
+   try{
+        ids = ViewData["ids"] as List<dynamic>;
+   }
+   catch { }
+  
+     
+}
+<div>
+<div class="navbar-inner ">
+    <ul class="nav nav-tabs" id="myTab">
+      
+       <li class="active" id="tab1"><a href="#newstab" data-toggle="tab">Nuevos Objetos</a></li>
+        <li id="tab3"><a href="#dupidtab" data-toggle="tab">Objetos Modificados Via EPC</a></li>
+
+       <li id="tab2"><a href="#duptab" data-toggle="tab">Objetos Modificados Via ID</a></li>
+        
+    </ul>
+</div>
+<div class="tab-content" >
+    <div class="tab-pane active tabfirst perfilMargen" id="newstab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:600px; max-height: 600px; overflow: hidden">
+
+            <table id="newstable" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+                       
+                        <th class="table-fixed-medium">ID Registro</th>
+                        <th class="table-fixed-medium">Unidad Explotación</th>
+                        <th class="table-fixed-medium">Nombre de Oficina</th>
+                        <th class="table-fixed-medium">Departamento</th>
+                        <th class="table-fixed-medium">Ubicacion</th>
+                        <th class="table-fixed-medium">Sub Ubicacion</th>
+                        <th class="table-fixed-medium">ID Articulo</th>
+                        <th class="table-fixed-medium">Descripcion Articulo</th>
+                        <th class="table-fixed-medium">Marca</th>
+                        <th class="table-fixed-medium">Modelo</th>
+                        <th class="table-fixed-medium">#Serie</th>
+                        <th class="table-fixed-medium">Epc</th>
+                        <th class="table-fixed-medium">Estatus</th>
+                        <th class="table-fixed-medium">Fecha Etiq.</th>
+                        <th class="table-fixed-medium">Usuario Etiq.</th>
+                        <th class="table-fixed-medium">Cantidad</th>
+                        <th class="table-fixed-medium">ID Paquete</th>
+                        <th class="table-fixed-medium">ID Ubicacion</th>
+                        <th class="table-fixed-medium">ID Usuario</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot = 0;}
+                    @foreach (dynamic row in news)
+                    {
+                         
+                       <tr class="mailtr">
+                           
+                            <td class="table-fixed-medium">@row.id_registro</td>
+                            <td class="table-fixed-medium">@row.af_unidad_explotacion</td>
+                            <td class="table-fixed-medium">@row.af_nombre_conjunto</td>
+                            <td class="table-fixed-medium">@row.af_departamento</td>
+                            <td class="table-fixed-medium">@row.af_ubicacion</td>
+                           <td class="table-fixed-medium">@row.af_sububicacion</td>
+                            <td class="table-fixed-medium">@row.af_id_articulo</td>
+                            <td class="table-fixed-medium">@row.af_desc_articulo</td>
+                            <td class="table-fixed-medium">@row.af_marca</td>
+                            <td class="table-fixed-medium">@row.af_modelo</td>
+                            <td class="table-fixed-medium">@row.af_num_serie</td>
+                            <td class="table-fixed-medium">@row.af_epc_completo</td>
+                            <td class="table-fixed-medium">@row.af_status_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_fecha_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_usuario_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_cantidad</td>
+                            <td class="table-fixed-medium">@row.af_id_paquete</td>
+                            <td class="table-fixed-medium">@row.ub_id_ubicacion</td>
+                            <td class="table-fixed-medium">@row.id_usuario</td>
+                        </tr>
+                        hnot++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (news.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+            
+
+        </div>
+        
+      
+    </div>
+    <div class="tab-pane  tab perfilMargen" id="dupidtab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:290px; max-height: 290px; overflow: hidden">
+            <table id="duplicatetable1" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+
+                        <th class="table-fixed-medium">ID Registro</th>
+                        <th class="table-fixed-medium">Unidad Explotación</th>
+                        <th class="table-fixed-medium">Nombre de Conjunto</th>
+                        <th class="table-fixed-medium">Departamento</th>
+                        <th class="table-fixed-medium">Ubicacion</th>
+                        <th class="table-fixed-medium">ID Articulo</th>
+                        <th class="table-fixed-medium">Descripcion Articulo</th>
+                        <th class="table-fixed-medium">Marca</th>
+                        <th class="table-fixed-medium">Modelo</th>
+                        <th class="table-fixed-medium">#Serie</th>
+                        <th class="table-fixed-medium">Epc</th>
+                        <th class="table-fixed-medium">Estatus</th>
+                        <th class="table-fixed-medium">Fecha Etiq.</th>
+                        <th class="table-fixed-medium">Usuario Etiq.</th>
+                        <th class="table-fixed-medium">Cantidad</th>
+                        <th class="table-fixed-medium">ID Paquete</th>
+                        <th class="table-fixed-medium">ID Ubicacion</th>
+                        <th class="table-fixed-medium">ID Usuario</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot2 = 0;}
+                    @foreach (dynamic row in epcs)
+                    {
+
+                        <tr class="mailtr">
+
+                            <td class="table-fixed-medium">@row.id_registro</td>
+                            <td class="table-fixed-medium">@row.af_unidad_explotacion</td>
+                            <td class="table-fixed-medium">@row.af_nombre_conjunto</td>
+                            <td class="table-fixed-medium">@row.af_departamento</td>
+                            <td class="table-fixed-medium">@row.af_ubicacion</td>
+                            <td class="table-fixed-medium">@row.af_id_articulo</td>
+                            <td class="table-fixed-medium">@row.af_desc_articulo</td>
+                            <td class="table-fixed-medium">@row.af_marca</td>
+                            <td class="table-fixed-medium">@row.af_modelo</td>
+                            <td class="table-fixed-medium">@row.af_num_serie</td>
+                            <td class="table-fixed-medium">@row.af_epc_completo</td>
+                            <td class="table-fixed-medium">@row.af_status_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_fecha_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_usuario_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_cantidad</td>
+                            <td class="table-fixed-medium">@row.af_id_paquete</td>
+                            <td class="table-fixed-medium">@row.ub_id_ubicacion</td>
+                            <td class="table-fixed-medium">@row.id_usuario</td>
+                        </tr>
+                        hnot2++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (epcs.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+        </div>
+
+
+    </div>
+    <div class="tab-pane  tablast perfilMargen" id="duptab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:290px; max-height: 290px; overflow: hidden">
+            <table id="duplicatetable" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+
+                        <th class="table-fixed-medium">ID Registro</th>
+                        <th class="table-fixed-medium">Unidad Explotación</th>
+                        <th class="table-fixed-medium">Nombre de Conjunto</th>
+                        <th class="table-fixed-medium">Departamento</th>
+                        <th class="table-fixed-medium">Ubicacion</th>
+                        <th class="table-fixed-medium">ID Articulo</th>
+                        <th class="table-fixed-medium">Descripcion Articulo</th>
+                        <th class="table-fixed-medium">Marca</th>
+                        <th class="table-fixed-medium">Modelo</th>
+                        <th class="table-fixed-medium">#Serie</th>
+                        <th class="table-fixed-medium">Epc</th>
+                        <th class="table-fixed-medium">Estatus</th>
+                        <th class="table-fixed-medium">Fecha Etiq.</th>
+                        <th class="table-fixed-medium">Usuario Etiq.</th>
+                        <th class="table-fixed-medium">Cantidad</th>
+                        <th class="table-fixed-medium">ID Paquete</th>
+                        <th class="table-fixed-medium">ID Ubicacion</th>
+                        <th class="table-fixed-medium">ID Usuario</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot1 = 0;}
+                    @foreach (dynamic row in ids)
+                    {
+
+                        <tr class="mailtr">
+
+                            <td class="table-fixed-medium">@row.id_registro</td>
+                            <td class="table-fixed-medium">@row.af_unidad_explotacion</td>
+                            <td class="table-fixed-medium">@row.af_nombre_conjunto</td>
+                            <td class="table-fixed-medium">@row.af_departamento</td>
+                            <td class="table-fixed-medium">@row.af_ubicacion</td>
+                            <td class="table-fixed-medium">@row.af_id_articulo</td>
+                            <td class="table-fixed-medium">@row.af_desc_articulo</td>
+                            <td class="table-fixed-medium">@row.af_marca</td>
+                            <td class="table-fixed-medium">@row.af_modelo</td>
+                            <td class="table-fixed-medium">@row.af_num_serie</td>
+                            <td class="table-fixed-medium">@row.af_epc_completo</td>
+                            <td class="table-fixed-medium">@row.af_status_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_fecha_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_usuario_etiquetado</td>
+                            <td class="table-fixed-medium">@row.af_cantidad</td>
+                            <td class="table-fixed-medium">@row.af_id_paquete</td>
+                            <td class="table-fixed-medium">@row.ub_id_ubicacion</td>
+                            <td class="table-fixed-medium">@row.id_usuario</td>
+                        </tr>
+                        hnot1++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (ids.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+        </div>
+
+       
+    </div>
+</div>
+   
+    
+</div>
+<script>
+    jQuery(function () {
+        jQuery('#myTab a:first').tab('show')
+    });
+    jQuery('.overOn').perfectScrollbar({ wheelSpeed: 1000 });
+    try {
+        jQuery('#newstable').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    try {
+        jQuery('#duplicatetable').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    try {
+        jQuery('#duplicatetable1').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    jQuery(".tableHeader").css("padding-right", "10px");
+    jQuery(".tableHeader").css("padding-bottom", "20px");
+
+  
+       
+       
+    jQuery(document).ready(function () {
+
+
+
+    })
+</script>

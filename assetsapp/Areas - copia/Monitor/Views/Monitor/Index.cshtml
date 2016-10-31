@@ -1,0 +1,3281 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.Monitor.Models;
+@{
+
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["users"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+}
+@* Work Area *@
+<div class="widgets_area">
+    <div class="row-fluid">
+
+        <div class="span8">
+            <h3 class="ModuleTitle">Monitoreo de Ubicaciones</h3>
+        </div>
+        <div class="span4">
+      
+        </div>
+    </div>
+    <br />
+    <div id="divvista1" class="row-fluid">
+
+        <div class="span12">
+            <div class="row-fluid" style="margin-top:30px;">
+                <center>
+                    <div class="light_blue set_color" style="width:1000px;">
+                        <div class="well-header widgetclient titleclient">
+                            <h5>Monitoreo de Ubicaciones</h5>
+                            <div class="span1 offset8" style="margin:10px 10px 0px 5px; float:right;">
+                                <button type="button" data-original-title="Cambiar vista" rel="tooltip" data-placement="top" class="pull-right btn btn-mini dark_green changeview"><i class="icon-arrow-right"></i><span></span></button>
+                            </div>
+                        </div>
+                        <div class="well-content" style="float: right; width:1000px; padding:0px;">
+
+                            <div class="span12" style="margin:10px;">
+                                <div class="span4">
+                                    <select id="selectType" class="chosen">
+                                        <option value="null"> Elegir</option>
+                                        <option value="1">Ubicación</option>
+                                        <option value="2">Proceso</option>
+                                    </select>
+                                </div>
+                                <div class="span4">
+                                    <div class="span12">
+                                        <div id="divlocations">
+                                            <select id="selectLocations" class="chosen">
+
+                                                @{var count = 0;}
+                                                @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                                                {
+
+                                                    if (count == 0)
+                                                    {
+                                                        <option value="0">Elige una ubicación</option>
+                                                        count++;
+                                                    }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                }
+
+                                            </select>
+                                        </div>
+                                        <div id="divprocesses">
+                                            <select id="selectProcess" class="chosen">
+
+                                                @{count = 0;}
+                                                @foreach (var item in (Dictionary<string, string>)ViewData["processes"])
+                                                {
+
+                                                    if (count == 0)
+                                                    {
+                                                        <option value="0">Elige un proceso</option>
+                                                        count++;
+                                                    }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                }
+
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                                <div class="span3">
+
+                                    <div id="divdiagrams">
+                                        <select id="selectDiagrams" class="chosen">
+
+                                            @{count = 0;}
+                                            @foreach (var item in (Dictionary<string, string>)ViewData["diagrams"])
+                                            {
+
+                                                if (count == 0)
+                                                {
+                                                    <option value="0">Elige un diagrama</option>
+                                                    count++;
+                                                }
+                                                <option value="@item.Key">@item.Value</option>
+
+                                            }
+
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </center>
+
+            </div>
+            <div class="row-fluid" style="margin-top:30px;">
+                <center>
+                    <div class="light_blue set_color" style="width:1000px;">
+                        <div class="well-header widgetclient titleclient">
+                            <div class="span12">
+                                <div class="span9">
+                                    <h5 id="scenario_name"></h5>
+                                </div>
+                                <div class="span3">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="well-content">
+                            <div class="scenario-container" id="scenario-container"></div>
+                        </div>
+
+
+                    </div>
+
+                </center>
+            </div>
+            <div class="row-fluid" style="margin-top:30px;">
+                <center>
+                    <div class="well-content" style="width:1000px;" id="usersTable">
+
+                    </div>
+                </center>
+
+            </div>
+          
+        </div>
+    </div>
+
+    <div id="divvista2" class="row-fluid">
+
+        <div class="content">
+            <ul id="myDashboardMonitor" class="sDashboard ui-sortable">
+
+            </ul>
+        </div>
+
+        <div class="row span12" style="width:100%">
+
+            <div class="span4">
+                <div class="light_blue set_color" style="width:400px; height:400px;">
+                    <div class="well-header widgetclient titleclient">
+                        <center>
+                            <h5 >Monitoreo</h5>
+
+                        </center>
+                        <div class="span1 offset8" style="margin:10px 10px 0px 5px; float:right;">
+                            <button id="1" type="button" data-original-title="Cambiar vista" rel="tooltip" data-placement="top" class="pull-right btn btn-mini dark_green changeview"><i class="icon-arrow-right"></i><span></span></button>
+                        </div>
+                    </div>
+                    <div class="well-content">
+                        <div class="float_margen">
+
+
+                            <center>
+                                <div class="well light_blue span12" style="padding-left:2%;">
+                                    <div class="span4">
+                                        <select id="selectType1" class="chosen">
+                                            <option value="null"> Elegir</option>
+                                            <option value="1">Ubicación</option>
+                                            <option value="2">Proceso</option>
+                                        </select>
+                                    </div>
+                                    <div class="span4">
+                                        <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                                            <div id="divlocations1">
+                                                <select id="selectLocations1" class="chosen">
+
+                                                    @{ count = 0;}
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                                                    {
+
+                                                        if (count == 0)
+                                                        {
+                                                            <option value="0">Elige una ubicación</option>
+                                                            count++;
+                                                        }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+
+                                                </select>
+                                            </div>
+                                            <div id="divprocesses1">
+                                                <select id="selectProcess" class="chosen">
+
+                                                    @{count = 0;}
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["processes"])
+                                                    {
+
+                                                        if (count == 0)
+                                                        {
+                                                            <option value="0">Elige un proceso</option>
+                                                            count++;
+                                                        }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                    }
+
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                    <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+                                        <div id="divdiagrams1">
+                                            <select id="selectDiagrams1" class="chosen">
+                                                @{count = 0;}
+                                                @foreach (var item in (Dictionary<string, string>)ViewData["diagrams"])
+                                                {
+
+                                                    if (count == 0)
+                                                    {
+                                                        <option value="0">Elige un diagrama</option>
+                                                        count++;
+                                                    }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                }
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+                                    
+                                </div>
+                            </center>
+
+
+                        </div>
+                        <div class="light_blue set_color">
+                            <div class="well-header">
+                                <div class="span12">
+                                    <div class="span9">
+                                        <h5 id="scenario_name1"></h5>
+                                    </div>
+                                    <div class="span3">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well-content">
+                                <div class="scenario-container" id="scenario-container1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span1"></div>
+            <div class="span4">
+                <div class="light_blue set_color" style="width:400px; height:400px;">
+                    <div class="well-header widgetclient titleclient">
+                        <center>
+                            <h5>Monitoreo</h5>
+
+                        </center>
+                        <div class="span1 offset8" style="margin:10px 10px 0px 5px; float:right;">
+                            <button id="2" type="button" data-original-title="Cambiar vista" rel="tooltip" data-placement="top" class="pull-right btn btn-mini dark_green changeview"><i class="icon-arrow-right"></i><span></span></button>
+                        </div>
+
+                    </div>
+                    <div class="well-content no_padding row-fluid">
+                        <div class="well-content no_padding row-fluid">
+                            <div class="float_margen">
+
+
+                                <center>
+                                    <div class="well light_blue span12" style="padding-left:2%;">
+                                        <div class="span4">
+                                            <select id="selectType2" class="chosen">
+                                                <option value="null"> Elegir</option>
+                                                <option value="1">Ubicación</option>
+                                                <option value="2">Proceso</option>
+                                            </select>
+                                        </div>
+                                        <div class="span4">
+                                            <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                                                <div id="divlocations2">
+                                                    <select id="selectLocations2" class="chosen">
+
+                                                        @{count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige una ubicación</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+                                                <div id="divprocesses2">
+                                                    <select id="selectProcess2" class="chosen">
+
+                                                        @{count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["processes"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige un proceso</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                        <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+                                            <div id="divdiagrams2">
+                                                <select id="selectDiagrams2" class="chosen">
+
+                                                    @{count = 0;}
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["diagrams"])
+                                                    {
+
+                                                        if (count == 0)
+                                                        {
+                                                    <option value="0">Elige un diagrama</option>
+                                                            count++;
+                                                        }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                    }
+
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </center>
+
+
+                            </div>
+                        </div>
+
+                        <div class="row-fluid">
+                            <div class="light_blue set_color">
+                                <div class="well-header widgetclient titleclient">
+                                    <div class="span12">
+                                        <div class="span9">
+                                            <h5 id="scenario_name2"></h5>
+                                        </div>
+                                        <div class="span3">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="well-content">
+                                    <div class="scenario-container" id="scenario-container2"></div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row span12" style="width:100%; margin-top:20px;">
+            <div class="span4">
+                <div class="light_blue set_color" style="width:400px; height:400px;">
+                    <div class="well-header widgetclient titleclient">
+                        <center>
+                            <h5>Monitoreo</h5>
+
+                        </center>
+                        <div class="span1 offset8" style="margin:10px 10px 0px 5px; float:right;">
+                            <button id="3" type="button" data-original-title="Cambiar vista" rel="tooltip" data-placement="top" class="pull-right btn btn-mini dark_green changeview"><i class="icon-arrow-right"></i><span></span></button>
+                        </div>
+
+                    </div>
+                    <div class="well-content no_padding row-fluid">
+                        <div class="well-content no_padding row-fluid">
+                            <div class="float_margen">
+
+
+                                <center>
+                                    <div class="well light_blue span12" style="padding-left:2%;">
+                                        <div class="span4">
+                                            <select id="selectType3" class="chosen">
+                                                <option value="null"> Elegir</option>
+                                                <option value="1">Ubicación</option>
+                                                <option value="2">Proceso</option>
+                                            </select>
+                                        </div>
+                                        <div class="span4">
+                                            <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                                                <div id="divlocations3">
+                                                    <select id="selectLocations3" class="chosen">
+
+                                                        @{ count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige una ubicación</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+                                                <div id="divprocesses3">
+                                                    <select id="selectProcess" class="chosen">
+
+                                                        @{count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["processes"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige un proceso</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                        <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+                                            <div id="divdiagrams3">
+                                                <select id="selectDiagrams3" class="chosen">
+
+                                                    @{count = 0;}
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["diagrams"])
+                                                    {
+
+                                                        if (count == 0)
+                                                        {
+                                                    <option value="0">Elige un diagrama</option>
+                                                            count++;
+                                                        }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                    }
+
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </center>
+
+
+                            </div>
+
+                            <div class="row-fluid">
+                                <div class="light_blue set_color">
+                                    <div class="well-header widgetclient titleclient">
+                                        <div class="span12">
+                                            <div class="span9">
+                                                <h5 id="scenario_name3"></h5>
+                                            </div>
+                                            <div class="span3">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="well-content">
+                                        <div class="scenario-container" id="scenario-container3"></div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span1"></div>
+            <div class="span4">
+                <div class="light_blue set_color" style="width:400px; height:400px;">
+                    <div class="well-header widgetclient titleclient">
+                        <center>
+                            <h5>Monitoreo</h5>
+
+                        </center>
+                        <div class="span1 offset8" style="margin:10px 10px 0px 5px; float:right;">
+                            <button id="4" type="button" data-original-title="Cambiar vista" rel="tooltip" data-placement="top" class="pull-right btn btn-mini dark_green changeview"><i class="icon-arrow-right"></i><span></span></button>
+                        </div>
+
+                    </div>
+                    <div class="well-content no_padding row-fluid">
+                        <div class="well-content no_padding row-fluid">
+                            <div class="float_margen">
+
+
+                                <center>
+                                    <div class="well light_blue span12" style="padding-left:2%;">
+                                        <div class="span4">
+                                            <select id="selectType4" class="chosen">
+                                                <option value="null"> Elegir</option>
+                                                <option value="1">Ubicación</option>
+                                                <option value="2">Proceso</option>
+                                            </select>
+                                        </div>
+                                        <div class="span4">
+                                            <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                                                <div id="divlocations4">
+                                                    <select id="selectLocations4" class="chosen">
+
+                                                        @{count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["locations"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige una ubicación</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+                                                <div id="divprocesses4">
+                                                    <select id="selectProcess4" class="chosen">
+
+                                                        @{count = 0;}
+                                                        @foreach (var item in (Dictionary<string, string>)ViewData["processes"])
+                                                        {
+
+                                                            if (count == 0)
+                                                            {
+                                                        <option value="0">Elige un proceso</option>
+                                                                count++;
+                                                            }
+                                                        <option value="@item.Key">@item.Value</option>
+
+                                                        }
+
+                                                    </select>
+                                                </div>
+
+                                            </div>
+
+
+                                        </div>
+                                        <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+                                            <div id="divdiagrams4">
+                                                <select id="selectDiagrams4" class="chosen">
+
+                                                    @{count = 0;}
+                                                    @foreach (var item in (Dictionary<string, string>)ViewData["diagrams"])
+                                                    {
+
+                                                        if (count == 0)
+                                                        {
+                                                    <option value="0">Elige un diagrama</option>
+                                                            count++;
+                                                        }
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                    }
+
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </center>
+
+
+                            </div>
+                        </div>
+
+                        <div class="row-fluid">
+                            <div class="light_blue set_color">
+                                <div class="well-header widgetclient titleclient">
+                                    <div class="span12">
+                                        <div class="span9">
+                                            <h5 id="scenario_name4"></h5>
+                                        </div>
+                                        <div class="span3">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="well-content">
+                                    <div class="scenario-container" id="scenario-container4"></div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Content/Scripts/joint.js"></script>
+<link href="/Content/CSS/joint.css" rel="stylesheet">
+<script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+<script type="text/javascript">
+    var upd = "";
+    var del = "";
+    var diagram = {};
+    var process = {};
+        var selectedId = null;
+        var viewer = new RivkaViewer("usersTable");
+        function resetData() {
+            selectedId = null;
+        }
+
+        function loadLocation(nodoid, num) {
+            var mapayes = "";
+            var planoyes = "";
+            var cadena = "";
+            var scenarioactual = {};
+            $.ajax({
+                url: "/Monitor/Monitor/getDiagrambyLocationControl",
+                type: "POST",
+                async: false,
+                data: { id_location: nodoid },
+                success: function (data) {
+                    cadena = data;
+                    if (data != "") {
+                        scenarioactual = JSON.parse(data);
+                        //     diagram.loadScenario(scenario);
+                    }
+
+                },
+                error: function () {
+                    _alert("error", "Ocurrio un error, intente más tarde");
+                }
+            });
+
+            var nod = scenarioactual[0].locationid;
+
+            $.ajax({
+                url: "/Monitor/Monitor/getNodesDetails",
+                type: "POST",
+                async: false,
+                data: { nodeid: nod },
+                success: function (data) {
+                    var details = JSON.parse(data);
+
+                    if (details.planeimgext != "null" && details.planeimgext != "") {
+                        jQuery("#scenario-container"+num).css({ 'background': 'url(/Uploads/Images/planos/' + details._id.toString() + '.' + details.planeimgext + ') no-repeat 0 0' });
+                        if (cadena == "" || cadena == "[]") {
+                            if (num == "")diagram.loadScenarioFromLocations(details.scenario, details._id);
+                            if (num == "1")diagram1.loadScenarioFromLocations(details.scenario, details._id);
+                            if (num == "2")diagram2.loadScenarioFromLocations(details.scenario, details._id);
+                            if (num == "3")diagram3.loadScenarioFromLocations(details.scenario, details._id);
+                            if (num == "4") diagram4.loadScenarioFromLocations(details.scenario, details._id);
+                            
+                        }
+                        else {
+                            nombres = [];
+                            for (var i in details.scenario) {
+                                nombres.push(details.scenario[i].nameLocation);
+                            }
+
+                            for (var i in scenarioactual) {
+                                scenarioactual[i].nombres = nombres;
+                                if (num == "") diagram.loadScenario(scenarioactual[i]);
+                                if (num == "1") diagram1.loadScenario(scenarioactual[i]);
+                                if (num == "2") diagram2.loadScenario(scenarioactual[i]);
+                                if (num == "3") diagram3.loadScenario(scenarioactual[i]);
+                                if (num == "4") diagram4.loadScenario(scenarioactual[i]);
+                            }
+
+                        }
+
+                    }
+                    else {
+                        jQuery("#scenario-container"+num).css({ 'background': 'url(/Content/Images/grid.gif)' });
+                    }
+
+                },
+                error: function (data) {
+
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+
+        jQuery(document).ready(function ($) {
+            var model = {
+
+                monitorData: null,
+
+                init: function (nodoid) {
+                    jQuery.ajax({
+                        url: "/Monitor/Monitor/getMonitorTable",
+                        type: "POST",
+                        async: false,
+                        data: { locationid: nodoid },
+                        success: function (data) {
+
+                            model.monitorData = data;
+                            var dataOptions = { id: "_id", name: "locationname" };
+                            viewer.setData(model.monitorData, dataOptions);
+                            table.print();
+                            jQuery("#usersTable_rvtable").find(".btn-group").closest("td").hide();
+                            jQuery("#usersTable_rvtable th").last().hide();
+                        }
+                    });
+                },
+
+                restart: function () {
+                    selectedId = null;
+                }
+            };
+
+            var table = {
+
+                display: "table",
+
+                init: function () {
+                    table.bindAll();
+                },
+
+                print: function () {
+                    switch (table.display) {
+                        case "table":
+                            table.printTable();
+                            
+                            break;
+                    }
+                },
+
+                printTable: function () {
+                    table.display = "table";
+
+                    var tableOptions = {
+                        headers: { "Locationname": "Ubicación de control", "Movementname": "Movimiento", "objectname": "Objeto", "EPC": "EPC", "cantidad": "Cantidad", "MovementDate": "Fecha" },
+                        showSelecters: false,
+                        onEditRowAction: null,
+                        onDeleteRowAction: null,
+                        onSelectRowAction: null
+                    };
+                    viewer.setDisplayMethod(RivkaViewer.METHODS.TABLE, tableOptions);
+                    viewer.print();
+
+                    var monitors = JSON.parse(model.monitorData);
+                    for (i = 0; i < monitors.length; i++) {
+                        jQuery("table tr[data-id=" + monitors[i]._id + "]");
+                    }
+
+
+                    //Add pagination functions
+                    try {
+                        jQuery(".table").dataTable({
+                            "sPaginationType": "bootstrap",
+                            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                            "iDisplayLength": 10,
+                            "aoColumnDefs": [{
+                                'bSortable': false,
+                                'aTargets': [0]
+                            }],
+                            "oLanguage": {
+                                "sLengthMenu": "Mostrar _MENU_ registros",
+                                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                                "sSearch": "Buscar"
+                            }
+                        });
+                        jQuery('.dataTables_length select').chosen();
+                    } catch (Exception) { console.log(); }
+
+                },
+
+                bindAll: function () {
+
+                },
+
+
+            };
+
+            diagram = {
+                draw: null, paper: null, processes: [], connections: [], editing: null,
+                old_scenario: [], location_scenario: [], join: { processA: null, processB: null },
+                name: "", id_scenario: "",
+
+                init: function () {
+
+                    if (this.draw != null)
+                        this.draw.destroy();
+
+                    var graph = new joint.dia.Graph;
+
+                    var paper = new joint.dia.Paper({
+                        el: $("#scenario-container"),
+                        width: "100%",
+                        height: "100%",
+                        model: graph,
+                        gridSize: 1
+                    });
+
+                    //var drawSet = SVG("scenario-container").size("100%", "100%");
+                    this.draw = graph;
+                    this.paper = paper;
+
+                },
+
+                resetDiagram: function () {
+                    this.processes = [];
+                    this.connections = [];
+                    this.editing = null;
+                    this.old_scenario = [];
+                    this.location_scenario = [];
+                    this.join = { processA: null, processB: null };
+                    this.name = "";
+                    this.id_scenario = "";
+                },
+
+                destroy: function () {
+                    if (this.draw != null) {
+                        this.draw.parent.firstChild.remove()
+                        this.draw = null
+                    }
+                },
+
+                setProcess: function (element) {
+                    var attr = {
+                        position: {},
+                        size: {},
+                        attrs: { rect: {}, text: {} }
+                    };
+
+                    if (typeof (element.shape) != "undefined") {
+                        attr = element.shape;
+                        attr.attrs.text = {
+                            fill: "white",
+                            text: $("selectLocations option[value=" + element.processId + "]").text()
+                        };
+                        if (attr.attrs.text.text == "") attr.attrs.text.text = element.name;
+                        attr.attrs.text["font-weight"] = "bold";
+                    }
+                    else {
+                        attr.position.x = 10;
+                        attr.position.y = 10;
+                        attr.size.width = 130;
+                        attr.size.height = 40;
+                        attr.attrs.rect.fill = "#5FB3F9";
+
+                        attr.attrs.text.fill = "white";
+                        attr.attrs.text["font-weight"] = "bold";
+                        attr.attrs.text.text = element.name;
+                    }
+
+                    attr.opacity = 1;
+                    var shape;
+
+                    if (element.type == "process") {
+                        shape = new joint.shapes.basic.Rect(attr);
+                        shape.type = "process";
+                        shape.status = element.status;
+                    }
+
+                    if (element.type == "decision") {
+                        shape = new joint.shapes.basic.Rect({
+                            position: { x: attr.position.x, y: attr.position.y },
+                            size: { width: 45, height: 45 },
+                            attrs: {
+                                rect: { fill: "yellow" }
+                            }
+                        });
+
+                        shape.type = "decision";
+                        shape.rotate(45);
+                    }
+
+                    shape.algo = element.algo;
+
+                    //Set a custom id to get reference to it
+                    if (typeof element.processId != "undefined")
+                        shape.processId = element.processId;
+                    else {
+                        shape.processId = shape.cid;
+                    }
+
+
+                    //save reference in diagram.processes
+                    this.processes.push(shape);
+
+                    //draw into the diagram
+                    try {
+                        this.draw.addCell(shape);
+                    }
+                    catch (Exception) { }
+
+                    //Function to allow the edition for every element in the scenario
+                    //var setProcess = function (cellView) {
+                    //    if (cellView.model.type == "process") {
+                    //        var processData = null;
+                    //        $.ajax({
+                    //            url: "/Processes/Process/GetProcess",
+                    //            type: "POST",
+                    //            async: false,
+                    //            data: { id_process: cellView.model.processId },
+                    //            beforeSend: _loading,
+                    //            success: function (data) {
+                    //                processData = JSON.parse(data);
+                    //                _loading();
+                    //            },
+                    //            error: function (errorThrown) {
+                    //                _loading();
+                    //            }
+                    //        });
+
+                    //        process.set("name", cellView.model.attributes.attrs.text.text);
+                    //        process.set("id", cellView.model.processId);
+                    //        process.set("status", cellView.model.status);
+                    //        //   process.set("min_duration", processData["min_duration"]);
+                    //        //   process.set("max_duration", processData["max_duration"]);
+                    //        process.fillForm();
+                    //    }
+                    //}
+                    ////Function to remove an element(basicRect) from the scenario
+                    //var removeProcess = function (cellView) {
+                    //    var modelId = $(this).closest(".basic.Rect").attr("model-id");
+                    //    var model = diagram.paper.getModelById(modelId);
+
+                    //    //Confirm before remove
+                    //    _confirm({
+                    //        title: "Remover Elemento",
+                    //        message: "Desea remover este elemento?",
+                    //        action: function () {
+                    //            model.remove()
+                    //        }
+                    //    });
+                    //}
+
+                    //process.set("name", element.name);
+                    //process.set("id", shape.processId);
+                    //process.set("status", shape.status);
+                    //process.set("algo", element.algo)
+                    //process.fillForm();
+
+                    return shape;
+                },
+
+                //Start the relation of two processes, clicking the elements to join
+                startJoining: function () {
+                    this.join.processA = null;
+                    this.join.processB = null;
+
+                    var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var unsetJoinEvents = function () {
+                        diagram.join.processA = null;
+                        diagram.join.processB = null;
+                        $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var joinEvent = function (cellView) {
+                        if (!diagram.join.processA) {
+                            diagram.join.processA = cellView.model.id;
+                        }
+                        else if (diagram.join.processA != cellView.model.id) {
+                            diagram.join.processB = cellView.model.id;
+                            diagram.joinProcesses();
+                            unsetJoinEvents();
+                        }
+                    }
+
+                    setJoinEvents();
+
+                },
+
+                joinProcesses: function (vertices) {
+                    var process1 = this.join.processA;
+                    var process2 = this.join.processB;
+
+                    var link = new joint.dia.Link({
+                        source: { id: process1 },
+                        target: { id: process2 },
+                        vertices: vertices
+                    });
+
+                    link.attr({
+                        '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                    });
+
+                    try {
+                        diagram.draw.addCell(link);
+                    }
+                    catch (Exception) { }
+
+                    diagram.connections.push(link);
+
+                    return false;
+                },
+
+                removeElement: function (element) {
+                },
+
+                //Removes all processes in the scenario
+                clearScenario: function () {
+                    if (this.draw)
+                        this.draw.clear();
+                    this.processes = [];
+                    this.connections = [];
+                },
+
+                //Loads a previous saved scenario
+                loadScenario: function (scenario) {
+                    //first clear the scenario
+                    this.clearScenario();
+
+                    var myScenario = scenario;
+                    var processes = scenario.processes;
+                    var connections = scenario.connections;
+                    var names = scenario.nombres;
+
+                    //Set name and scenario id
+                    this.name = myScenario.name;
+                    this.id_scenario = myScenario["_id"];
+                   // $("#scenario_name").html(myScenario.name);
+
+                    //Draw the process and decision boxes
+                    for (var process in processes) {
+                      if(names!=undefined)  processes[process].name = names[process];
+                        this.setProcess(processes[process]);
+                    }
+
+
+                    //Draw the connectors
+                    for (var connection in connections) {
+                        var link = connections[connection];
+                        //try{
+                        this.join.processA = this.getModelByCustomId(link.shape.source).id;
+                        //}catch(e){}
+                        //try{
+                        this.join.processB = this.getModelByCustomId(link.shape.target).id;
+                        //}catch(e){}
+
+                        this.joinProcesses(link.shape.vertices);
+                    }
+
+
+                },
+
+                loadScenarioFromLocations: function (control_scenario, locationid) {
+                    var procesos = [];
+
+                    var scenario = {};
+                    scenario._id = locationid;
+                    // scenario.name=
+                    //crear processo
+                    for (var i in control_scenario) {
+                        var proc = {
+                            processId: null,
+                            shape: {
+                                attrs: {
+                                    rect: {
+                                        fill: "#5FB3F9",
+                                        stroke: "black"
+                                    },
+                                    text: {
+                                        fill: "white",
+                                        "font-weight": "bold",
+                                        text: ""
+                                    }
+
+                                },
+                                position: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                size: {
+                                    height: 0,
+                                    width: 0
+                                },
+                            },
+
+                            status: "ASD",
+                            type: "process"
+                        };
+                        var newElement = control_scenario[i].element;
+                        if (control_scenario[i].typeLocation == 2) {
+                            proc.processId = control_scenario[i].id_location;
+                            proc.shape.position.x = newElement.x;
+                            proc.shape.position.y = newElement.y;
+                            proc.shape.size.height = newElement.height;
+                            proc.shape.size.width = newElement.width;
+                            proc.name = control_scenario[i].nameLocation;
+                            proc.shape.attrs.text.text = control_scenario[i].nameLocation;
+                            procesos.push(proc);
+                        }
+
+                    }
+                    processes = procesos;
+                    for (var process in procesos)
+                        this.setProcess(procesos[process]);
+                },
+
+                //Returns the shape by the customId
+                getModelByCustomId: function (processId) {
+                    //debugger;
+                    var process = null;
+                    for (var i in this.processes) {
+                        var temp = this.processes[i];
+                        if ( /*temp.type == "process" &&*/ temp.processId == processId) {
+                            process = temp;
+                            break;
+                            //}else if( temp.cid == processId){
+                            //    process = temp;
+                            //    break;
+                        }
+                    }
+                    return process;
+                },
+
+
+                //Returns an array of elements positioned in the scenario
+                getSVGScenario: function () {
+                    var id = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory")
+                    var scenario = {
+                        name: this.name,
+                        locationid: id,
+                        processes: [],
+                        connections: []
+                    };
+
+                    //Get the process and decision shapes
+                    console.log(this.processes);
+                    for (var i in this.processes) {
+                        if (this.processes[i] != undefined) {
+                            var thisProcess = this.processes[i];
+
+                            var element = {
+                                position: thisProcess.attributes.position,
+                                size: thisProcess.attributes.size,
+                                attrs: {
+                                    rect: {
+                                        fill: thisProcess.attributes.attrs.rect.fill,
+                                        stroke: thisProcess.attributes.attrs.rect.stroke
+                                    }
+                                }
+                            };
+                            scenario.processes.push({
+                                processId: thisProcess.processId,
+                                status: thisProcess.status,
+                                shape: element,
+                                type: thisProcess.type,
+                                algo: "algo"
+                            });
+                        }
+                    }
+                    //Get the connectors
+                    for (var i in this.connections) {
+                        if (this.connections[i] != undefined) {
+                            var thisConnection = this.connections[i];
+
+                            //Save the processId instead the original id
+                            var sourceObject = this.paper.getModelById(thisConnection.attributes.source.id);
+                            var targetObject = this.paper.getModelById(thisConnection.attributes.target.id);
+
+                            //var source = sourceObject.type == "process" ? sourceObject.processId : sourceObject.cid;
+                            //var target = targetObject.type == "process" ? targetObject.processId : targetObject.cid;
+
+                            var source = sourceObject.processId;
+                            var target = targetObject.processId;
+
+                            var element = {
+                                source: source,
+                                target: target,
+                                vertices: thisConnection.attributes.vertices
+                            };
+                            scenario.connections.push({
+                                shape: element
+                            });
+                        }
+                    }
+
+                    return scenario;
+                },
+
+                bindActions: function () {
+
+
+                    //Listen for a removed element and remove it from the diagram object
+                    this.draw.on("remove", function (cell) {
+                        if (cell.attributes.type === "link") {
+                            for (var i in diagram.connections) {
+                                if (diagram.connections[i].id == cell.id) {
+                                    diagram.connections.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (cell.attributes.type === "basic.Rect") {
+                            for (var i in diagram.processes) {
+                                if (diagram.processes[i].id == cell.id) {
+
+                                    //And show again in the processes list
+                                    var showAgain = diagram.processes[i].processId;
+                                    $("li[data-id=" + showAgain + "]").show();
+
+                                    diagram.processes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                }
+            };
+
+            diagram1 = {
+                draw: null, paper: null, processes: [], connections: [], editing: null,
+                old_scenario: [], location_scenario: [], join: { processA: null, processB: null },
+                name: "", id_scenario: "",
+
+                init: function () {
+
+                    if (this.draw != null)
+                        this.draw.destroy();
+
+                    var graph = new joint.dia.Graph;
+
+                    var paper = new joint.dia.Paper({
+                        el: $("#scenario-container1"),
+                        width: "100%",
+                        height: "100%",
+                        model: graph,
+                        gridSize: 1
+                    });
+
+                    //var drawSet = SVG("scenario-container").size("100%", "100%");
+                    this.draw = graph;
+                    this.paper = paper;
+
+                },
+
+                resetDiagram: function () {
+                    this.processes = [];
+                    this.connections = [];
+                    this.editing = null;
+                    this.old_scenario = [];
+                    this.location_scenario = [];
+                    this.join = { processA: null, processB: null };
+                    this.name = "";
+                    this.id_scenario = "";
+                },
+
+                destroy: function () {
+                    if (this.draw != null) {
+                        this.draw.parent.firstChild.remove()
+                        this.draw = null
+                    }
+                },
+
+                setProcess: function (element) {
+                    var attr = {
+                        position: {},
+                        size: {},
+                        attrs: { rect: {}, text: {} }
+                    };
+
+                    if (typeof (element.shape) != "undefined") {
+                        attr = element.shape;
+                        attr.attrs.text = {
+                            fill: "white",
+                            text: $("selectLocations1 option[value=" + element.processId + "]").text()
+                        };
+                        if (attr.attrs.text.text == "") attr.attrs.text.text = element.name;
+                        attr.attrs.text["font-weight"] = "bold";
+                    }
+                    else {
+                        attr.position.x = 10;
+                        attr.position.y = 10;
+                        attr.size.width = 130;
+                        attr.size.height = 40;
+                        attr.attrs.rect.fill = "#5FB3F9";
+
+                        attr.attrs.text.fill = "white";
+                        attr.attrs.text["font-weight"] = "bold";
+                        attr.attrs.text.text = element.name;
+                    }
+
+                    attr.opacity = 1;
+                    var shape;
+
+                    if (element.type == "process") {
+                        shape = new joint.shapes.basic.Rect(attr);
+                        shape.type = "process";
+                        shape.status = element.status;
+                    }
+
+                    if (element.type == "decision") {
+                        shape = new joint.shapes.basic.Rect({
+                            position: { x: attr.position.x, y: attr.position.y },
+                            size: { width: 45, height: 45 },
+                            attrs: {
+                                rect: { fill: "yellow" }
+                            }
+                        });
+
+                        shape.type = "decision";
+                        shape.rotate(45);
+                    }
+
+                    shape.algo = element.algo;
+
+                    //Set a custom id to get reference to it
+                    if (typeof element.processId != "undefined")
+                        shape.processId = element.processId;
+                    else {
+                        shape.processId = shape.cid;
+                    }
+
+
+                    //save reference in diagram.processes
+                    this.processes.push(shape);
+
+                    //draw into the diagram
+                    try {
+                        this.draw.addCell(shape);
+                    }
+                    catch (Exception) { }
+
+                    //Function to allow the edition for every element in the scenario
+                    //var setProcess = function (cellView) {
+                    //    if (cellView.model.type == "process") {
+                    //        var processData = null;
+                    //        $.ajax({
+                    //            url: "/Processes/Process/GetProcess",
+                    //            type: "POST",
+                    //            async: false,
+                    //            data: { id_process: cellView.model.processId },
+                    //            beforeSend: _loading,
+                    //            success: function (data) {
+                    //                processData = JSON.parse(data);
+                    //                _loading();
+                    //            },
+                    //            error: function (errorThrown) {
+                    //                _loading();
+                    //            }
+                    //        });
+
+                    //        process.set("name", cellView.model.attributes.attrs.text.text);
+                    //        process.set("id", cellView.model.processId);
+                    //        process.set("status", cellView.model.status);
+                    //        //   process.set("min_duration", processData["min_duration"]);
+                    //        //   process.set("max_duration", processData["max_duration"]);
+                    //        process.fillForm();
+                    //    }
+                    //}
+                    ////Function to remove an element(basicRect) from the scenario
+                    //var removeProcess = function (cellView) {
+                    //    var modelId = $(this).closest(".basic.Rect").attr("model-id");
+                    //    var model = diagram.paper.getModelById(modelId);
+
+                    //    //Confirm before remove
+                    //    _confirm({
+                    //        title: "Remover Elemento",
+                    //        message: "Desea remover este elemento?",
+                    //        action: function () {
+                    //            model.remove()
+                    //        }
+                    //    });
+                    //}
+
+                    //process.set("name", element.name);
+                    //process.set("id", shape.processId);
+                    //process.set("status", shape.status);
+                    //process.set("algo", element.algo)
+                    //process.fillForm();
+
+                    return shape;
+                },
+
+                //Start the relation of two processes, clicking the elements to join
+                startJoining: function () {
+                    this.join.processA = null;
+                    this.join.processB = null;
+
+                    var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var unsetJoinEvents = function () {
+                        diagram.join.processA = null;
+                        diagram.join.processB = null;
+                        $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var joinEvent = function (cellView) {
+                        if (!diagram.join.processA) {
+                            diagram.join.processA = cellView.model.id;
+                        }
+                        else if (diagram.join.processA != cellView.model.id) {
+                            diagram.join.processB = cellView.model.id;
+                            diagram.joinProcesses();
+                            unsetJoinEvents();
+                        }
+                    }
+
+                    setJoinEvents();
+
+                },
+
+                joinProcesses: function (vertices) {
+                    var process1 = this.join.processA;
+                    var process2 = this.join.processB;
+
+                    var link = new joint.dia.Link({
+                        source: { id: process1 },
+                        target: { id: process2 },
+                        vertices: vertices
+                    });
+
+                    link.attr({
+                        '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                    });
+
+                    try {
+                        diagram.draw.addCell(link);
+                    }
+                    catch (Exception) { }
+
+                    diagram.connections.push(link);
+
+                    return false;
+                },
+
+                removeElement: function (element) {
+                },
+
+                //Removes all processes in the scenario
+                clearScenario: function () {
+                    if (this.draw)
+                        this.draw.clear();
+                    this.processes = [];
+                    this.connections = [];
+                },
+
+                //Loads a previous saved scenario
+                loadScenario: function (scenario) {
+                    //first clear the scenario
+                    this.clearScenario();
+
+                    var myScenario = scenario;
+                    var processes = scenario.processes;
+                    var connections = scenario.connections;
+                    var names = scenario.nombres;
+
+                    //Set name and scenario id
+                    this.name = myScenario.name;
+                    this.id_scenario = myScenario["_id"];
+                    // $("#scenario_name").html(myScenario.name);
+
+                    //Draw the process and decision boxes
+                    for (var process in processes) {
+                        if (names != undefined) processes[process].name = names[process];
+                        this.setProcess(processes[process]);
+                    }
+
+
+                    //Draw the connectors
+                    for (var connection in connections) {
+                        var link = connections[connection];
+                        //try{
+                        this.join.processA = this.getModelByCustomId(link.shape.source).id;
+                        //}catch(e){}
+                        //try{
+                        this.join.processB = this.getModelByCustomId(link.shape.target).id;
+                        //}catch(e){}
+
+                        this.joinProcesses(link.shape.vertices);
+                    }
+
+
+                },
+
+                loadScenarioFromLocations: function (control_scenario, locationid) {
+                    var procesos = [];
+
+                    var scenario = {};
+                    scenario._id = locationid;
+                    // scenario.name=
+                    //crear processo
+                    for (var i in control_scenario) {
+                        var proc = {
+                            processId: null,
+                            shape: {
+                                attrs: {
+                                    rect: {
+                                        fill: "#5FB3F9",
+                                        stroke: "black"
+                                    },
+                                    text: {
+                                        fill: "white",
+                                        "font-weight": "bold",
+                                        text: ""
+                                    }
+
+                                },
+                                position: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                size: {
+                                    height: 0,
+                                    width: 0
+                                },
+                            },
+
+                            status: "ASD",
+                            type: "process"
+                        };
+                        var newElement = control_scenario[i].element;
+                        if (control_scenario[i].typeLocation == 2) {
+                            proc.processId = control_scenario[i].id_location;
+                            proc.shape.position.x = newElement.x;
+                            proc.shape.position.y = newElement.y;
+                            proc.shape.size.height = newElement.height;
+                            proc.shape.size.width = newElement.width;
+                            proc.name = control_scenario[i].nameLocation;
+                            proc.shape.attrs.text.text = control_scenario[i].nameLocation;
+                            procesos.push(proc);
+                        }
+
+                    }
+                    processes = procesos;
+                    for (var process in procesos)
+                        this.setProcess(procesos[process]);
+                },
+
+                //Returns the shape by the customId
+                getModelByCustomId: function (processId) {
+                    //debugger;
+                    var process = null;
+                    for (var i in this.processes) {
+                        var temp = this.processes[i];
+                        if ( /*temp.type == "process" &&*/ temp.processId == processId) {
+                            process = temp;
+                            break;
+                            //}else if( temp.cid == processId){
+                            //    process = temp;
+                            //    break;
+                        }
+                    }
+                    return process;
+                },
+
+
+                //Returns an array of elements positioned in the scenario
+                getSVGScenario: function () {
+                    var id = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory")
+                    var scenario = {
+                        name: this.name,
+                        locationid: id,
+                        processes: [],
+                        connections: []
+                    };
+
+                    //Get the process and decision shapes
+                    console.log(this.processes);
+                    for (var i in this.processes) {
+                        if (this.processes[i] != undefined) {
+                            var thisProcess = this.processes[i];
+
+                            var element = {
+                                position: thisProcess.attributes.position,
+                                size: thisProcess.attributes.size,
+                                attrs: {
+                                    rect: {
+                                        fill: thisProcess.attributes.attrs.rect.fill,
+                                        stroke: thisProcess.attributes.attrs.rect.stroke
+                                    }
+                                }
+                            };
+                            scenario.processes.push({
+                                processId: thisProcess.processId,
+                                status: thisProcess.status,
+                                shape: element,
+                                type: thisProcess.type,
+                                algo: "algo"
+                            });
+                        }
+                    }
+                    //Get the connectors
+                    for (var i in this.connections) {
+                        if (this.connections[i] != undefined) {
+                            var thisConnection = this.connections[i];
+
+                            //Save the processId instead the original id
+                            var sourceObject = this.paper.getModelById(thisConnection.attributes.source.id);
+                            var targetObject = this.paper.getModelById(thisConnection.attributes.target.id);
+
+                            //var source = sourceObject.type == "process" ? sourceObject.processId : sourceObject.cid;
+                            //var target = targetObject.type == "process" ? targetObject.processId : targetObject.cid;
+
+                            var source = sourceObject.processId;
+                            var target = targetObject.processId;
+
+                            var element = {
+                                source: source,
+                                target: target,
+                                vertices: thisConnection.attributes.vertices
+                            };
+                            scenario.connections.push({
+                                shape: element
+                            });
+                        }
+                    }
+
+                    return scenario;
+                },
+
+                bindActions: function () {
+
+
+                    //Listen for a removed element and remove it from the diagram object
+                    this.draw.on("remove", function (cell) {
+                        if (cell.attributes.type === "link") {
+                            for (var i in diagram.connections) {
+                                if (diagram.connections[i].id == cell.id) {
+                                    diagram.connections.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (cell.attributes.type === "basic.Rect") {
+                            for (var i in diagram.processes) {
+                                if (diagram.processes[i].id == cell.id) {
+
+                                    //And show again in the processes list
+                                    var showAgain = diagram.processes[i].processId;
+                                    $("li[data-id=" + showAgain + "]").show();
+
+                                    diagram.processes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                }
+            };
+
+
+            //*****************
+            diagram2 = {
+                draw: null, paper: null, processes: [], connections: [], editing: null,
+                old_scenario: [], location_scenario: [], join: { processA: null, processB: null },
+                name: "", id_scenario: "",
+
+                init: function () {
+
+                    if (this.draw != null)
+                        this.draw.destroy();
+
+                    var graph = new joint.dia.Graph;
+
+                    var paper = new joint.dia.Paper({
+                        el: $("#scenario-container2"),
+                        width: "100%",
+                        height: "100%",
+                        model: graph,
+                        gridSize: 1
+                    });
+
+                    //var drawSet = SVG("scenario-container").size("100%", "100%");
+                    this.draw = graph;
+                    this.paper = paper;
+
+                },
+
+                resetDiagram: function () {
+                    this.processes = [];
+                    this.connections = [];
+                    this.editing = null;
+                    this.old_scenario = [];
+                    this.location_scenario = [];
+                    this.join = { processA: null, processB: null };
+                    this.name = "";
+                    this.id_scenario = "";
+                },
+
+                destroy: function () {
+                    if (this.draw != null) {
+                        this.draw.parent.firstChild.remove()
+                        this.draw = null
+                    }
+                },
+
+                setProcess: function (element) {
+                    var attr = {
+                        position: {},
+                        size: {},
+                        attrs: { rect: {}, text: {} }
+                    };
+
+                    if (typeof (element.shape) != "undefined") {
+                        attr = element.shape;
+                        attr.attrs.text = {
+                            fill: "white",
+                            text: $("selectLocations2 option[value=" + element.processId + "]").text()
+                        };
+                        if (attr.attrs.text.text == "") attr.attrs.text.text = element.name;
+                        attr.attrs.text["font-weight"] = "bold";
+                    }
+                    else {
+                        attr.position.x = 10;
+                        attr.position.y = 10;
+                        attr.size.width = 130;
+                        attr.size.height = 40;
+                        attr.attrs.rect.fill = "#5FB3F9";
+
+                        attr.attrs.text.fill = "white";
+                        attr.attrs.text["font-weight"] = "bold";
+                        attr.attrs.text.text = element.name;
+                    }
+
+                    attr.opacity = 1;
+                    var shape;
+
+                    if (element.type == "process") {
+                        shape = new joint.shapes.basic.Rect(attr);
+                        shape.type = "process";
+                        shape.status = element.status;
+                    }
+
+                    if (element.type == "decision") {
+                        shape = new joint.shapes.basic.Rect({
+                            position: { x: attr.position.x, y: attr.position.y },
+                            size: { width: 45, height: 45 },
+                            attrs: {
+                                rect: { fill: "yellow" }
+                            }
+                        });
+
+                        shape.type = "decision";
+                        shape.rotate(45);
+                    }
+
+                    shape.algo = element.algo;
+
+                    //Set a custom id to get reference to it
+                    if (typeof element.processId != "undefined")
+                        shape.processId = element.processId;
+                    else {
+                        shape.processId = shape.cid;
+                    }
+
+
+                    //save reference in diagram.processes
+                    this.processes.push(shape);
+
+                    //draw into the diagram
+                    try {
+                        this.draw.addCell(shape);
+                    }
+                    catch (Exception) { }
+
+                    //Function to allow the edition for every element in the scenario
+                    //var setProcess = function (cellView) {
+                    //    if (cellView.model.type == "process") {
+                    //        var processData = null;
+                    //        $.ajax({
+                    //            url: "/Processes/Process/GetProcess",
+                    //            type: "POST",
+                    //            async: false,
+                    //            data: { id_process: cellView.model.processId },
+                    //            beforeSend: _loading,
+                    //            success: function (data) {
+                    //                processData = JSON.parse(data);
+                    //                _loading();
+                    //            },
+                    //            error: function (errorThrown) {
+                    //                _loading();
+                    //            }
+                    //        });
+
+                    //        process.set("name", cellView.model.attributes.attrs.text.text);
+                    //        process.set("id", cellView.model.processId);
+                    //        process.set("status", cellView.model.status);
+                    //        //   process.set("min_duration", processData["min_duration"]);
+                    //        //   process.set("max_duration", processData["max_duration"]);
+                    //        process.fillForm();
+                    //    }
+                    //}
+                    ////Function to remove an element(basicRect) from the scenario
+                    //var removeProcess = function (cellView) {
+                    //    var modelId = $(this).closest(".basic.Rect").attr("model-id");
+                    //    var model = diagram.paper.getModelById(modelId);
+
+                    //    //Confirm before remove
+                    //    _confirm({
+                    //        title: "Remover Elemento",
+                    //        message: "Desea remover este elemento?",
+                    //        action: function () {
+                    //            model.remove()
+                    //        }
+                    //    });
+                    //}
+
+                    //process.set("name", element.name);
+                    //process.set("id", shape.processId);
+                    //process.set("status", shape.status);
+                    //process.set("algo", element.algo)
+                    //process.fillForm();
+
+                    return shape;
+                },
+
+                //Start the relation of two processes, clicking the elements to join
+                startJoining: function () {
+                    this.join.processA = null;
+                    this.join.processB = null;
+
+                    var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var unsetJoinEvents = function () {
+                        diagram.join.processA = null;
+                        diagram.join.processB = null;
+                        $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var joinEvent = function (cellView) {
+                        if (!diagram.join.processA) {
+                            diagram.join.processA = cellView.model.id;
+                        }
+                        else if (diagram.join.processA != cellView.model.id) {
+                            diagram.join.processB = cellView.model.id;
+                            diagram.joinProcesses();
+                            unsetJoinEvents();
+                        }
+                    }
+
+                    setJoinEvents();
+
+                },
+
+                joinProcesses: function (vertices) {
+                    var process1 = this.join.processA;
+                    var process2 = this.join.processB;
+
+                    var link = new joint.dia.Link({
+                        source: { id: process1 },
+                        target: { id: process2 },
+                        vertices: vertices
+                    });
+
+                    link.attr({
+                        '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                    });
+
+                    try {
+                        diagram.draw.addCell(link);
+                    }
+                    catch (Exception) { }
+
+                    diagram.connections.push(link);
+
+                    return false;
+                },
+
+                removeElement: function (element) {
+                },
+
+                //Removes all processes in the scenario
+                clearScenario: function () {
+                    if (this.draw)
+                        this.draw.clear();
+                    this.processes = [];
+                    this.connections = [];
+                },
+
+                //Loads a previous saved scenario
+                loadScenario: function (scenario) {
+                    //first clear the scenario
+                    this.clearScenario();
+
+                    var myScenario = scenario;
+                    var processes = scenario.processes;
+                    var connections = scenario.connections;
+                    var names = scenario.nombres;
+
+                    //Set name and scenario id
+                    this.name = myScenario.name;
+                    this.id_scenario = myScenario["_id"];
+                    // $("#scenario_name").html(myScenario.name);
+
+                    //Draw the process and decision boxes
+                    for (var process in processes) {
+                        if (names != undefined) processes[process].name = names[process];
+                        this.setProcess(processes[process]);
+                    }
+
+
+                    //Draw the connectors
+                    for (var connection in connections) {
+                        var link = connections[connection];
+                        //try{
+                        this.join.processA = this.getModelByCustomId(link.shape.source).id;
+                        //}catch(e){}
+                        //try{
+                        this.join.processB = this.getModelByCustomId(link.shape.target).id;
+                        //}catch(e){}
+
+                        this.joinProcesses(link.shape.vertices);
+                    }
+
+
+                },
+
+                loadScenarioFromLocations: function (control_scenario, locationid) {
+                    var procesos = [];
+
+                    var scenario = {};
+                    scenario._id = locationid;
+                    // scenario.name=
+                    //crear processo
+                    for (var i in control_scenario) {
+                        var proc = {
+                            processId: null,
+                            shape: {
+                                attrs: {
+                                    rect: {
+                                        fill: "#5FB3F9",
+                                        stroke: "black"
+                                    },
+                                    text: {
+                                        fill: "white",
+                                        "font-weight": "bold",
+                                        text: ""
+                                    }
+
+                                },
+                                position: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                size: {
+                                    height: 0,
+                                    width: 0
+                                },
+                            },
+
+                            status: "ASD",
+                            type: "process"
+                        };
+                        var newElement = control_scenario[i].element;
+                        if (control_scenario[i].typeLocation == 2) {
+                            proc.processId = control_scenario[i].id_location;
+                            proc.shape.position.x = newElement.x;
+                            proc.shape.position.y = newElement.y;
+                            proc.shape.size.height = newElement.height;
+                            proc.shape.size.width = newElement.width;
+                            proc.name = control_scenario[i].nameLocation;
+                            proc.shape.attrs.text.text = control_scenario[i].nameLocation;
+                            procesos.push(proc);
+                        }
+
+                    }
+                    processes = procesos;
+                    for (var process in procesos)
+                        this.setProcess(procesos[process]);
+                },
+
+                //Returns the shape by the customId
+                getModelByCustomId: function (processId) {
+                    //debugger;
+                    var process = null;
+                    for (var i in this.processes) {
+                        var temp = this.processes[i];
+                        if ( /*temp.type == "process" &&*/ temp.processId == processId) {
+                            process = temp;
+                            break;
+                            //}else if( temp.cid == processId){
+                            //    process = temp;
+                            //    break;
+                        }
+                    }
+                    return process;
+                },
+
+
+                //Returns an array of elements positioned in the scenario
+                getSVGScenario: function () {
+                    var id = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory")
+                    var scenario = {
+                        name: this.name,
+                        locationid: id,
+                        processes: [],
+                        connections: []
+                    };
+
+                    //Get the process and decision shapes
+                    console.log(this.processes);
+                    for (var i in this.processes) {
+                        if (this.processes[i] != undefined) {
+                            var thisProcess = this.processes[i];
+
+                            var element = {
+                                position: thisProcess.attributes.position,
+                                size: thisProcess.attributes.size,
+                                attrs: {
+                                    rect: {
+                                        fill: thisProcess.attributes.attrs.rect.fill,
+                                        stroke: thisProcess.attributes.attrs.rect.stroke
+                                    }
+                                }
+                            };
+                            scenario.processes.push({
+                                processId: thisProcess.processId,
+                                status: thisProcess.status,
+                                shape: element,
+                                type: thisProcess.type,
+                                algo: "algo"
+                            });
+                        }
+                    }
+                    //Get the connectors
+                    for (var i in this.connections) {
+                        if (this.connections[i] != undefined) {
+                            var thisConnection = this.connections[i];
+
+                            //Save the processId instead the original id
+                            var sourceObject = this.paper.getModelById(thisConnection.attributes.source.id);
+                            var targetObject = this.paper.getModelById(thisConnection.attributes.target.id);
+
+                            //var source = sourceObject.type == "process" ? sourceObject.processId : sourceObject.cid;
+                            //var target = targetObject.type == "process" ? targetObject.processId : targetObject.cid;
+
+                            var source = sourceObject.processId;
+                            var target = targetObject.processId;
+
+                            var element = {
+                                source: source,
+                                target: target,
+                                vertices: thisConnection.attributes.vertices
+                            };
+                            scenario.connections.push({
+                                shape: element
+                            });
+                        }
+                    }
+
+                    return scenario;
+                },
+
+                bindActions: function () {
+
+
+                    //Listen for a removed element and remove it from the diagram object
+                    this.draw.on("remove", function (cell) {
+                        if (cell.attributes.type === "link") {
+                            for (var i in diagram.connections) {
+                                if (diagram.connections[i].id == cell.id) {
+                                    diagram.connections.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (cell.attributes.type === "basic.Rect") {
+                            for (var i in diagram.processes) {
+                                if (diagram.processes[i].id == cell.id) {
+
+                                    //And show again in the processes list
+                                    var showAgain = diagram.processes[i].processId;
+                                    $("li[data-id=" + showAgain + "]").show();
+
+                                    diagram.processes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                }
+            };
+
+            //********************************
+            diagram3 = {
+                draw: null, paper: null, processes: [], connections: [], editing: null,
+                old_scenario: [], location_scenario: [], join: { processA: null, processB: null },
+                name: "", id_scenario: "",
+
+                init: function () {
+
+                    if (this.draw != null)
+                        this.draw.destroy();
+
+                    var graph = new joint.dia.Graph;
+
+                    var paper = new joint.dia.Paper({
+                        el: $("#scenario-container3"),
+                        width: "100%",
+                        height: "100%",
+                        model: graph,
+                        gridSize: 1
+                    });
+
+                    //var drawSet = SVG("scenario-container").size("100%", "100%");
+                    this.draw = graph;
+                    this.paper = paper;
+
+                },
+
+                resetDiagram: function () {
+                    this.processes = [];
+                    this.connections = [];
+                    this.editing = null;
+                    this.old_scenario = [];
+                    this.location_scenario = [];
+                    this.join = { processA: null, processB: null };
+                    this.name = "";
+                    this.id_scenario = "";
+                },
+
+                destroy: function () {
+                    if (this.draw != null) {
+                        this.draw.parent.firstChild.remove()
+                        this.draw = null
+                    }
+                },
+
+                setProcess: function (element) {
+                    var attr = {
+                        position: {},
+                        size: {},
+                        attrs: { rect: {}, text: {} }
+                    };
+
+                    if (typeof (element.shape) != "undefined") {
+                        attr = element.shape;
+                        attr.attrs.text = {
+                            fill: "white",
+                            text: $("selectLocations3 option[value=" + element.processId + "]").text()
+                        };
+                        if (attr.attrs.text.text == "") attr.attrs.text.text = element.name;
+                        attr.attrs.text["font-weight"] = "bold";
+                    }
+                    else {
+                        attr.position.x = 10;
+                        attr.position.y = 10;
+                        attr.size.width = 130;
+                        attr.size.height = 40;
+                        attr.attrs.rect.fill = "#5FB3F9";
+
+                        attr.attrs.text.fill = "white";
+                        attr.attrs.text["font-weight"] = "bold";
+                        attr.attrs.text.text = element.name;
+                    }
+
+                    attr.opacity = 1;
+                    var shape;
+
+                    if (element.type == "process") {
+                        shape = new joint.shapes.basic.Rect(attr);
+                        shape.type = "process";
+                        shape.status = element.status;
+                    }
+
+                    if (element.type == "decision") {
+                        shape = new joint.shapes.basic.Rect({
+                            position: { x: attr.position.x, y: attr.position.y },
+                            size: { width: 45, height: 45 },
+                            attrs: {
+                                rect: { fill: "yellow" }
+                            }
+                        });
+
+                        shape.type = "decision";
+                        shape.rotate(45);
+                    }
+
+                    shape.algo = element.algo;
+
+                    //Set a custom id to get reference to it
+                    if (typeof element.processId != "undefined")
+                        shape.processId = element.processId;
+                    else {
+                        shape.processId = shape.cid;
+                    }
+
+
+                    //save reference in diagram.processes
+                    this.processes.push(shape);
+
+                    //draw into the diagram
+                    try {
+                        this.draw.addCell(shape);
+                    }
+                    catch (Exception) { }
+
+                    //Function to allow the edition for every element in the scenario
+                
+
+                    return shape;
+                },
+
+                //Start the relation of two processes, clicking the elements to join
+                startJoining: function () {
+                    this.join.processA = null;
+                    this.join.processB = null;
+
+                    var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var unsetJoinEvents = function () {
+                        diagram.join.processA = null;
+                        diagram.join.processB = null;
+                        $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var joinEvent = function (cellView) {
+                        if (!diagram.join.processA) {
+                            diagram.join.processA = cellView.model.id;
+                        }
+                        else if (diagram.join.processA != cellView.model.id) {
+                            diagram.join.processB = cellView.model.id;
+                            diagram.joinProcesses();
+                            unsetJoinEvents();
+                        }
+                    }
+
+                    setJoinEvents();
+
+                },
+
+                joinProcesses: function (vertices) {
+                    var process1 = this.join.processA;
+                    var process2 = this.join.processB;
+
+                    var link = new joint.dia.Link({
+                        source: { id: process1 },
+                        target: { id: process2 },
+                        vertices: vertices
+                    });
+
+                    link.attr({
+                        '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                    });
+
+                    try {
+                        diagram.draw.addCell(link);
+                    }
+                    catch (Exception) { }
+
+                    diagram.connections.push(link);
+
+                    return false;
+                },
+
+                removeElement: function (element) {
+                },
+
+                //Removes all processes in the scenario
+                clearScenario: function () {
+                    if (this.draw)
+                        this.draw.clear();
+                    this.processes = [];
+                    this.connections = [];
+                },
+
+                //Loads a previous saved scenario
+                loadScenario: function (scenario) {
+                    //first clear the scenario
+                    this.clearScenario();
+
+                    var myScenario = scenario;
+                    var processes = scenario.processes;
+                    var connections = scenario.connections;
+                    var names = scenario.nombres;
+
+                    //Set name and scenario id
+                    this.name = myScenario.name;
+                    this.id_scenario = myScenario["_id"];
+                    // $("#scenario_name").html(myScenario.name);
+
+                    //Draw the process and decision boxes
+                    for (var process in processes) {
+                        if (names != undefined) processes[process].name = names[process];
+                        this.setProcess(processes[process]);
+                    }
+
+
+                    //Draw the connectors
+                    for (var connection in connections) {
+                        var link = connections[connection];
+                        //try{
+                        this.join.processA = this.getModelByCustomId(link.shape.source).id;
+                        //}catch(e){}
+                        //try{
+                        this.join.processB = this.getModelByCustomId(link.shape.target).id;
+                        //}catch(e){}
+
+                        this.joinProcesses(link.shape.vertices);
+                    }
+
+
+                },
+
+                loadScenarioFromLocations: function (control_scenario, locationid) {
+                    var procesos = [];
+
+                    var scenario = {};
+                    scenario._id = locationid;
+                    // scenario.name=
+                    //crear processo
+                    for (var i in control_scenario) {
+                        var proc = {
+                            processId: null,
+                            shape: {
+                                attrs: {
+                                    rect: {
+                                        fill: "#5FB3F9",
+                                        stroke: "black"
+                                    },
+                                    text: {
+                                        fill: "white",
+                                        "font-weight": "bold",
+                                        text: ""
+                                    }
+
+                                },
+                                position: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                size: {
+                                    height: 0,
+                                    width: 0
+                                },
+                            },
+
+                            status: "ASD",
+                            type: "process"
+                        };
+                        var newElement = control_scenario[i].element;
+                        if (control_scenario[i].typeLocation == 2) {
+                            proc.processId = control_scenario[i].id_location;
+                            proc.shape.position.x = newElement.x;
+                            proc.shape.position.y = newElement.y;
+                            proc.shape.size.height = newElement.height;
+                            proc.shape.size.width = newElement.width;
+                            proc.name = control_scenario[i].nameLocation;
+                            proc.shape.attrs.text.text = control_scenario[i].nameLocation;
+                            procesos.push(proc);
+                        }
+
+                    }
+                    processes = procesos;
+                    for (var process in procesos)
+                        this.setProcess(procesos[process]);
+                },
+
+                //Returns the shape by the customId
+                getModelByCustomId: function (processId) {
+                    //debugger;
+                    var process = null;
+                    for (var i in this.processes) {
+                        var temp = this.processes[i];
+                        if ( /*temp.type == "process" &&*/ temp.processId == processId) {
+                            process = temp;
+                            break;
+                            //}else if( temp.cid == processId){
+                            //    process = temp;
+                            //    break;
+                        }
+                    }
+                    return process;
+                },
+
+
+                //Returns an array of elements positioned in the scenario
+                getSVGScenario: function () {
+                    var id = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory")
+                    var scenario = {
+                        name: this.name,
+                        locationid: id,
+                        processes: [],
+                        connections: []
+                    };
+
+                    //Get the process and decision shapes
+                    console.log(this.processes);
+                    for (var i in this.processes) {
+                        if (this.processes[i] != undefined) {
+                            var thisProcess = this.processes[i];
+
+                            var element = {
+                                position: thisProcess.attributes.position,
+                                size: thisProcess.attributes.size,
+                                attrs: {
+                                    rect: {
+                                        fill: thisProcess.attributes.attrs.rect.fill,
+                                        stroke: thisProcess.attributes.attrs.rect.stroke
+                                    }
+                                }
+                            };
+                            scenario.processes.push({
+                                processId: thisProcess.processId,
+                                status: thisProcess.status,
+                                shape: element,
+                                type: thisProcess.type,
+                                algo: "algo"
+                            });
+                        }
+                    }
+                    //Get the connectors
+                    for (var i in this.connections) {
+                        if (this.connections[i] != undefined) {
+                            var thisConnection = this.connections[i];
+
+                            //Save the processId instead the original id
+                            var sourceObject = this.paper.getModelById(thisConnection.attributes.source.id);
+                            var targetObject = this.paper.getModelById(thisConnection.attributes.target.id);
+
+                            //var source = sourceObject.type == "process" ? sourceObject.processId : sourceObject.cid;
+                            //var target = targetObject.type == "process" ? targetObject.processId : targetObject.cid;
+
+                            var source = sourceObject.processId;
+                            var target = targetObject.processId;
+
+                            var element = {
+                                source: source,
+                                target: target,
+                                vertices: thisConnection.attributes.vertices
+                            };
+                            scenario.connections.push({
+                                shape: element
+                            });
+                        }
+                    }
+
+                    return scenario;
+                },
+
+                bindActions: function () {
+
+
+                    //Listen for a removed element and remove it from the diagram object
+                    this.draw.on("remove", function (cell) {
+                        if (cell.attributes.type === "link") {
+                            for (var i in diagram.connections) {
+                                if (diagram.connections[i].id == cell.id) {
+                                    diagram.connections.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (cell.attributes.type === "basic.Rect") {
+                            for (var i in diagram.processes) {
+                                if (diagram.processes[i].id == cell.id) {
+
+                                    //And show again in the processes list
+                                    var showAgain = diagram.processes[i].processId;
+                                    $("li[data-id=" + showAgain + "]").show();
+
+                                    diagram.processes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                }
+            };
+
+            //******************
+            diagram4 = {
+                draw: null, paper: null, processes: [], connections: [], editing: null,
+                old_scenario: [], location_scenario: [], join: { processA: null, processB: null },
+                name: "", id_scenario: "",
+
+                init: function () {
+
+                    if (this.draw != null)
+                        this.draw.destroy();
+
+                    var graph = new joint.dia.Graph;
+
+                    var paper = new joint.dia.Paper({
+                        el: $("#scenario-container4"),
+                        width: "100%",
+                        height: "100%",
+                        model: graph,
+                        gridSize: 1
+                    });
+
+                    //var drawSet = SVG("scenario-container").size("100%", "100%");
+                    this.draw = graph;
+                    this.paper = paper;
+
+                },
+
+                resetDiagram: function () {
+                    this.processes = [];
+                    this.connections = [];
+                    this.editing = null;
+                    this.old_scenario = [];
+                    this.location_scenario = [];
+                    this.join = { processA: null, processB: null };
+                    this.name = "";
+                    this.id_scenario = "";
+                },
+
+                destroy: function () {
+                    if (this.draw != null) {
+                        this.draw.parent.firstChild.remove()
+                        this.draw = null
+                    }
+                },
+
+                setProcess: function (element) {
+                    var attr = {
+                        position: {},
+                        size: {},
+                        attrs: { rect: {}, text: {} }
+                    };
+
+                    if (typeof (element.shape) != "undefined") {
+                        attr = element.shape;
+                        attr.attrs.text = {
+                            fill: "white",
+                            text: $("selectLocations4 option[value=" + element.processId + "]").text()
+                        };
+                        if (attr.attrs.text.text == "") attr.attrs.text.text = element.name;
+                        attr.attrs.text["font-weight"] = "bold";
+                    }
+                    else {
+                        attr.position.x = 10;
+                        attr.position.y = 10;
+                        attr.size.width = 130;
+                        attr.size.height = 40;
+                        attr.attrs.rect.fill = "#5FB3F9";
+
+                        attr.attrs.text.fill = "white";
+                        attr.attrs.text["font-weight"] = "bold";
+                        attr.attrs.text.text = element.name;
+                    }
+
+                    attr.opacity = 1;
+                    var shape;
+
+                    if (element.type == "process") {
+                        shape = new joint.shapes.basic.Rect(attr);
+                        shape.type = "process";
+                        shape.status = element.status;
+                    }
+
+                    if (element.type == "decision") {
+                        shape = new joint.shapes.basic.Rect({
+                            position: { x: attr.position.x, y: attr.position.y },
+                            size: { width: 45, height: 45 },
+                            attrs: {
+                                rect: { fill: "yellow" }
+                            }
+                        });
+
+                        shape.type = "decision";
+                        shape.rotate(45);
+                    }
+
+                    shape.algo = element.algo;
+
+                    //Set a custom id to get reference to it
+                    if (typeof element.processId != "undefined")
+                        shape.processId = element.processId;
+                    else {
+                        shape.processId = shape.cid;
+                    }
+
+
+                    //save reference in diagram.processes
+                    this.processes.push(shape);
+
+                    //draw into the diagram
+                    try {
+                        this.draw.addCell(shape);
+                    }
+                    catch (Exception) { }
+
+                    
+                    return shape;
+                },
+
+                //Start the relation of two processes, clicking the elements to join
+                startJoining: function () {
+                    this.join.processA = null;
+                    this.join.processB = null;
+
+                    var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var unsetJoinEvents = function () {
+                        diagram.join.processA = null;
+                        diagram.join.processB = null;
+                        $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                    };
+
+                    var joinEvent = function (cellView) {
+                        if (!diagram.join.processA) {
+                            diagram.join.processA = cellView.model.id;
+                        }
+                        else if (diagram.join.processA != cellView.model.id) {
+                            diagram.join.processB = cellView.model.id;
+                            diagram.joinProcesses();
+                            unsetJoinEvents();
+                        }
+                    }
+
+                    setJoinEvents();
+
+                },
+
+                joinProcesses: function (vertices) {
+                    var process1 = this.join.processA;
+                    var process2 = this.join.processB;
+
+                    var link = new joint.dia.Link({
+                        source: { id: process1 },
+                        target: { id: process2 },
+                        vertices: vertices
+                    });
+
+                    link.attr({
+                        '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                    });
+
+                    try {
+                        diagram.draw.addCell(link);
+                    }
+                    catch (Exception) { }
+
+                    diagram.connections.push(link);
+
+                    return false;
+                },
+
+                removeElement: function (element) {
+                },
+
+                //Removes all processes in the scenario
+                clearScenario: function () {
+                    if (this.draw)
+                        this.draw.clear();
+                    this.processes = [];
+                    this.connections = [];
+                },
+
+                //Loads a previous saved scenario
+                loadScenario: function (scenario) {
+                    //first clear the scenario
+                    this.clearScenario();
+
+                    var myScenario = scenario;
+                    var processes = scenario.processes;
+                    var connections = scenario.connections;
+                    var names = scenario.nombres;
+
+                    //Set name and scenario id
+                    this.name = myScenario.name;
+                    this.id_scenario = myScenario["_id"];
+                    // $("#scenario_name").html(myScenario.name);
+
+                    //Draw the process and decision boxes
+                    for (var process in processes) {
+                        if (names != undefined) processes[process].name = names[process];
+                        this.setProcess(processes[process]);
+                    }
+
+
+                    //Draw the connectors
+                    for (var connection in connections) {
+                        var link = connections[connection];
+                        //try{
+                        this.join.processA = this.getModelByCustomId(link.shape.source).id;
+                        //}catch(e){}
+                        //try{
+                        this.join.processB = this.getModelByCustomId(link.shape.target).id;
+                        //}catch(e){}
+
+                        this.joinProcesses(link.shape.vertices);
+                    }
+
+
+                },
+
+                loadScenarioFromLocations: function (control_scenario, locationid) {
+                    var procesos = [];
+
+                    var scenario = {};
+                    scenario._id = locationid;
+                    // scenario.name=
+                    //crear processo
+                    for (var i in control_scenario) {
+                        var proc = {
+                            processId: null,
+                            shape: {
+                                attrs: {
+                                    rect: {
+                                        fill: "#5FB3F9",
+                                        stroke: "black"
+                                    },
+                                    text: {
+                                        fill: "white",
+                                        "font-weight": "bold",
+                                        text: ""
+                                    }
+
+                                },
+                                position: {
+                                    x: 0,
+                                    y: 0
+                                },
+                                size: {
+                                    height: 0,
+                                    width: 0
+                                },
+                            },
+
+                            status: "ASD",
+                            type: "process"
+                        };
+                        var newElement = control_scenario[i].element;
+                        if (control_scenario[i].typeLocation == 2) {
+                            proc.processId = control_scenario[i].id_location;
+                            proc.shape.position.x = newElement.x;
+                            proc.shape.position.y = newElement.y;
+                            proc.shape.size.height = newElement.height;
+                            proc.shape.size.width = newElement.width;
+                            proc.name = control_scenario[i].nameLocation;
+                            proc.shape.attrs.text.text = control_scenario[i].nameLocation;
+                            procesos.push(proc);
+                        }
+
+                    }
+                    processes = procesos;
+                    for (var process in procesos)
+                        this.setProcess(procesos[process]);
+                },
+
+                //Returns the shape by the customId
+                getModelByCustomId: function (processId) {
+                    //debugger;
+                    var process = null;
+                    for (var i in this.processes) {
+                        var temp = this.processes[i];
+                        if ( /*temp.type == "process" &&*/ temp.processId == processId) {
+                            process = temp;
+                            break;
+                            //}else if( temp.cid == processId){
+                            //    process = temp;
+                            //    break;
+                        }
+                    }
+                    return process;
+                },
+
+
+                //Returns an array of elements positioned in the scenario
+                getSVGScenario: function () {
+                    var id = jQuery('#location_tree label[class="selected"]').closest("li").data("idcategory")
+                    var scenario = {
+                        name: this.name,
+                        locationid: id,
+                        processes: [],
+                        connections: []
+                    };
+
+                    //Get the process and decision shapes
+                    console.log(this.processes);
+                    for (var i in this.processes) {
+                        if (this.processes[i] != undefined) {
+                            var thisProcess = this.processes[i];
+
+                            var element = {
+                                position: thisProcess.attributes.position,
+                                size: thisProcess.attributes.size,
+                                attrs: {
+                                    rect: {
+                                        fill: thisProcess.attributes.attrs.rect.fill,
+                                        stroke: thisProcess.attributes.attrs.rect.stroke
+                                    }
+                                }
+                            };
+                            scenario.processes.push({
+                                processId: thisProcess.processId,
+                                status: thisProcess.status,
+                                shape: element,
+                                type: thisProcess.type,
+                                algo: "algo"
+                            });
+                        }
+                    }
+                    //Get the connectors
+                    for (var i in this.connections) {
+                        if (this.connections[i] != undefined) {
+                            var thisConnection = this.connections[i];
+
+                            //Save the processId instead the original id
+                            var sourceObject = this.paper.getModelById(thisConnection.attributes.source.id);
+                            var targetObject = this.paper.getModelById(thisConnection.attributes.target.id);
+
+                            //var source = sourceObject.type == "process" ? sourceObject.processId : sourceObject.cid;
+                            //var target = targetObject.type == "process" ? targetObject.processId : targetObject.cid;
+
+                            var source = sourceObject.processId;
+                            var target = targetObject.processId;
+
+                            var element = {
+                                source: source,
+                                target: target,
+                                vertices: thisConnection.attributes.vertices
+                            };
+                            scenario.connections.push({
+                                shape: element
+                            });
+                        }
+                    }
+
+                    return scenario;
+                },
+
+                bindActions: function () {
+
+
+                    //Listen for a removed element and remove it from the diagram object
+                    this.draw.on("remove", function (cell) {
+                        if (cell.attributes.type === "link") {
+                            for (var i in diagram.connections) {
+                                if (diagram.connections[i].id == cell.id) {
+                                    diagram.connections.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+                        else if (cell.attributes.type === "basic.Rect") {
+                            for (var i in diagram.processes) {
+                                if (diagram.processes[i].id == cell.id) {
+
+                                    //And show again in the processes list
+                                    var showAgain = diagram.processes[i].processId;
+                                    $("li[data-id=" + showAgain + "]").show();
+
+                                    diagram.processes.splice(i, 1);
+
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                }
+            };
+
+            jQuery("#divlocations").hide();
+            jQuery("#divprocesses").hide();
+            jQuery("#divdiagrams").hide();
+
+            jQuery("#divlocations1").hide();
+            jQuery("#divprocesses1").hide();
+            jQuery("#divdiagrams1").hide();
+
+            jQuery("#divlocations2").hide();
+            jQuery("#divprocesses2").hide();
+            jQuery("#divdiagrams2").hide();
+
+            jQuery("#divlocations3").hide();
+            jQuery("#divprocesses3").hide();
+            jQuery("#divdiagrams3").hide();
+
+            jQuery("#divlocations4").hide();
+            jQuery("#divprocesses4").hide();
+            jQuery("#divdiagrams4").hide();
+            jQuery("#divvista2").hide();
+
+            jQuery("#selectType").on('change', function () {
+
+                var valor = $("#selectType").val();
+                if (valor == "1") {
+                    jQuery("#divlocations").show();
+                    jQuery("#divprocesses").hide();
+                    jQuery("#divdiagrams").hide();
+                }
+                if (valor == "2") {
+                    jQuery("#divprocesses").show();
+                    jQuery("#divlocations").hide();
+                }
+              //  $("scenario_name").text(nametext);
+
+
+            });
+
+            jQuery("#selectType1").on('change', function () {
+
+                var valor = $("#selectType1").val();
+                if (valor == "1") {
+                    jQuery("#divlocations1").show();
+                    jQuery("#divprocesses1").hide();
+                    jQuery("#divdiagrams1").hide();
+                }
+                if (valor == "2") {
+                    jQuery("#divprocesses1").show();
+                    jQuery("#divlocations1").hide();
+                }
+                //  $("scenario_name").text(nametext);
+
+
+            });
+
+            jQuery("#selectType2").on('change', function () {
+
+                var valor = $("#selectType2").val();
+                if (valor == "1") {
+                    jQuery("#divlocations2").show();
+                    jQuery("#divprocesses2").hide();
+                    jQuery("#divdiagrams2").hide();
+                }
+                if (valor == "2") {
+                    jQuery("#divprocesses2").show();
+                    jQuery("#divlocations2").hide();
+                }
+                //  $("scenario_name").text(nametext);
+
+
+            });
+
+            jQuery("#selectType3").on('change', function () {
+
+                var valor = $("#selectType3").val();
+                if (valor == "1") {
+                    jQuery("#divlocations3").show();
+                    jQuery("#divprocesses3").hide();
+                    jQuery("#divdiagrams3").hide();
+                }
+                if (valor == "2") {
+                    jQuery("#divprocesses3").show();
+                    jQuery("#divlocations3").hide();
+                }
+                //  $("scenario_name").text(nametext);
+
+
+            });
+
+            jQuery("#selectType4").on('change', function () {
+
+                var valor = $("#selectType4").val();
+                if (valor == "1") {
+                    jQuery("#divlocations4").show();
+                    jQuery("#divprocesses4").hide();
+                    jQuery("#divdiagrams4").hide();
+                }
+                if (valor == "2") {
+                    jQuery("#divprocesses4").show();
+                    jQuery("#divlocations4").hide();
+                }
+                //  $("scenario_name").text(nametext);
+
+
+            });
+
+            jQuery("#selectProcess").on('change', function () {
+                jQuery("#divdiagrams").show();
+            });
+
+            jQuery("#selectProcess1").on('change', function () {
+                jQuery("#divdiagrams1").show();
+            });
+
+            jQuery("#selectProcess2").on('change', function () {
+                jQuery("#divdiagrams2").show();
+            });
+
+            jQuery("#selectProcess3").on('change', function () {
+                jQuery("#divdiagrams3").show();
+            });
+
+            jQuery("#selectProcess4").on('change', function () {
+                jQuery("#divdiagrams4").show();
+            });
+
+            jQuery("#selectLocations").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name").text(jQuery("#selectLocations option:selected").text());
+                diagram.clearScenario();
+                loadLocation(id, "");
+                model.init(id);
+                table.print();
+                jQuery("#usersTable_rvtable").find(".btn-group").closest("td").hide();
+                jQuery("#usersTable_rvtable th").last().hide();
+            });
+
+            jQuery("#selectLocations1").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name1").text(jQuery("#selectLocations1 option:selected").text());
+                diagram1.clearScenario();
+                loadLocation(id,"1");
+              
+            });
+
+            jQuery("#selectLocations2").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name2").text(jQuery("#selectLocations2 option:selected").text());
+                diagram2.clearScenario();
+                loadLocation(id, "2");
+
+            });
+
+            jQuery("#selectLocations3").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name3").text(jQuery("#selectLocations3 option:selected").text());
+                diagram3.clearScenario();
+                loadLocation(id, "3");
+
+            });
+
+            jQuery("#selectLocations4").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name4").text(jQuery("#selectLocations4 option:selected").text());
+                diagram4.clearScenario();
+                loadLocation(id, "4");
+
+            });
+
+            jQuery("#selectDiagrams").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name").text(jQuery("#selectDiagrams option:selected").text());
+                $.ajax({
+                    url: "/Monitor/Monitor/GetDiagram",
+                    type: "POST",
+                    data: { id_diagram: id },
+                    success: function (data) {
+                        scenario = JSON.parse(data);
+                        diagram.loadScenario(scenario);
+
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+                model.init(id);
+                table.print();
+                jQuery("#usersTable_rvtable").find(".btn-group").closest("td").hide();
+                jQuery("#usersTable_rvtable th").last().hide();
+            });
+
+
+            jQuery("#selectDiagrams1").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name1").text(jQuery("#selectDiagrams1 option:selected").text());
+                $.ajax({
+                    url: "/Monitor/Monitor/GetDiagram",
+                    type: "POST",
+                    data: { id_diagram: id },
+                    success: function (data) {
+                        scenario = JSON.parse(data);
+                        diagram1.loadScenario(scenario);
+
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+            });
+
+            jQuery("#selectDiagrams2").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name2").text(jQuery("#selectDiagrams2 option:selected").text());
+                $.ajax({
+                    url: "/Monitor/Monitor/GetDiagram",
+                    type: "POST",
+                    data: { id_diagram: id },
+                    success: function (data) {
+                        scenario = JSON.parse(data);
+                        diagram2.loadScenario(scenario);
+
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+            });
+
+            jQuery("#selectDiagrams3").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name3").text(jQuery("#selectDiagrams3 option:selected").text());
+                $.ajax({
+                    url: "/Monitor/Monitor/GetDiagram",
+                    type: "POST",
+                    data: { id_diagram: id },
+                    success: function (data) {
+                        scenario = JSON.parse(data);
+                        diagram3.loadScenario(scenario);
+
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+            });
+
+            jQuery("#selectDiagrams4").on('change', function () {
+                var id = jQuery(this).val();
+                $("#scenario_name4").text(jQuery("#selectDiagrams4 option:selected").text());
+                $.ajax({
+                    url: "/Monitor/Monitor/GetDiagram",
+                    type: "POST",
+                    data: { id_diagram: id },
+                    success: function (data) {
+                        scenario = JSON.parse(data);
+                        diagram4.loadScenario(scenario);
+
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+            });
+
+            jQuery(".changeview").on('click', function () {
+                //var id = jQuery(this).val();
+                var display1=jQuery("#divvista1").css("display");
+                var display2=jQuery("#divvista2").css("display");
+                if (display1 != "none") {
+                    jQuery("#divvista1").hide();
+                    jQuery("#divvista2").show();
+                }
+
+                if (display2 != "none") {
+                    jQuery("#divvista2").hide();
+                    jQuery("#divvista1").show();
+                }
+            });
+
+            diagram.init();
+            diagram.bindActions();
+
+            diagram1.init();
+            diagram1.bindActions();
+
+            diagram2.init();
+            diagram2.bindActions();
+
+            diagram3.init();
+            diagram3.bindActions();
+
+            diagram4.init();
+            diagram4.bindActions();
+
+            model.init("null");
+            table.init();
+                 @if (upd != null && upd != "") {
+               @(new HtmlString("upd = '" + upd + "';"))
+            }
+            @if (del != null && del != "") {
+
+            @(new HtmlString("del ='" + del+ "';"))
+            }
+
+        });
+</script>

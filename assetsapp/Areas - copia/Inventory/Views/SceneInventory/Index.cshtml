@@ -1,0 +1,413 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.User.Models;
+@model JArray
+
+@{ViewBag.Title = "Recepción de Inventario";
+
+    //var datos = Session["Permissions"].ToString();
+    //JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    //var upd = "";
+    //var del = "";
+    //var add = "";
+    //foreach (string x in allp["movement"]["grant"])
+    //{
+    //    if (x.Contains("u"))
+    //    {
+    //        upd = "u";
+    //    }
+    //    if (x.Contains("d"))
+    //    {
+    //        del = "d";
+
+    //    }
+    //    if (x.Contains("c"))
+    //    {
+
+    //        add = "c";
+
+    //    }
+    //}
+
+}
+
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Recepción de Inventario</h3>
+                </div>
+                <div class="span4">
+                    <div class="search">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Inventarios Programados</h5>
+                    </div>
+                    <div style="margin-left: 35%; position: absolute; margin-top: 1%; z-index: 1;">
+                        de: 
+                        <select id="typeShow">
+                            <option value="today">Hoy</option>
+                            <option value="assgined">Pendientes</option>
+                            <option value="outDate">Fuera de día</option>
+                            <option value="completed">Completados</option>
+                            <option value="all">Todos</option>
+                        </select>
+                    </div>
+                    <div id="inventoryTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal_SQL" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="cancel_buttonSQLx"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="myModalLabel">Crear archivos para Handheld</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row-fluid" id="optionSQL">
+                    <div class="span5">
+                        <table class="line">
+                            <tbody>
+                                <tr>
+                                    <td width="170">
+                                        <input id="locationBox" type="checkbox" checked="checked" value="true" />
+                                        Ubicación</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="referenceBox" type="checkbox" checked="checked" value="true" />
+                                        Activos de Referencia</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="inventoryBox" type="checkbox" checked="checked" value="true" />
+                                        Inventario (Blanco)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="activeInventoryBox" type="checkbox" checked="checked" value="true" />
+                                        Activos para Inventarios</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="span7">
+                        <table>
+                            <tbody>
+                                <tr class="gray-location">
+                                    <td width="280px">
+                                        <div>Descargar la versión comprimida</div>
+                                        <table class="line-small">
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <label class="checkbox-inline">
+                                                        <input type="radio" name="groupRadio" id="rarOption" value="true" checked="checked"/>
+                                                        .rar
+                                                    </label>
+                                                </td>
+                                                <td></td>
+                                                <td>
+                                                    <label class="checkbox-inline">
+                                                        <input type="radio" name="groupRadio" id="zipOption" value="true" />
+                                                        .zip
+                                                    </label>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table class="line-small">
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h10>Ubicación:</h10>
+                                                        <label id="locationLabel"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h10>Inicio: </h10>
+                                                        <label id="startLabel"></label>
+                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <h10>Fin: </h10>
+                                                        <label id="endLabel"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h10>Status:</h10>
+                                                        <label id="statusLabel"></label>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Aceptar" class="btn blue" type="submit" id="acept_buttonSQL">
+                <input value="Cancelar" class="btn grey" type="button" id="cancel_buttonSQL" data-dismiss="modal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Report-->
+<div class="modal fade" id="modal_reportSQL" style="min-width:900px;left:40%;top:500px" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                @* <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="cancel_buttonReportx"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>*@
+                <div class="btn-group pull-right top-btn" id="buttonStatus">
+                </div>
+                <h4 class="modal-title">Resultado</h4>
+            </div>
+            <div class="modal-body">
+                <div id="filesdf">
+                <table class="line">
+                    <tbody>
+                        <tr>
+                            <td width="170">Información
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <input value="Aceptar" class="btn blue" type="submit" id="acept_buttonReportSQL">
+                @*<input value="Cancelar" class="btn grey" type="button" id="cancel_buttonReportSQL" data-dismiss="modal">*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    inventoryId = "";
+
+    function loadInventory() {
+        selectOption = jQuery("#typeShow").val();
+        jQuery.ajax({
+            url: "/Inventory/SceneInventory/getInventoryTable",
+            type: "POST",
+            data: { selectOption: selectOption },
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#inventoryTable").html(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function getSQLinventory(thisInventory) {
+        inventoryId = jQuery(thisInventory).closest("tr").data("id");
+        jQuery('#locationLabel').html(jQuery(thisInventory).closest("tr").find('.locationName').text());
+        jQuery('#startLabel').html(jQuery(thisInventory).closest("tr").find('.dateStart').text());
+        jQuery('#endLabel').html(jQuery(thisInventory).closest("tr").find('.dateEnd').text());
+        jQuery('#statusLabel').html(jQuery(thisInventory).closest("tr").find('.status').text());
+        jQuery("#modal_SQL").modal('show');
+    }
+
+    function reset() {
+        jQuery("#zipOption").attr('checked', false);
+        jQuery("#locationBox,#referenceBox,#inventoryBox,#activeInventoryBox,#rarOption").prop('checked', true);
+    }
+
+    jQuery(document).ready(function ($) {
+        loadInventory();
+
+        jQuery("#typeShow").change(function () {
+            loadInventory();
+        });
+
+        jQuery("#acept_buttonReportSQL").click(function () {
+            jQuery("#modal_reportSQL").modal('hide');
+        });
+
+        jQuery("#cancel_buttonSQL,#cancel_buttonSQLx").click(function () {
+            reset();
+        });
+
+        jQuery("#zipOption").change(function () {
+            if (jQuery("#zipOption").is(':checked')) {
+                $('#rarOption').attr('checked', false);
+            }
+        });
+        jQuery("#rarOption").change(function () {
+            if (jQuery("#rarOption").is(':checked')) {
+                $('#zipOption').attr('checked', false);
+            }
+        });
+
+
+        $("#acept_buttonSQL").click(function () {
+            infoData = "{";
+            infoData += '"location":"' + jQuery("#locationBox").is(':checked').toString() + '",';
+            infoData += '"activeReference":"' + jQuery("#referenceBox").is(':checked').toString() + '",';
+            infoData += '"inventory":"' + jQuery("#inventoryBox").is(':checked').toString() + '",';
+            infoData += '"activeInventory":"' + jQuery("#activeInventoryBox").is(':checked').toString() + '",';
+            infoData += '"rarOption":"' + jQuery("#rarOption").is(':checked').toString() + '",';
+            infoData += '"zipOption":"' + jQuery("#zipOption").is(':checked').toString() + '"}';
+
+            jQuery.ajax({
+                url: "/Inventory/SceneInventory/SubCrearDB",
+                data: { idInventory: inventoryId, dataInfo: infoData },
+                type: 'POST',
+                beforeSend: _loading(),
+                success: function (data) {
+                    if (data == null || data == "") {
+                        _loading();
+                        _alert("error", "Selecciona datos!");
+                        return false;
+                    }
+                    try{
+                        data = JSON.parse(data);
+                        jQuery("#modal_SQL").modal('hide');
+                        _loading();
+                        if (data["type"] == "compress") {
+                            window.location.href = data["url"].toString() + data["data"].toString();
+                        }
+                    } catch (ex) {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error,intente mas tarde!!!");
+                    }
+                    reset();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        });
+    });
+
+    function setReportSQL(idInvnetory) {
+       
+        inventoryId = idInvnetory;
+      //  jQuery("#filesdf").html("");
+
+     //   jQuery("#modal_reportSQL").modal('show');
+        window.location.href = "/Inventory/SceneInventory/setSdf?idInventory=" + inventoryId;
+
+      /*  jQuery.ajax({
+            url: "/Inventory/SceneInventory/getInventoryRow",
+            data: { idInventory: inventoryId },
+            type: 'POST',
+            beforeSend: _loading(),
+            success: function (data) {
+                data = JSON.parse(data);
+
+                if (data["status"].toString() == "Completado") {
+                    jQuery("#buttonStatus").html(
+                        '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                        '¡Completado! <i class="icon-ok icon-white"></i>' +
+                    '</button>');
+                } else {
+                    jQuery("#buttonStatus").html(
+                         '<button class="btn btn-mini red fileinput-button" id="complete_buttonSQL" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                         '¡Pendiente! <i class="icon-save icon-white"></i>' +
+                     '</button>');
+                    activeCompletAction();
+                }
+
+                  /* jQuery.ajax({
+                    url: "/Inventory/SceneInventory/setSdf",
+                    data: { idInventory: inventoryId },
+                    type: 'POST',
+                   
+                    success: function (data) {
+
+                        jQuery("#filesdf").html("");
+                        jQuery("#filesdf").html(data);
+                      
+                        _loading();
+                       
+                          jQuery("#modal_reportSQL").css('top', '1%');
+                        jQuery("#modal_reportSQL").css('margin-top', '0%');
+
+                    },
+                    error: function () {
+                        _loading();
+                        jQuery("#filesdf").html("");
+                        jQuery("#filesdf").html("Archivo(s) no Encontrados..");
+                        _alert("error", "Ha ocurrido un error");
+                          jQuery("#modal_reportSQL").css('top', '1%');
+                        jQuery("#modal_reportSQL").css('margin-top', '0%');
+
+                    }
+                });
+               
+            },
+            error: function () {
+                _loading();
+                jQuery("#filesdf").html("");
+                _alert("error", "Ha ocurrido un error");
+            }
+        });*/
+
+    }
+
+    function activeCompletAction() {
+        jQuery("#complete_buttonSQL").click(function () {
+            _confirm({
+                title: "Completar Inventario",
+                message: "¿Seguro que desea completarlo?, \n no se podrán realizar cambios después!",
+                action: function () {
+                    jQuery.ajax({
+                        url: "/Inventory/SceneInventory/setComplete",
+                        data: { idInventory: inventoryId },
+                        type: 'POST',
+                        beforeSend: _loading(),
+                        success: function (data) {
+                            _loading();
+                            loadInventory();
+                            jQuery("#buttonStatus").html(
+                                '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                                '¡Completado! <i class="icon-ok icon-white"></i>' +
+                            '</button>');
+                        },
+                        error: function () {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                }
+            });
+        });
+    }
+</script>
+
+

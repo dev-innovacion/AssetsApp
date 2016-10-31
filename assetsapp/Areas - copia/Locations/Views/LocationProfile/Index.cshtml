@@ -1,0 +1,205 @@
+@using MongoDB.Bson
+@model List<BsonDocument>
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+        
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["profiles"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["profiles"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Administrar Perfiles</h3>
+                </div>
+                <div class="span4">
+                    <div class="search">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Perfiles</h5>
+                        <div class="btn-group">
+                            @if (add == "c" && addc=="c")
+                            {
+                                <button class="btn btn-mini dark_green fileinput-button" onclick="window.location.href='/Locations/LocationProfile/newProfile'" data-original-title="Agregar Perfil" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (del == "d" && delc=="d")
+                    { 
+                    <div id="deleteProfile" class="modal hide fade" data-backdrop="static">
+                        <div class="modal-header">
+                            <h3 class="modal-header-text">Eliminar Perfil</h3>
+                        </div>
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <input value="Borrar" class="btn red" type="submit" id="delete_button">
+                            <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+                        </div>
+                    </div>
+                    }
+                    <div class="well-content no-search">
+                        <table id="locprof2" class="table table-striped table-bordered table-hover datatable">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th># Ubicaciones</th>
+                                    <th>Creador</th>
+                                    <th>Última modificación</th>
+                                    <th>Fecha de Creación</th>
+                                    <th>Acciones</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (BsonDocument profiles in Model)
+                                {
+                                    <tr data-name="@profiles.GetElement("name").Value" data-id="@profiles.GetElement("_id").Value">
+                                        <td>@profiles.GetElement("name").Value</td>
+                                        <!--TODO: advanced search using Agregation-->
+                                        <td>@ViewBag.locationTable.get("profileId", profiles.GetElement("_id").Value.ToString()).Count</td>
+                                        <td>HTK-Admin</td>
+                                        <td>@profiles.GetElement("LastmodDate").Value
+                                        <td>
+                                            @profiles.GetElement("CreatedDate").Value
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                @if (upd == "u" && updc=="u")
+                                                {
+                                                    <a class="btn" href="/Locations/LocationProfile/newProfile?idProfile=@profiles.GetElement("_id").Value" data-original-title="Editar" rel="tooltip" data-placement="top"><i class="icon-edit"></i></a>
+                                                }
+                                                @if (del == "d" && delc=="d")
+                                                {
+                                                    <a class="btn" href="#" onclick="getLocationsProfile(this)" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(function () {
+        try {
+
+            jQuery("#locprof2").dataTable({
+                "sPaginationType": "full_numbers",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [0]
+                }],
+                "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Ultimo",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+
+                    },
+                    "sEmptyTable": "Tabla Sin Datos"
+                }
+            });
+            jQuery('.dataTables_length select').chosen();
+        } catch (Exception) { console.log(); }
+    }, 2000)
+    jQuery("[rel=tooltip]").tooltip();
+
+    function getLocationsProfile(profile) {
+        profileName = jQuery(profile).closest("tr").data("name");
+        idProfile = jQuery(profile).closest("tr").data("id");
+        modalTitle = "Eliminar Perfil - ";
+        modalTitle += profileName;
+        jQuery("#deleteProfile").find("h3").html(modalTitle);
+        
+        jQuery.ajax({
+            url: '/Locations/LocationProfile/getLocationByProfile',
+            data: { idProfile: idProfile },
+            beforeSend: _loading(),
+            type: "POST",
+            success: function (data) {
+                jQuery("#deleteProfile").find(".modal-body").html(data);
+                jQuery("#deleteProfile").modal("show");
+                _loading();
+            },
+            error: function (errorThrown) {
+                console.log(errorThrown.statusText);
+            }
+        });
+    }
+
+    $("#delete_button").click(function () {
+        deleteProfile();
+    });
+    
+    $("#cancel_button").click(function () {
+        jQuery("#deleteProfile").modal("hide");
+    });
+    
+   
+</script>

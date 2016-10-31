@@ -1,0 +1,85 @@
+﻿@using MongoDB.Bson
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    Layout = null;
+    JArray semaphores = new JArray();
+    Dictionary<string, string> typemovements = new Dictionary<string, string>();
+    typemovements.Add("create", "Alta");
+    typemovements.Add("delete", "Baja");
+    typemovements.Add("movement", "Transferencia");
+    typemovements.Add("temporal", "Salida Temporal");
+    
+    if (Model != null)
+    {
+        semaphores = Model;
+    }
+}
+<table class="table table-striped table-bordered table-hover datatable" style="max-height:400px;">
+    <thead>
+        <tr>
+            <th>Color</th>
+
+            <th>Tipo de Movimiento</th>
+            <th>Dias</th>
+            <th>Fecha de Creación</th>
+            <th>Funciones</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (JObject semaphore in semaphores)
+        {
+            <tr data-id="@semaphore["_id"]">
+                <td style="border-left: 20px solid @semaphore["color"];">@semaphore["color"]</td>
+
+                <td>@typemovements[semaphore["typeMovement"].ToString()]</td>
+                <td>@semaphore["days"]</td>
+                <td>@semaphore["CreatedDate"]</td>
+
+
+                <td>
+                    <div class="btn-group">
+
+                        <a class="edit btn" href="#"><i class="icon-edit"></i></a>
+
+
+                        <a class="delete btn" href="#"><i class="icon-trash"></i></a>
+
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    try {
+
+        jQuery(".table").dataTable({
+            "sPaginationType": "full_numbers",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 100,
+            "sScrollY": "400px",
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [0]
+            }],
+            "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Ultimo",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+
+                },
+                "sEmptyTable": "Tabla Sin Datos"
+            }
+        });
+        jQuery('.dataTables_length select').chosen();
+    } catch (Exception) { console.log(); }
+</script>
+

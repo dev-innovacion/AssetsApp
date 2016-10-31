@@ -1,0 +1,567 @@
+﻿@{Layout = null;}
+
+
+@{
+    ViewBag.Title = "HwReport";
+    Dictionary<string, string> col = new Dictionary<string, string>();
+
+    col.Add("name", "Nombre");
+  
+    col.Add("smart", "Tipo");
+
+
+    int index = 0;
+    string idus = "";
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+        idus = Session["_id"].ToString();
+    }
+}
+<br />
+<center>
+    <div id="optionsdiv1" class=" white span12" style="padding-left:0%;">
+      
+        <div class="span6">
+            <div id="hwFilter">
+                <div class="hida" style="padding-left: 2%;">
+                   
+                    Tipo de Hw:  
+                </div>
+                <select  class="span11">
+                    <option value="-1" style="background:white;color:black;font-weight:bold">Elige un Tipo</option>
+                    <option value="0" style="background:white;color:black;font-weight:bold">Todos</option>
+                    <option value="1" style="background:white;color:black;font-weight:bold">Inteligente</option>
+                    <option value="2" style="background:white;color:black;font-weight:bold">No Inteligente</option>
+
+                </select>
+            </div>
+            <!--<div class="span12 no-search" style="padding-left:8px;padding-top:0px;">
+                <p>
+                    <select id="selectprofile" class="chosen" style="background:#8793A0; min-height: 15px; line-height: 15px; color: white; font-weight: bold;">
+                        <option value="-1" style="background:white;color:black;font-weight:bold">Elige un Tipo</option>
+                        <option value="0" style="background:white;color:black;font-weight:bold">Todos</option>
+                        <option value="1" style="background:white;color:black;font-weight:bold">Inteligente</option>
+                        <option value="2" style="background:white;color:black;font-weight:bold">No Inteligente</option>
+
+                    </select>
+                </p>
+            </div>-->
+        </div>
+        <div class="span6" style="padding-right:10px;">
+
+
+            <div id="fieldFilter">
+                <div class="hida" style="padding-left: 2%;">
+                    <input id="fieldcheck" type="checkbox" style="right:5px;" />
+                    Campos A Visualizar:  
+                </div>
+                <select multiple class="span11">
+                    @foreach (var item in col)
+                    {
+                        <option value="@item.Key">@item.Value</option>
+
+                    }
+                </select>
+            </div>
+
+          <!--  <div id="optionsdivx3" class="well white span12" style="padding-left:2%;">
+                <dl class="dropdown">
+                    <dt>
+                        <a href="#"><input id="all" type="checkbox" style="right:5px;" checked />
+                            <span class="hida" style="color:white">Campos A Visualizar<i class="icon-chevron-down"></i></span>
+                            <p class="multiSel"></p>
+                        </a>
+                    </dt>
+                    <dd>
+                        <div class="mutliSelect ">
+                            <ul style="width:210px;">
+                                @foreach (var item in col)
+                                {
+
+
+                                    <li>
+                                        <input type="checkbox" value="@item.Key" name="options[]" data-option="@item.Value" checked/><label style="padding-left:5px;">@item.Value</label>
+                                    </li>
+                                              }
+                            </ul>
+                        </div>
+                    </dd>
+                </dl>
+            </div>-->
+
+
+
+        </div>
+
+    </div>
+</center>
+
+
+
+
+<div class=" no_padding row-fluid" style="background-color:white !important">
+    <div class="float_right" style="padding-right:4%">
+
+        <input type="submit" class="btn button_green" id="generate" value="Generar Reporte" />
+        <!--<input type="submit" class="btn blue" id="saver" value="Guardar Reporte" />-->
+
+    </div>
+</div>
+
+<!--
+<div class="well">
+
+    <div id="myCarousel" class="carousel slide">
+       
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+
+        </ol>
+       
+        <div class="carousel-inner">
+            <div class="item active">
+
+                <div class="well-header">
+                    <center> <h4 style="color:white;padding-top:10px;">Filtrar Reporte de Hardware</h4></center>
+                </div>
+
+                <div class="well-content no_padding row-fluid" >
+                    <div class="float_margen" style="padding-bottom: 29%; padding-top: 4%;">
+
+                        <br />
+                        <center>
+                            <div id="optionsdiv" class="well white span12" style="padding-left:2%;">
+                                <div class="span3">
+                                    <div class="well-header">
+                                        <h4 style="color:white;padding-top:10px;">Filtrar:</h4>
+                                    </div>
+                                    <div id="NoWheelPropagation" class="contentHolder well-content no_padding row-fluid" style="overflow:hidden">
+
+
+                                        <div class="span12 no-search" style="padding-left:8px;padding-top:5px;">
+                                            <p>
+                                                <strong>Elige Tipo Hardware:</strong>
+                                                <select id="selectprofile" class="chosen">
+                                                    <option value="0">Todos</option>
+                                                    <option value="1">Inteligente</option>
+                                                    <option value="2">No Inteligente</option>
+
+                                                </select>
+                                            </p>
+                                        </div>
+                                        </div>
+                                    </div>
+                                <div class="span9" style="padding-right:10px;">
+                                    <div class="well-header">
+                                        <center> <h4 style="color:white;padding-top:10px;">Campos a visualizar</h4></center>
+                                    </div>
+                                    <div class="well-content no_padding row-fluid">
+                                        <div class="float_margen">
+                                            <center>
+                                                <div id="optionsdiv" class="well white span12" style="padding-left:2%;">
+                                                    @foreach (var item in col)
+                                                    {
+                                                        <div class="float_left" style="padding: 10px 10px 0px 5px; max-height: 50px; ">
+
+                                                            <label class="btn blue  float_left" style="min-width:210px;max-width:210px;max-height:50px; overflow-x:auto;padding-top:5px;color:white; border-radius:0px 0px 0px 0px;">
+                                                                <input type="checkbox" class="float_left" style="padding-left:0px;" value="@item.Key" name="options[]" data-option="@item.Value" checked>  @item.Value
+                                                            </label>
+
+                                                        </div>
+                                                    }
+                                                    <div class="float_left" style="padding: 10px 10px 0px 5px; max-height: 50px; ">
+                                                        <label class="checkbox-inline btn blue  float_left" style="min-width:210px;max-width:210px;max-height:50px; overflow-x:auto;padding-top:5px;color:white; border-radius:0px 0px 0px 0px;">
+
+                                                            <input id="all" type="checkbox" class="float_left" style="padding-left:0px;" value="all">Todos
+
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="span3" style="padding-left:8px;padding-top:20px;">
+
+
+                                </div>
+                            </div>
+                        </center>
+
+
+                    </div>
+                </div>
+                <div class="float_right">
+
+                    <input type="submit" class="btn blue" id="generate" value="Generar Reporte" />
+                    <input type="submit" class="btn blue" id="saver" value="Guardar Reporte" />
+
+                </div>
+
+            </div>
+            <div class="item">
+                <div class="well">
+                    <div class="well-header">
+                        <center> <h4 style="color:white;padding-top:10px;">Cargar Reporte</h4></center>
+                    </div>
+                    <div class="well-content no_padding row-fluid" style="background-color:white;">
+                        <div class="float_margen">
+                            <br />
+                            <br />
+                            <div class="span12 no-search " style="padding-left: 30%; padding-top: 1%; padding-bottom: 1%; font-size: 14px;">
+                                <br />
+                                <p>
+                                    <strong>Reportes Almacenados:</strong>
+                                    <select id="selectreport" class="chosen">
+
+                                        @foreach (var x in (Dictionary<string, string>)ViewData["reports"])
+                                        {
+
+                                            if (index == 0)
+                                            {
+                                                <option value="0">Elige un Reporte</option>
+                                                index++;
+                                            }
+                                            <option value="@x.Key">@x.Value</option>
+
+                                        }
+                                        @if (index == 0)
+                                        {
+                                            <option value="0">No Hay Reportes</option>
+                                            index++;
+                                        }
+                                    </select>
+                                </p>
+                                <img src="/Content/Images/report.png" style="width:400px !important;height:273px !important;">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        
+        <a class="carousel-control left" href="#myCarousel"
+           data-slide="prev">&lsaquo;</a>
+        <a class="carousel-control right" href="#myCarousel"
+           data-slide="next">&rsaquo;</a>
+    </div>
+
+
+</div>-->
+            <script>
+
+
+
+                jQuery(document).ready(function ($) {
+                    $("#fieldFilter select").select2();
+                    $("#hwFilter select").select2();
+                    var idus = ""
+                    @(new HtmlString("idus='"+idus+"';"))
+                    $('#myCarousel').carousel({
+                        interval: 200000
+                    })
+
+                    var valid = 1;
+                    var checkboxValues = new Array();
+                    $('#fieldcheck').change(function () {
+
+                        if ($(this).is(":checked")) {
+                            var alls = Array();
+                            jQuery("#fieldFilter option").each(function () { alls.push(jQuery(this).val()) });
+                            $("#fieldFilter select").select2("val", alls);
+                        } else {
+                            $("#fieldFilter select").select2("val", null);
+                        }
+
+                    });
+                  
+                   /* $('#all').change(function () {
+
+
+
+                        $('input[name="options[]"]').each(function () {
+                            debugger;
+
+                            if (valid == 0) {
+                                this.checked = true;
+
+                            } else {
+                                this.checked = false;
+                            }
+
+                        });
+
+                        if (valid == 0) {
+                            valid++;
+                        } else {
+                            valid = 0;
+                        }
+                        jQuery('#optionsdivx3 .multiSel').html("");
+                        jQuery('#optionsdivx3 .hida').css("display", "initial");
+
+                    });*/
+                    $('#generate').unbind('click.generate');
+                    $('#generate').bind('click.generate', function () {
+
+
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                      //  var profile = $("#selectprofile").val();
+                        var profile = jQuery("#hwFilter select").select2("val");
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate == "" || enddate == null) {
+                            enddate = "01/01/3000";
+                        }
+                        var index = 0;
+                      /*  $('input[name="options[]"]:checked').each(function () {
+                            var objdata = new Object();
+                            objdata.data = $(this).val();
+                            objdata.value = $(this).data("option");
+                            checkboxValues.push(objdata);
+                            index++;
+                        });*/
+                        var fieldsObj = jQuery("#fieldFilter select").select2("data");
+                        for (i = 0; i < fieldsObj.length; i++) {
+                            var objdata = new Object();
+                            objdata.data = fieldsObj[i].id;
+                            objdata.value = fieldsObj[i].text;
+                            checkboxValues.push(objdata);
+
+                        }
+
+
+                        var jsondata = JSON.stringify(checkboxValues);
+                        if (profile == "-1" || profile == -1) {
+                            profile = 0;
+                        }
+                        if (checkboxValues.length > 0) {
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GenerateHwReport",
+                                data: { type: profile, startdate: startdate, enddate: enddate, col: jsondata },
+                                beforeSend: _loading(),
+                                type: "POST",
+                                success: function (data) {
+                                    $('#Report').html("");
+                                    $('#Report').html(data);
+
+                                    checkboxValues.length = 0;
+                                    $(".header_actions a").first().click()
+                                    _loading();
+
+                                }
+
+
+                            });
+                        } else {
+                            alert("Elija por lo menos un Campo!!!");
+                        }
+                    });
+                    $('#saver').on('click', function () {
+
+                        jQuery("#namereport").modal("show");
+
+
+                    });
+                    $('#save').unbind('click.save');
+                    $('#save').bind('click.save', function () {
+
+
+
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        var profile = jQuery("#hwFilter select").select2("val");
+                        var namereport = "";
+                        namereport = $("#getnamex").val();
+
+                        if (namereport != "" && namereport != null) {
+
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate == "" || enddate == null) {
+                            enddate = "01/01/3000";
+                        }
+                      /*  var index = 0;
+                        $('input[name="options[]"]:checked').each(function () {
+                            var objdata = new Object();
+                            objdata.data = $(this).val();
+                            objdata.value = $(this).data("option");
+                            checkboxValues.push(objdata);
+                            index++;
+                        });*/
+                        var fieldsObj = jQuery("#fieldFilter select").select2("data");
+                        for (i = 0; i < fieldsObj.length; i++) {
+                            var objdata = new Object();
+                            objdata.data = fieldsObj[i].id;
+                            objdata.value = fieldsObj[i].text;
+                            checkboxValues.push(objdata);
+
+                        }
+
+
+
+                        var jsondata = JSON.stringify(checkboxValues);
+                        if (profile == "-1" || profile == -1) {
+                            profile = 0;
+                        }
+                        if (checkboxValues.length > 0) {
+                            jQuery.ajax({
+                                url: "/Reports/Reports/SaveReport",
+                                data: { namereport: namereport, filter: profile, startdate: startdate, enddate: enddate, col: jsondata, type: "Hardwares" },
+                                beforeSend: _loading(),
+                                   
+                                type: "POST",
+                                success: function (data) {
+
+                                    _alert("success", data);
+                                    checkboxValues.length = 0;
+                                  jQuery("#namereport").modal("hide");
+                                    $("#getnamex").val("");
+                                      
+                                    jQuery.ajax({
+
+                                        url: "/Reports/Reports/HwReport",
+                                        data: { id: idus, datestart: startdate, dateend: enddate },
+                                        beforeSend: _loading(),
+                                        type: "POST",
+                                        success: function (data) {
+                                            $('#Report1').html("");
+                                            $('#Report').html("");
+                                            $('#Report1').html(data);
+
+                                            checkboxValues.length = 0;
+                                            _loading();
+
+                                        }
+                                    });
+
+                                    
+                                    _loading();
+
+                                }
+
+
+                            });
+                        } else {
+                            
+                                alert("Elija por lo menos un Campo!!!");
+                           
+                        }
+                    } else {
+                            alert("Escriba un Nombre!!!");
+                }
+                    });
+
+
+                    $('#selectreport').on('change', function () {
+
+                        var value = $('#selectreport').val();
+
+                        if (value != 0) {
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GetReport",
+                                data: { id: value },
+                                type: "POST",
+                                beforeSend: _loading(),
+
+                                success: function (data) {
+
+
+
+                                    if (data != "" && data != null) {
+                                        var data = JSON.parse(data);
+                                        var jsondatafilter = data["filter"];
+                                        var startdate = data["startdate"];
+                                        var enddate = data["enddate"];
+                                        var jsondata = data["cols"];
+
+                                        jQuery.ajax({
+
+                                            url: "/Reports/Reports/GenerateHwReport",
+                                            data: { type: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata },
+                                              type: "POST",
+                                            success: function (data) {
+                                                $('#Report').html("");
+                                                $('#Report').html(data);
+
+                                                checkboxValues.length = 0;
+                                                 $('#selectreport').val("0");
+                                                _loading();
+
+                                            }
+
+
+                                        });
+
+                                    } else {
+                                        alert("Error Al Generar el Reporte!!!");
+                                    }
+
+
+                                }
+
+
+                            });
+                        }
+                    });
+
+
+                 
+
+
+
+                    $("#optionsdivx3 .dropdown dt a").on('click', function () {
+
+                        $("#optionsdivx3 .dropdown dd ul").slideToggle('fast');
+                    });
+
+                    $("#optionsdivx3 .dropdown dd ul li a").on('click', function () {
+                        $("#optionsdivx3 .dropdown dd ul").hide();
+                    });
+
+                    function getSelectedValue(id) {
+                        return $("#" + id).find("dt a span.value").html();
+                    }
+
+                    $(document).bind('click', function (e) {
+                        var $clicked = $(e.target);
+                        if (!$clicked.parents().hasClass("dropdown")) $("#optionsdivx3 .dropdown dd ul").hide();
+                    });
+
+
+                    $('#optionsdivx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+                        // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+                        var title = $(this).closest('#optionsdivx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+                        //title = $(this).val() + ",";
+                        title = $(this).data("option") + ",";
+
+                        if ($(this).is(':checked')) {
+                            var html = '<span title="' + title + '">' + title + '</span>';
+                            $('#optionsdivx3 .multiSel').append(html);
+                            $("#optionsdivx3 .hida").hide();
+                        }
+                        else {
+                            $('span[title="' + title + '"]').remove();
+                            var ret = $("#optionsdivx3 .hida");
+                            $('#optionsdivx3 .dropdown dt a').append(ret);
+
+                        }
+                    });
+
+                    $("#fieldcheck").click();
+                });
+
+
+            </script>

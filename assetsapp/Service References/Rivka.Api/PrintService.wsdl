@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="PrintService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/WCFServiceHost" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IPrintService_Connect_InputMessage">
+    <wsdl:part name="parameters" element="tns:Connect" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Connect_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ConnectResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Disconnect_InputMessage">
+    <wsdl:part name="parameters" element="tns:Disconnect" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Disconnect_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DisconnectResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_OpenLabel_InputMessage">
+    <wsdl:part name="parameters" element="tns:OpenLabel" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_OpenLabel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OpenLabelResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_CloseLabel_InputMessage">
+    <wsdl:part name="parameters" element="tns:CloseLabel" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_CloseLabel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CloseLabelResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Print_InputMessage">
+    <wsdl:part name="parameters" element="tns:Print" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Print_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PrintResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetVariables_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetVariables" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetVariables_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetVariablesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_SetEPC_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetEPC" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_SetEPC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetEPCResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatus" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatusResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetStatus2_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatus2" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetStatus2_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatus2Response" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_AddPrinter_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddPrinter" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_AddPrinter_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddPrinterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetPrinter_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPrinter" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetPrinter_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPrinterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_QuitPrinter_InputMessage">
+    <wsdl:part name="parameters" element="tns:QuitPrinter" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_QuitPrinter_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QuitPrinterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Play_InputMessage">
+    <wsdl:part name="parameters" element="tns:Play" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Play_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PlayResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Pause_InputMessage">
+    <wsdl:part name="parameters" element="tns:Pause" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Pause_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PauseResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Stop_InputMessage">
+    <wsdl:part name="parameters" element="tns:Stop" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Stop_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StopResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Read_InputMessage">
+    <wsdl:part name="parameters" element="tns:Read" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Read_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReadResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Write_InputMessage">
+    <wsdl:part name="parameters" element="tns:Write" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_Write_OutputMessage">
+    <wsdl:part name="parameters" element="tns:WriteResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_AddAntenna_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddAntenna" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_AddAntenna_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddAntennaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetAntenna_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAntenna" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_GetAntenna_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAntennaResponse" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_QuitAntenna_InputMessage">
+    <wsdl:part name="parameters" element="tns:QuitAntenna" />
+  </wsdl:message>
+  <wsdl:message name="IPrintService_QuitAntenna_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QuitAntennaResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IPrintService">
+    <wsdl:operation name="Connect">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Connect" message="tns:IPrintService_Connect_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/ConnectResponse" message="tns:IPrintService_Connect_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Disconnect">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Disconnect" message="tns:IPrintService_Disconnect_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/DisconnectResponse" message="tns:IPrintService_Disconnect_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OpenLabel">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/OpenLabel" message="tns:IPrintService_OpenLabel_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/OpenLabelResponse" message="tns:IPrintService_OpenLabel_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CloseLabel">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/CloseLabel" message="tns:IPrintService_CloseLabel_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/CloseLabelResponse" message="tns:IPrintService_CloseLabel_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Print">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Print" message="tns:IPrintService_Print_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/PrintResponse" message="tns:IPrintService_Print_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/GetVariables" message="tns:IPrintService_GetVariables_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/GetVariablesResponse" message="tns:IPrintService_GetVariables_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetEPC">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/SetEPC" message="tns:IPrintService_SetEPC_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/SetEPCResponse" message="tns:IPrintService_SetEPC_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/GetStatus" message="tns:IPrintService_GetStatus_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/GetStatusResponse" message="tns:IPrintService_GetStatus_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus2">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/GetStatus2" message="tns:IPrintService_GetStatus2_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/GetStatus2Response" message="tns:IPrintService_GetStatus2_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddPrinter">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/AddPrinter" message="tns:IPrintService_AddPrinter_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/AddPrinterResponse" message="tns:IPrintService_AddPrinter_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPrinter">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/GetPrinter" message="tns:IPrintService_GetPrinter_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/GetPrinterResponse" message="tns:IPrintService_GetPrinter_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QuitPrinter">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/QuitPrinter" message="tns:IPrintService_QuitPrinter_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/QuitPrinterResponse" message="tns:IPrintService_QuitPrinter_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Play">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Play" message="tns:IPrintService_Play_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/PlayResponse" message="tns:IPrintService_Play_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Pause">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Pause" message="tns:IPrintService_Pause_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/PauseResponse" message="tns:IPrintService_Pause_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Stop">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Stop" message="tns:IPrintService_Stop_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/StopResponse" message="tns:IPrintService_Stop_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Read">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Read" message="tns:IPrintService_Read_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/ReadResponse" message="tns:IPrintService_Read_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Write">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/Write" message="tns:IPrintService_Write_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/WriteResponse" message="tns:IPrintService_Write_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddAntenna">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/AddAntenna" message="tns:IPrintService_AddAntenna_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/AddAntennaResponse" message="tns:IPrintService_AddAntenna_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAntenna">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/GetAntenna" message="tns:IPrintService_GetAntenna_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/GetAntennaResponse" message="tns:IPrintService_GetAntenna_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QuitAntenna">
+      <wsdl:input wsaw:Action="http://tempuri.org/IPrintService/QuitAntenna" message="tns:IPrintService_QuitAntenna_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IPrintService/QuitAntennaResponse" message="tns:IPrintService_QuitAntenna_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IPrintService" type="tns:IPrintService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Connect">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Connect" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Disconnect">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Disconnect" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpenLabel">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/OpenLabel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CloseLabel">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/CloseLabel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Print">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Print" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVariables">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/GetVariables" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetEPC">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/SetEPC" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/GetStatus" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus2">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/GetStatus2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddPrinter">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/AddPrinter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPrinter">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/GetPrinter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="QuitPrinter">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/QuitPrinter" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Play">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Play" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Pause">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Pause" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Stop">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Stop" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Read">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Read" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Write">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/Write" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddAntenna">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/AddAntenna" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAntenna">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/GetAntenna" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="QuitAntenna">
+      <soap:operation soapAction="http://tempuri.org/IPrintService/QuitAntenna" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PrintService">
+    <wsdl:port name="BasicHttpBinding_IPrintService" binding="tns:BasicHttpBinding_IPrintService">
+      <soap:address location="http://webservice.assetsapp.com/ws/PrintService.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,313 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+
+@{ViewBag.Title = "Movimientos";
+
+  var datos = Session["Permissions"].ToString();
+  JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+  var upd = "";
+  var del = "";
+  var add = "";
+  foreach (string x in allp["movement"]["grant"])
+  {
+      if (x.Contains("u"))
+      {
+          upd = "u";
+      }
+      if (x.Contains("d"))
+      {
+          del = "d";
+      }
+      if (x.Contains("c"))
+      {
+
+          add = "c";
+
+      }
+  }
+  var dataclient = Session["PermissionsClient"].ToString();
+  JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+  var updc = "";
+  var delc = "";
+  var addc = "";
+  foreach (string x in dataclientjo["movement"]["grant"])
+  {
+      if (x.Contains("u"))
+      {
+          updc = "u";
+      }
+      if (x.Contains("d"))
+      {
+          delc = "d";
+      }
+      if (x.Contains("c"))
+      {
+          addc = "c";
+      }
+  }
+    
+  
+
+}
+
+<div class="inner_content">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Movimientos</h3>
+                </div>
+                <div class="span4">
+                    <div class="search"  style="display:none">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Lista de Procesos</h5>
+                    </div>
+                    <div id="processesTable"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--- MODAL PROCESS -->
+<!-- Modal -->
+<div class="modal fade" id="modalProcess" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="titleProcess"></h4>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="navbar-inner">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active" id="tabProcess"><a href="#process" data-toggle="tab">Inf. General</a></li>
+                        <li id="tabMovement"><a href="#movement" data-toggle="tab">Movimiento</a></li>
+                    </ul>
+                </div>
+                <!-- Tabs Content -->
+                <div class="tab-content">
+                    <!--Processes Section -->
+                    <div class="tab-pane active" id="process">
+                        <table class="line">
+                            <tbody>
+                                <tr >
+                                    <td>
+                                        <h10 >Nombre:</h10>
+                                        <div class="line">
+                                            <label id="nameProcess"></label>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <h10>Fecha de Creación:</h10>
+                                        <div>
+                                            <label class="body" id="createDateProcess"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td class ="gray-location"></td><td></td><td  class ="gray-location"></td></tr>
+                                <tr>
+                                    <td>
+                                        <h10>Estatus:</h10>
+                                        <div>
+                                            <label class="body" id="statusProcess"></label>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td >
+                                        <h10>Fecha ultima modificación:</h10>
+                                        <div>
+                                            <label class="body" id="dateLastModProcess"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td class ="gray-location"></td><td></td><td  class ="gray-location"></td></tr>
+                                <tr>
+                                    <td>
+                                        <h10>Duración:</h10>
+                                        <div>
+                                            <label class="body" id="minProcess"></label>
+                                        </div>
+                                        <div>
+                                            <label class="body" id="maxProcess"></label>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <h10>Creador:</h10>
+                                        <div>
+                                            <label class="body" id="creatorUserProcess"></label>
+                                        </div>
+                                        <div>
+                                            <label class="body" id="creatorNameProcess"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td class ="gray-location"></td><td></td><td  class ="gray-location"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Movement Section -->
+                    <div class="tab-pane" id="movement">
+                        <div id="movementContent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Aceptar" class="btn blue" type="button" id="cancel_buttonProcess" data-dismiss="modal">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    var upd = "";
+    var add = "";
+    var del = "";
+
+    $(document).ready(function ($) {
+        
+        
+        loadCustomers();
+
+        process = $_GET("idProfile");
+        if (process != null) {
+            getMovementTable(process);
+            getProcessInfo(process);
+            jQuery('#modalProcess').modal('show');
+            jQuery("#process").removeClass("active");
+            jQuery("#movement").addClass("active");
+            jQuery("#tabProcess").removeClass("active");
+            jQuery("#tabMovement").addClass("active");
+            history.pushState(null, null, '/Movement/Movement');
+        }
+    });
+
+
+
+    function seeProcess(thisprocess) {
+        selectedProcess = jQuery(thisprocess).closest("tr").data("id");
+        getMovementTable(selectedProcess);
+        getProcessInfo(selectedProcess);
+        jQuery('#modalProcess').modal('show');
+    }
+
+    function getProcessCreator(selectedProcess) {
+        jQuery.ajax({
+            url: "/Movement/Movement/getProcessCreator",
+            type: "POST",
+            data: { idProcess: selectedProcess },
+            beforeSend: _loading(),
+            success: function (data) {
+                _loading();
+                data = JSON.parse(data);
+                jQuery("#creatorUserProcess").text("Usuario: " + data["user"]);
+                jQuery("#creatorNameProcess").text("Nombre: " + data["name"] + " " + data["lastname"]);
+              
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function getProcessInfo(selectedProcess) {
+        jQuery.ajax({
+            url: "/Movement/Movement/getProcessInfo",
+            type: "POST",
+            data: { idProcess: selectedProcess },
+            beforeSend: _loading(),
+            success: function (data) {
+                _loading();
+                data = JSON.parse(data);
+                jQuery("#nameProcess").text(data["name"]);
+                jQuery("#statusProcess").text(data["status"]);
+                jQuery("#createDateProcess").text(data["CreatedDate"]);
+                jQuery("#dateLastModProcess").text(data["LastmodDate"]);
+                jQuery("#minProcess").text("Mínima: " + data["min_duration_time"] + " " + data["min_duration_type"]);
+                jQuery("#maxProcess").text("Máxima: " + data["max_duration_time"] + " " + data["max_duration_type"]);
+                jQuery('#titleProcess').html("Proceso " + data["name"]);
+                getProcessCreator(data["Creator"]);
+                
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function getMovementTable(selectedProcess) {
+        jQuery.ajax({
+            url: "/Movement/Movement/setMovementTable",
+            data: { idProcess: selectedProcess },
+            async: false,
+            beforeSend: _loading(),
+            success: function (data) {
+
+                _loading();
+                jQuery("#movementContent").html(data);
+               
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function loadCustomers() {
+        jQuery.ajax({
+            url: "/Movement/Movement/getMovementTable",
+            beforeSend: _loading(),
+            success: function (data) {
+                _loading();
+                jQuery("#processesTable").html(data);
+              
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+
+    //Parametro
+    function $_GET(param) {
+        url = document.URL;
+        url = String(url.match(/\?+.+/));
+        url = url.replace("?", "");
+        url = url.split("&");
+
+        x = 0;
+        while (x < url.length) {
+            p = url[x].split("=");
+            if (p[0] == param) {
+                return decodeURIComponent(p[1]);
+            }
+            x++;
+        }
+    }
+   
+
+</script>

@@ -1,0 +1,23 @@
+﻿
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+@foreach (JObject adjudicating in (JArray)ViewData["adjudicatingList"]) { 
+    <tr data-id="@adjudicating["_id"].ToString()">
+        <td data-userID="@adjudicating["user"]["value"]">@adjudicating["user"]["text"]</td>
+        <td data-locationID="@adjudicating["location"]["value"]">@adjudicating["location"]["text"]</td>
+        <td data-typeValue="@adjudicating["type"]["value"]">@adjudicating["type"]["text"]</td>
+        <td class="options">
+            <div class="btn-group">
+                <a class="btn" href="#" data-original-title="Borrar" rel="tooltip" data-placement="top">
+                    <i class="icon-trash"></i>
+                </a>
+            </div>
+        </td>
+    </tr>
+}

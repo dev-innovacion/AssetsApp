@@ -1,0 +1,76 @@
+﻿@{
+    if (ViewData.TemplateInfo.TemplateDepth > 1)
+    {
+        if (Model == null)
+        {
+            @ViewData.ModelMetadata.NullDisplayText
+        }
+        else
+        {
+            @ViewData.ModelMetadata.SimpleDisplayText
+        }
+    }
+    else
+    {
+        foreach (var prop in ViewData.ModelMetadata
+        .Properties
+        .Where(pm => ShouldShow(pm)))
+        {
+            if (prop.HideSurroundingHtml)
+            {
+                <td class="hiddenfield editor-label"></td>
+                <td class="hiddenfield editor-field">
+                    @Html.Hidden(prop.PropertyName)
+                </td>
+                continue;
+            }
+            else
+            {
+
+                if (!String.IsNullOrEmpty(
+                    Html.Label(prop.PropertyName).ToHtmlString()))
+                {
+                    <td class="editor-label">
+                        @if (prop.DisplayName != null)
+                        {
+                            @Html.Label(prop.DisplayName)
+                        }
+                        else
+                        {
+                            @Html.Label(prop.PropertyName)
+                        }
+                    </td>
+                }
+            }
+            if (prop.Model is System.Collections.ICollection)
+            {
+                System.Collections.IList items = prop.Model as System.Collections.IList;
+                var dropdownitems = new List<SelectListItem>();
+                foreach (object item in items)
+                {
+                    var selecteditem = (SelectListItem)item;
+                    dropdownitems.Add(selecteditem);
+                }
+                <td class="editor-field">
+                    @Html.DropDownList(prop.PropertyName, dropdownitems)
+                    @Html.ValidationMessage(prop.PropertyName)
+                </td>
+                continue;
+            }
+            <td class="editor-field">
+                @Html.Editor(prop.PropertyName)
+
+                @Html.ValidationMessage(prop.PropertyName)
+            </td>
+        }
+    }
+}
+
+@functions {
+    bool ShouldShow(ModelMetadata metadata)
+    {
+        return metadata.ShowForEdit
+        && !ViewData.TemplateInfo.Visited(metadata);
+        //&& !metadata.IsComplexType
+    }
+}

@@ -1,0 +1,99 @@
+﻿@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@{
+    ViewBag.Title = "GetDiagrams";
+    Layout = null;
+}
+
+<table class="table table-hover" id="diagram_list">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Creado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{JArray diagramList = ViewBag.diagramList;}
+        @if(diagramList.Count > 0){
+            
+            foreach (JObject diagram in ViewBag.diagramList)
+            {
+                <tr data-id="@diagram.GetValue("_id")">
+                    <td>@diagram.GetValue("name")</td>
+                    <td>@diagram.GetValue("CreatedDate")</td>
+                    <td>
+                        <button class="btn btn-mini dark_green open_this" rel="tooltip" title="Abrir">
+                            <i class="icon-folder-open icon-white"></i>
+                        </button>
+                        <button class="btn btn-mini red delete_this" rel="tooltip" title="Borrar">
+                            <i class="icon-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+        else{
+            <tr>
+                <td colspan="3">
+                    <div align="center">
+                        No hay diagramas guardados, crea tu primer diagrama
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    //Open the selected diagram
+    $(".open_this").click(function () {
+        var diagramId = $(this).closest("tr").data("id");
+
+        $.ajax({
+            url: "/Processes/Diagram/GetDiagram",
+            type: "POST",
+            data: { id_diagram: diagramId },
+            beforeSend: _loading(),
+            success: function (data) {
+                scenario = JSON.parse(data);
+                diagram.loadScenario(scenario);
+                diagram_modal.close();
+            },
+            error: function () {
+                _alert("error", "Ocurrio un error, intente más tarde")
+            },
+            complete: function () {
+                _loading()
+            }
+        });
+    });
+
+    //Delete the selected diagram
+    $(".delete_this").click(function () {
+        var diagramId = $(this).closest("tr").data("id");
+
+        _confirm({
+            title: "Borrar Diagrama",
+            message: "Desea borrar este diagrama?",
+            action: function () {
+                $.ajax({
+                    url: "/Processes/Diagram/DeleteDiagram",
+                    type: "POST",
+                    data: { id_diagram: diagramId },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        _alert("success", "Diagrama Borrado");
+                        diagram_modal.getList();
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    },
+                    complete: function () {
+                        _loading()
+                    }
+                });
+            }
+        });
+    });
+</script>

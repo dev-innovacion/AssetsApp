@@ -1,0 +1,87 @@
+﻿@{Layout = null;}
+
+
+@model Dictionary<string,string>
+@{
+    ViewBag.Title = "getType";
+    var count = 0;
+}
+
+
+<select id="selectx" class="chosen">
+    @foreach (var item in Model) {
+        if (count == 0)
+        {
+           <option value="0">Elija Una Opcion</option> 
+            count++;
+        }
+    <option value="@item.Key">@item.Value</option>
+    
+    }
+</select>
+
+<script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+<script>
+   
+    var typeis = "";
+     @(new HtmlString("typeis='" + ViewData["type"].ToString() + "';"))
+            
+   
+    jQuery(document).ready(function ($) {
+
+        $('#selectx').on('change', function () {
+          
+            var value = $('#selectx').val();
+            if (value != 0) {
+
+                if (typeis == 1) {
+                    jQuery.ajax({
+                        url: "/Rule/ObjectRule/getProccess",
+                        data: { id: value },
+                        beforeSend: _loading(),
+                        type: "POST",
+                        success: function (data) {
+                            $('#proccessTable').html("");
+                            $('#proccessTable').html(data);
+                            _loading();
+                          }
+                    });
+                }
+                if (typeis == 2) {
+                    jQuery.ajax({
+                        url: "/Rule/ObjectRule/getProccessObj",
+                        data: { id: value },
+                        beforeSend: _loading(),
+                        type: "POST",
+                        success: function (data) {
+                            $('#proccessTable').html("");
+                            $('#proccessTable').html(data);
+                            _loading();
+                         
+                        }
+                    });
+                }
+                if (typeis == 3) {
+                    jQuery.ajax({
+                        url: "/Rule/ObjectRule/getProccessLoc",
+                        data: { id: value },
+                        beforeSend: _loading(),
+                        type: "POST",
+                        success: function (data) {
+                            $('#proccessTable').html("");
+                            $('#proccessTable').html(data);
+                            _loading();
+                           }
+                    });
+                }
+            } else {
+                $('#proccessTable').html("");
+
+            }
+        });
+
+
+
+     
+    });
+</script>

@@ -1,0 +1,608 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Diagram";
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["processes"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["processes"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+
+<div class="widgets_area">
+
+    <div class="row-fluid">
+
+        <div class="span12">
+
+            <div class="span3">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <div class="span12">
+                            <div class="span9">
+                                <h5>Herramientas</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="well-content">
+                        <ul class="scenario-tools">
+                            <li id="new_process">
+                                <svg style="width: 70px; height: 50px; display: block; position: relative; overflow: hidden;">
+                                    <g style="visibility: visible;">
+                                        <rect width="65" height="45" fill="#ffffff" stroke="#000000"></rect>
+                                        <g>
+                                </svg>
+                                <span>Proceso</span>
+                            </li>
+                            <li id="new_decision">
+                                <svg style="width: 70px; height: 50px; display: block; position: relative; overflow: hidden;">
+                                    <g transform="rotate(45)" style="visibility: visible;">
+                                        <rect x="25" y="-20" width="30" height="30" fill="#ffffff" stroke="#000000"></rect>
+                                    <g>
+                                </svg>
+                                <span>Decisión</span>
+                            </li>
+                            <li id="new_join">
+                                <svg style="width: 140px; height: 30px; display: block; position: relative; overflow: hidden;">
+                                    <g>
+                                        <path d="M 10 20 L 120 20" fill="none" stroke="#000000" stroke-miterlimit="10"></path>
+                                        <path d="M 120 20 L 117 15 L 130 20 L 117 25 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="all"></path>
+                                    </g>
+                                </svg>
+                                <span>Flujo</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="set_color process_details">
+                    <div>
+                        <div class="well-header widgetclient titleclient">
+                            <div class="span12">
+                                <h5>Proceso "X"</h5>
+                                <div id="btngrouplocation" class="btn-group pull-right">
+                                    <button rel="tooltip" title="Ver más" class="btn btn-mini orange fileinput-button" id="show_more">
+                                        <i class="icon-chevron-right icon-white"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="well-content">
+                            <form id="processForm" method="post" enctype="multipart/form-data" autocomplete="off">
+                                <div class="modal-header">
+                                    <div class="row-fluid">
+                                        <div class="span6">
+                                            <label>Nombre: </label>
+                                            <input name="name" type="text" />
+                                        </div>
+                                        <div class="show_less span6">
+                                            <label>Duración Minima (Días): </label>
+                                            <select name="min_duration">
+                                                <option>0</option>
+                                                <option>1</option>
+                                                <option>5</option>
+                                                <option>10</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span6">
+                                            <label class="lanelMargen">Estatus: </label>
+                                            <input name="status" type="text" />
+                                        </div>
+                                        <div class="show_less span6">
+                                            <label>Duración Máxima (Días): </label>
+                                            <select name="max_duration">
+                                                <option>0</option>
+                                                <option>1</option>
+                                                <option>5</option>
+                                                <option>10</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="show_less modal-body">
+
+                                    <div class="navbar-inner">
+                                        <ul class="nav nav-tabs" id="tabHeader1">
+                                            <li class="active" id="staticFormHeader"><a href="#staticFieldsSection" data-toggle="tab">Hardware / Ubicación</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="tab-content" id="tabContent1">
+                                        <div class="tab-pane active staticFieldsSection perfilMargen" id="staticFieldsSection">
+                                            <div class="row-fluid">
+                                                <div class="span6">
+                                                    <label>Hardware: </label>
+                                                    <select name="hardware">
+                                                        <option>Antena 001</option>
+                                                        <option>Antena 002</option>
+                                                        <option>Antena 003</option>
+                                                        <option>Antena 004</option>
+                                                    </select>
+                                                </div>
+                                                <div class="span6">
+                                                    <label>Ubicación: </label>
+                                                    <select name="location">
+                                                        <option>Ubicación 1</option>
+                                                        <option>Ubicación 2</option>
+                                                        <option>Ubicación 3</option>
+                                                        <option>Ubicación 4</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div class="row-fluid">
+                                                <div class="span6">
+                                                    <label>Hardware: </label>
+                                                    <select>
+                                                        <option>Seleccione Hardware</option>
+                                                        <option>Antena 001</option>
+                                                        <option>Antena 002</option>
+                                                        <option>Antena 003</option>
+                                                        <option>Antena 004</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <span width="80%" id="final_msg" class="error_msg"></span>
+                                    <input value="Guardar" class="btn blue" type="submit" id="save_process">
+                                    <input value="Cancelar" class="btn grey" type="button" id="cancel_process">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="span9">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <div class="span12">
+                            <div class="span9">
+                                <h5>Flujo Básico</h5>
+                            </div>
+                            <div class="span3">
+
+                                <div id="btngrouplocation" class="btn-group pull-right">
+                                    @if (add == "c" && addc=="c")
+                                    {
+                                        <button class="btn btn-mini dark_green fileinput-button" id="addLocationButton" data-original-title="Agregar" rel="tooltip" data-placement="top">
+                                            <i class="icon-plus icon-white"></i>
+                                        </button>
+                                    }
+                                    @if (del == "d" && delc=="d")
+                                    {
+                                        <button type="button" class="btn btn-mini red delete" id="deleteLocationButton" data-original-title="Editar" rel="tooltip" data-placement="top">
+                                            <i class="icon-trash icon-white"></i>
+                                        </button>
+                                    }
+                                    @if (upd == "u" && updc=="u")
+                                    {
+                                        <button type="button" class="btn btn-mini orange delete" id="editLocationButton" data-original-title="Eliminar" rel="tooltip" data-placement="top">
+                                            <i class="icon-pencil icon-white"></i>
+                                        </button>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="well-content">
+                        <div class="scenario-container" id="scenario-container">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@*<script src="/Content/Scripts/svg.js"></script>
+<script src="/Content/Scripts/svg.tools.js"></script>
+<script src="/Content/Scripts/svg.math.js"></script>*@
+
+<script src="/Content/Scripts/joint.js"></script>
+<link href="/Content/CSS/joint.css" rel="stylesheet">
+
+<script>
+
+    var diagram = {};
+    var process = {};
+
+    $(document).ready(function ($) {
+
+        //Object used to handle the diagram
+        diagram = {
+            draw: null, paper: null, processes: [], connections: [], editing: null, old_scenario: [],
+            join: { processA: null, processB: null},
+
+            init: function () {
+
+                if (this.draw != null)
+                    this.destroy();
+
+                var graph = new joint.dia.Graph;
+
+                var paper = new joint.dia.Paper({
+                    el: $("#scenario-container"),
+                    width: "100%",
+                    height: "100%",
+                    model: graph,
+                    gridSize: 1
+                });
+
+                //var drawSet = SVG("scenario-container").size("100%", "100%");
+                this.draw = graph;
+                this.paper = paper;
+
+            },
+
+            destroy: function () {
+                if (this.draw != null) {
+                    this.draw.parent.firstChild.remove()
+                    this.draw = null
+                }
+            },
+
+            setProcess: function (idProcess, element, typeElement) {
+                var attr = {};
+                if (typeof (element) != "undefined") {
+                    attr.fill = element.fill;
+                    attr.x = element.x;
+                    attr.y = element.y;
+                    attr.width = element.width;
+                    attr.height = element.height;
+                }
+                else {
+                    attr.fill = "#FFF";
+                    attr.stroke = "#000";
+                    attr.x = 10;
+                    attr.y = 10;
+                    attr.width = 120;
+                    attr.height = 30;
+                }
+
+                attr.opacity = 1;
+                var shape;
+
+                if (typeElement == "process") {
+                    shape = new joint.shapes.basic.Rect({
+                        position: { x: attr.x, y: attr.y },
+                        size: { width: attr.width, height: attr.height },
+                        attrs: {
+                            rect: { fill: "blue" },
+                            text: { text: "Proceso X", fill: "white" }
+                        }
+                    });
+
+                    shape.type = "process";
+                }
+                
+                if (typeElement == "decision") {
+                    shape = new joint.shapes.basic.Rect({
+                        position: { x: attr.x, y: attr.y },
+                        size: { width: 45, height: 45 },
+                        attrs: {
+                            rect: { fill: "yellow" }
+                        }
+                    });
+
+                    shape.type = "decision";
+                    shape.rotate(45);
+                }                     
+
+                //save reference in diagram.processes
+                this.processes.push(shape);
+
+                //draw into the diagram
+                try{
+                    this.draw.addCell(shape);
+                }
+                catch (Exception) {
+                    console.log(Exception.message);
+                }
+                
+                return shape;
+            },
+
+            //Start the relation of two processes, clicking the elements to join
+            startJoining: function () {
+                this.join.processA = null;
+                this.join.processB = null;
+
+                var setJoinEvents = function () {
+
+                        try {
+                            diagram.paper.on("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                };
+
+                var unsetJoinEvents = function () {
+                    diagram.join.processA = null;
+                    diagram.join.processB = null;
+                    $("#new_join").removeClass("selected");
+
+                        try {
+                            diagram.paper.off("cell:pointerdown", joinEvent);
+                        }
+                        catch (Exception) { };
+                };
+
+                var joinEvent = function (cellView) {
+                    if (!diagram.join.processA) {
+                        diagram.join.processA = cellView.model.id;
+                    }
+                    else if (diagram.join.processA != cellView.model.id) {
+                        diagram.join.processB = cellView.model.id;
+                        diagram.joinProcesses();
+                        unsetJoinEvents();
+                    }
+                }
+
+                setJoinEvents();
+
+            },
+
+            //Join two processes to create a new Process Rule
+            joinProcesses: function () {
+                var process1 = this.join.processA;
+                var process2 = this.join.processB;
+
+                var link = new joint.dia.Link({
+                    source: { id: process1 },
+                    target: { id: process2 }
+                });
+
+                link.attr({
+                    '.marker-target': { fill: 'black', d: 'M 10 0 L 0 5 L 10 10 z' }
+                });
+
+                try{
+                    diagram.draw.addCell(link);
+                }
+                catch(Exception){}
+                
+                diagram.connections.push(link);
+
+                return false;
+            },
+
+            //Removes all locations in the scenario
+            clearLocations: function () {
+                for (var i in this.locations) {
+                    if (this.locations[i] != undefined) {
+                        this.locations[i].fixResize();
+                        this.locations[i].remove();
+                    }
+                }
+                this.locations = {};
+            },
+
+            //Removes the edition wrapper of each location
+            //param except : 
+            fixAll: function (except) {
+                for (var i in this.processes) {
+                    if (this.processes[i] != undefined && this.processes[i] != except) {
+                        try {
+                            this.processes[i].fixResize();
+                        } catch (Exception) { }
+                    }
+                }
+            },
+
+            //Returns an array of elements positioned in the scenario
+            getSVGScenario: function () {
+                var scenario = {
+                    processes: [],
+                    connections: []
+                };
+
+                //Get the process and decision shapes
+                for (var i in this.processes) {
+                    if (this.processes[i] != undefined) {
+                        var thisProcess = this.processes[i];
+
+                        var element = {
+                            type: thisProcess.type,
+                            position: thisProcess.attributes.position,
+                            size: thisProcess.attributes.size,
+                            attrs: {
+                                rect: { fill: thisProcess.attributes.attrs.rect.fill, },
+                                text: {
+                                    text: thisProcess.attributes.attrs.text.text,
+                                    fill: thisProcess.attributes.attrs.text.fill
+                                }
+                            }
+                        };
+                        scenario.processes.push({
+                            id_process: "001", shape: element
+                        });
+                    }
+                }
+                //Get the connectors
+                for (var i in this.connections) {
+                    if (this.connections[i] != undefined) {
+                        var thisConnection = this.connections[i];
+
+                        var element = {
+                            source: thisConnection.attributes.source.id,
+                            target: thisConnection.attributes.target.id,
+                            vertices: thisConnection.attributes.vertices
+                        };
+                        scenario.connections.push({
+                            shape: element
+                        });
+                    }
+                }
+
+                return scenario;
+            },
+
+            //Remakes the scenario if it has one previous saved scenario
+            remakeScenario: function () {
+                for (var i in this.old_scenario) {
+                    var newId = this.old_scenario[i].id_location;
+                    var newElement = this.old_scenario[i].element;
+
+                    if ($("#" + newId).length) {
+                        this.setLocation(newId, newElement, newElement.type);
+                        $("#" + newId).find(".addLocation").click();
+                    }
+
+                }
+            },
+
+            saveScenario: function () {
+                var scenario = this.getSVGScenario();
+                scenario = JSON.stringify(scenario);
+                $.ajax({
+                    url: "/Processes/Process/SaveDiagram",
+                    data: { id_diagram: "id", scenario: scenario },
+                    type: "POST",
+                    beforeSend: _loading(),
+                    complete: _loading,
+                    success: function (data) {
+                        _alert("success", "Escenario guardado")
+                    },
+                    error: function () {
+                        _alert("error", "Ocurrio un error, intente más tarde")
+                    }
+                });
+
+            },
+
+            bindActions: function () {
+
+                //Create a new processes join
+                $("#new_join").click(function () {
+                    diagram.startJoining();
+                    $(this).addClass("selected");
+                });
+
+                //Create a new process or decision element
+                $("#new_process, #new_decision").click(function () {
+                    diagram.fixAll();
+                    if (this.id == "new_process") {
+                        diagram.setProcess("123", undefined, "process");
+
+                        //show the new process details 
+                        $(".process_details > div").css("left", "0px").css("opacity", 1);
+                    }
+                    else
+                        diagram.setProcess("123", undefined, "decision");
+
+                });
+
+                //Remove a location with the delete keyboard button
+                $("body").keyup(function (event) {
+                    //delete button
+                    if (event.keyCode == 46) {
+                        var processes = diagram.processes;
+                        var toDelete;
+
+                        for (var process in processes) {
+                            if (typeof processes[process].fixResize == "function") {
+                                toDelete = processes[process];
+                                break;
+                            }
+                        }
+
+                        if (toDelete) {
+                            _confirm({
+                                title: "Borrar ubicación",
+                                message: "¿Desea borrar esta ubicación del Diagrama?",
+                                action: function () {
+                                    toDelete.fixResize();
+                                    toDelete.remove();
+                                }
+                            });
+                        }
+                    }
+                    
+                });
+
+                //Save the entire diagram
+                $("#save_scenario").unbind("click.save_scenario");
+                $("#save_scenario").bind("click.save_scenario", function () {
+                    diagram.saveScenario();
+                });
+            }
+        };
+        
+        var process = {
+
+            name: "", status: ""
+
+        };
+
+        $(".scenario-container rect").click(function () {
+            $(".process_details > div").css("left", "0px").css("opacity", 1);
+        });
+
+        $("#show_more").click(function () {
+
+            //Expand
+            if ($(this).find("i").hasClass("icon-chevron-right")) {
+                $(this).find("i").removeClass("icon-chevron-right").addClass("icon-chevron-left");
+                $(".process_details > div").css("width", "550px");
+                $(".process_details .show_less").removeClass("show_less").addClass("show_more");
+                $("#show_more").tooltip({ title: "Ver Menos" });
+            }
+                //collapse
+            else {
+                $(this).find("i").removeClass("icon-chevron-left").addClass("icon-chevron-right");
+                $(".process_details > div").css("width", "100%");
+                $(".process_details .show_more").removeClass("show_more").addClass("show_less");
+                $("#show_more").tooltip({ title: "Ver Más" });
+            }
+        });
+
+        diagram.init();
+        diagram.bindActions();
+
+    });
+</script>

@@ -1,0 +1,28 @@
+  string filePath = Server.MapPath("Web.config");
+            try
+            {
+                RemotingConfiguration.Configure(filePath, false);
+            }
+            catch { }
+            ACD.myObj obj = new ACD.myObj();
+            var get = obj.returnSomething();
+
+
+
+ <system.runtime.remoting>
+
+    <application name="Cliente">
+
+      <client>
+
+        <wellknown type="ACD.myObj, myObj"         
+
+                    url="tcp://localhost:2101/myObj.soap"/>
+     <wellknown type="ACD.First.myObjAnother, ACDDLL"                url="tcp://localhost:21011/myObj.soap"/>
+      </client>
+
+     
+
+    </application>
+
+  </system.runtime.remoting>

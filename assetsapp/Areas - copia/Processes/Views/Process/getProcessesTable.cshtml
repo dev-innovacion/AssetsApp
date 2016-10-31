@@ -1,0 +1,176 @@
+﻿@{Layout = null;}
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{ViewBag.Title = "getProcessesTable";
+
+  var datos = Session["Permissions"].ToString();
+  JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+  var upd = "";
+  var del = "";
+  var add = "";
+  foreach (string x in allp["processes"]["grant"])
+  {
+      if (x.Contains("u"))
+      {
+          upd = "u";
+      }
+      if (x.Contains("d"))
+      {
+          del = "d";
+      }
+
+  }
+  
+  }
+
+
+            <div class="well-content no-search">
+                <table class="table table-striped table-bordered table-hover datatable" style="max-height:400px">
+                    <thead>
+                        <tr>
+                            <th>Nombre del Proceso</th>
+                            <th>Estatus</th>
+                            <th>Duración Minima</th>
+                            <th>Duración Máxima</th>
+                            <th>Reglas</th>
+                            <th>Acciones</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (JObject process in Model)
+                        {
+                            <tr data-id="@process.GetValue("_id")">
+                                <td class="name">@process.GetValue("name")</td>
+                                <td>@process.GetValue("status")</td>
+                                <td>@process.GetValue("min_duration_time") @process.GetValue("min_duration_type")</td>
+                                <td>@process.GetValue("max_duration_time") @process.GetValue("max_duration_type")</td>
+                                <td>
+                                    <button class="btn button_green config_hw" id="config_hw"  onclick="hardware_modal.open(this)" >Configurar Reglas</button>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        @if (upd == "u") { 
+                                        <a class="btn" href="#" onclick="editProcess(this)" data-original-title="Editar" rel="tooltip" data-placement="top"><i class="icon-edit"></i></a>
+                                        }
+                                        @if (del == "d") { 
+                                        <a class="btn" href="#" onclick="deleteProcess(this)" data-original-title="Borrar" rel="tooltip" data-placement="top"><i class="icon-trash"></i></a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
+<script>
+
+    jQuery("[rel=tooltip]").tooltip();
+    try {
+
+        jQuery(".datatable").dataTable({
+            "sPaginationType": "full_numbers",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+            "sScrollY": "400px",
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [0]
+            }],
+            "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Ultimo",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+
+                },
+                "sEmptyTable": "No Hay Procesos Guardados",
+                "sInfoEmpty": "No Hay registros para mostrar"
+            }
+        });
+        jQuery('.dataTables_length select').chosen();
+    } catch (Exception) { console.log(); }
+
+
+    jQuery('.no-search .dataTables_length select').chosen();
+
+    function deleteProcess(thisProcess) {
+        _confirm({
+            title: "Eliminar Proceso",
+            message: "¿Seguro que desea eliminarlo?",
+            action: function () {
+                idProcess = jQuery(thisProcess).closest("tr").data("id");
+                jQuery.ajax({
+                    url: "/Processes/Process/deleteProcess",
+                    datatype: "json",
+                    type: "POST",
+                    data: { id: idProcess },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        loadProcessTable();
+                        _loading();
+                        _alert("success", "Eliminado Correctamente");
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+        });
+    }
+
+    function editProcess(thisProcess) {
+        idProcess = jQuery(thisProcess).closest("tr").data("id");
+        jQuery.ajax({
+            url: "/Processes/Process/getProcess",
+            data: { id_process: idProcess },
+            beforeSend: _loading(),
+            type: "POST",
+            success: function (data) {
+                data = JSON.parse(data);
+                
+                jQuery("#name").val(data["name"]);
+                jQuery("#status").val(data["status"]);
+                jQuery("#min_lenght").val(data["min_duration"]["duration"]);
+                jQuery("#min_length_type").val(data["min_duration"]["type"]);
+                jQuery("#max_lenght").val(data["max_duration"]["duration"]);
+                jQuery("#max_length_type").val(data["max_duration"]["type"]);
+
+                jQuery("#process_panel").modal("show");
+                _loading();                
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    //function setTree(id) {
+    //    jQuery.ajax({
+    //        url: "/Processes/Process/getRoute",
+    //        data: { parentCategory: id },
+    //        type: "POST",
+    //        async: false,
+    //        beforeSend: _loading(),
+    //        success: function (data) {
+    //            var data = JSON.parse(data);
+    //            tree.openRoute(data["route"]);
+    //            _loading();
+    //        }, error: function () {
+    //            _loading();
+    //            _alert("error", "Ha ocurrido un error");
+    //        }
+    //    });
+    //}
+
+
+</script>

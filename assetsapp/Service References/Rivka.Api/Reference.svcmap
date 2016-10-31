@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="a3498843-7e2c-4a6d-89fd-7e55fc69456e" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://webservice.assetsapp.com/ws/PrintService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="PrintService.xsd" MetadataType="Schema" ID="cd23f163-6932-4512-ab2e-e0d8fa0633ad" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd2" />
+    <MetadataFile FileName="PrintService.disco" MetadataType="Disco" ID="bfd72660-61ad-4f26-b054-bced82d6a62b" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?disco" />
+    <MetadataFile FileName="PrintService1.xsd" MetadataType="Schema" ID="f1ed09ac-e77f-4718-ae6a-496a9a16d370" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd1" />
+    <MetadataFile FileName="PrintService2.xsd" MetadataType="Schema" ID="94a2e2fb-ed7e-4890-af66-2b81dd4c372e" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd3" />
+    <MetadataFile FileName="PrintService3.xsd" MetadataType="Schema" ID="537c3ef3-6d74-42ef-9efa-a3ad2f9e527c" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd0" />
+    <MetadataFile FileName="PrintService.wsdl" MetadataType="Wsdl" ID="62d22408-6f5d-429c-b718-b20feff4bb87" SourceId="1" SourceUrl="http://webservice.assetsapp.com/ws/PrintService.svc?wsdl" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

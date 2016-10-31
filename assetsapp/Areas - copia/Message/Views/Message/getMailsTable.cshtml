@@ -1,0 +1,383 @@
+﻿@using MongoDB.Bson
+@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using Rivka.Db.MongoDb;
+@model JArray
+@{ViewBag.Title = "mails";
+
+string view = "inbox";
+int count = 0;
+int index = 0;
+List<string> listattach1 = new List<string>();
+
+List<string> aux = new List<string>();
+List<string> readlist=new List<string>();
+
+MongoModel messageModel = new MongoModel("Messages");
+MongoModel usermessageModel = new MongoModel("UserMessage");
+
+String msgstring = usermessageModel.Get("userId", Session["_id"].ToString());
+JArray usermsg = JsonConvert.DeserializeObject<JArray>(msgstring);
+
+JObject mailss = new JObject();
+JArray listmails = new JArray();
+foreach (JObject obj in usermsg) {
+   listmails=JsonConvert.DeserializeObject<JArray>(obj["mails"].ToString()); 
+}
+    
+
+try
+{
+    readlist=ViewData["idsread"] as List<string>;
+
+}
+catch (Exception ex)
+{
+    
+}
+foreach (string read in (List<string>)ViewData["readed"])
+{
+    aux.Add(read);
+
+}
+
+string viewAll = ViewData["viewAll"].ToString();
+string[] arrayread = aux.ToArray();
+count = arrayread.Length - 1;
+string thisid="";
+
+}
+
+
+<div id="bodymail">
+
+    <table id="mailtablex" class="table table-striped table-hover dataTable datatable" style="max-height:400px;">
+
+        <thead>
+            <tr style="background:#ABABAB; color: white;">
+                <th class="table-icon hidden-480">
+                    <input type="checkbox" name="selectAlls" class="uniform">
+                </th>
+                <th class="table-icon hidden-480"></th>
+                <th class="table-fixed-medium">Enviado por</th>
+                <th class="table-fixed-medium">Asunto</th>
+                <th class="table-icon hidden-480"></th>
+                <th class="table-fixed-medium">Fecha de Envío</th>
+                <th class="table-icon hidden-480">Reenviar</th>
+                <th class="table-icon hidden-480"></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (JObject mails in listmails.Reverse())
+            {
+                if (mails["status"].ToString() == "activo")
+                {
+                    try
+                    {
+                        string msgs = messageModel.GetRow(mails["idmessage"].ToString());
+                        JObject msgobj = JsonConvert.DeserializeObject<JObject>(msgs);
+
+                        thisid = msgobj["_id"].ToString();
+                        listattach1.Clear();
+
+                        foreach (JValue item in msgobj["attachments"].Reverse())
+                        {
+                            listattach1.Add(item.ToString());
+                        }
+
+                        <tr class="mailtr" data-idmail="@msgobj["_id"]">
+                            <td class="table-icon hidden-480">
+                                <input type="checkbox" name="selectMails" class="uniform" value="@msgobj["_id"]">
+                            </td>
+                            @if (!readlist.Contains(msgobj["_id"].ToString())) //|| viewAll == "access"
+                            { <text>
+                                <td class="table-icon hidden-480 getmail" data-idmail="@thisid"><i class="icon-book green"></i></td></text>   }
+                            else
+                            { <text>
+                                <td class="table-icon hidden-480 getmail" data-idmail="@thisid"><i class="icon-envelope" data-original-title="Ver Mensaje" rel="tooltip" data-placement="top"></i></td> </text>   }
+                            <td class="table-fixed-medium getmail" data-idmail="@thisid">@msgobj["userName"]</td>
+                            <td class="message getmail" data-idmail="@thisid">@msgobj["subject"]</td>
+                            @if (listattach1.Count > 0)
+                            { <text>
+                                <td class="table-icon hidden-480 getmail" data-idmail="@thisid"><i class="icon-paper-clip"></i></td></text>   }
+                            else
+                            { <text>
+                                <td class="table-icon hidden-480 getmail" data-idmail="@thisid"><i class=""></i></td> </text>   }
+
+                            <td class="table-fixed-medium getmail" data-idmail="@thisid">@msgobj["CreatedDate"]</td>
+                            <td class="fw table-icon hidden-480 " data-idmail="@thisid"><i class=" icon-reply"></i></td>
+
+
+                            <td class="table-icon hidden-480"><a data-original-title="Eliminar" rel="tooltip" data-placement="top" href="/Message/Message/deleteMail?idMail=@msgobj["_id"]"><i class="icon-remove"></i></a></td>
+
+                        </tr>
+                            count--;
+                            index++;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+
+                }
+
+            }
+        </tbody>
+    </table>
+    @if (index == 0)
+    {<hr size="3" /> <span class="" style="padding-left:40%;font-size:20px;"></span>}
+</div>
+
+
+
+
+
+<script>
+ 
+    var idforw = "";
+    jQuery("[rel=tooltip]").tooltip({"z-index": 99});
+
+    jQuery(".getmail").click(function () {
+        var idmail = jQuery(this).data("idmail");
+
+
+        location.href = "/Message/Message/getMail?idMail=" + idmail;
+
+       
+
+    });
+    jQuery(".fw").click(function () {
+        debugger;
+       idforw = jQuery(this).data("idmail");
+
+
+        jQuery("#rw_mail").modal("show");
+
+
+
+    });
+    jQuery(".sent_mailfor").click(function () {
+        debugger;
+        var mailf = jQuery("#emailf").val();
+        if (idforw != "" && mailf != "") {
+            jQuery.ajax({
+                url: "/Message/Message/forward",
+                data: { idmail: idforw, mail: mailf },
+                beforeSend: _loading(),
+                success: function (data) {
+
+                    if (data != null) {
+                        jQuery("#emailf").val("");
+                        jQuery("#rw_mail").modal("hide");
+                        alert("Correo Enviado Correctamente")
+                    } else {
+                        alert("verifica que el Email se Correcto");
+                    }
+                    _loading();
+                },
+                error: function () {
+
+                    _loading();
+                }
+            });
+        }
+
+
+
+    });
+    jQuery("#deletegroup").click(function () {
+        debugger;
+        deletealls("recycled");
+
+    });
+    jQuery("#readAlls").click(function () {
+        var o = [];
+        jQuery("#mailtablex tbody").find(":checked").each(function () {
+            o.push(jQuery(this).closest("tr").data("idmail"));
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-book")).addClass("icon-envelope");
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-book")).removeClass("green");
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-book")).removeClass("icon-book");
+            
+        })
+
+        var jsondata = JSON.stringify(o);
+        if (o.length > 0) {
+            jQuery.ajax({
+                url: "/Message/Message/readAlls",
+                data: {  ids: jsondata,status:"true" },
+                beforeSend: _loading(),
+                success: function (data) {
+                    refresh();
+                    if (data != null) {
+                      //  jQuery("#inboxact").click();
+                       _alert("success","Correos marcados como leidos")
+                    } else {
+                        alert("error");
+                    }
+                    _loading();
+                },
+                error: function () {
+
+                    _loading();
+                }
+            });
+        }
+    });
+
+    function refresh() {
+        refreshCenterMails();
+        jQuery.ajax({
+            url: "/Message/Message/refreshMail",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+
+            type: "POST",
+            // beforeSend: _loading(),
+            // complete: _loading(),
+            success: function (data) {
+                jQuery("#inboxnew").html("");
+                jQuery("#inboxnew").html(data);
+                jQuery("#notificationsmails").html("");
+                jQuery("#noticlass").removeClass("notification");
+                jQuery("#arrow-notif").removeClass("arrow-notif");
+                jQuery("#notificationsmails").html(data);
+                jQuery("#noticlass").addClass("notification");
+                jQuery("#arrow-notif").addClass("arrow-notif");
+
+
+
+            },
+            error: function (errorThrown) {
+
+            },
+
+        });
+
+    }
+
+
+
+
+    function refreshCenterMails() {
+
+        jQuery.ajax({
+            url: "/Message/Message/newMails",
+            // data: { maildata : jsonmail},
+
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+
+            type: "POST",
+            beforeSend: _loading(),
+            complete: _loading(),
+
+            success: function (data) {
+
+                jQuery("#ulMails").html("");
+                jQuery("#ulMails").html(data);
+
+
+                // alert("IN");
+
+            },
+            error: function (errorThrown) {
+
+            }
+        });
+
+    }
+
+    jQuery("#notreadAlls").click(function () {
+        var o = [];
+        jQuery("#mailtablex tbody").find(":checked").each(function () {
+            o.push(jQuery(this).closest("tr").data("idmail"));
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-envelope")).addClass("icon-book");
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-envelope")).addClass("green");
+            jQuery(jQuery(jQuery(this).closest("tr")).find(".icon-envelope")).removeClass("icon-envelope");
+        })
+
+        var jsondata = JSON.stringify(o);
+        if (o.length > 0) {
+            jQuery.ajax({
+                url: "/Message/Message/readAlls",
+                data: { ids: jsondata, status: "false" },
+                beforeSend: _loading(),
+                success: function (data) {
+
+                    if (data != null) {
+                      //  jQuery("#inboxact").click();
+                        _alert("success", "Correos marcados como no leidos")
+                    } else {
+                        alert("error");
+                    }
+                    _loading();
+                },
+                error: function () {
+
+                    _loading();
+                }
+            });
+        }
+    });
+    jQuery("[name=selectAlls]").on("change",function () {
+
+        jQuery("#mailtablex tbody").find(":checkbox").each(function () {
+            if (jQuery("[name=selectAlls]").is(":checked")) {
+                jQuery(this).prop("checked", true);
+            } else
+            {
+                jQuery(this).prop("checked", false);
+            }
+        })
+    });
+    function deletemails(idm) {
+        jQuery.ajax({
+            url: "/Message/Message/deleteMail",
+            data:{idMail:idm},
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#mailTable").html("");
+                jQuery("#mailTable").html(data);
+                jQuery("#inboxact").removeClass("active");
+                jQuery("#outboxact").removeClass("active");
+                jQuery("#deleteact").addClass("active");
+                _loading();
+            },
+            error: function () {
+               
+                _loading();
+            }
+        });
+    }
+
+    try {
+        jQuery(".datatable").dataTable({
+            "sPaginationType": "full_numbers",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+            "sScrollY": "400px",
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1,0]
+            }],
+            "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Ultimo",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+
+                },
+                "sEmptyTable": "No Tiene Correos Recibidos!!!",
+                "sInfoEmpty": "No Hay registros para mostrar"
+            },
+        });
+        jQuery('.dataTables_length select').chosen();
+    } catch (Exception) { console.log(); }
+</script>

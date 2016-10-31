@@ -1,0 +1,149 @@
+﻿<div class="widgets_area">
+    <div class="span12 form_row ">
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Administrar Reglas</h3>
+            </div>
+            <div class="span4">
+                <div class="search">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="light_blue set_color">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Lista de Reglas</h5>
+
+                </div>
+                <div class="well-content no-search" id="rulesContent">
+                <div class="row-fluid">
+                   <div class="span3">
+                       <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                           <select id="selectType" class="chosen">
+                               <option value="0">Elige una Opcion</option>
+                               <option value="1">Hardware</option>
+                               <option value="2">Objetos</option>
+                               <option value="3">Ubicaciones</option>
+
+                           </select>
+                       </div>
+                   
+                    <div id="getType" class="span12 no-search" style="padding-top:50px;">
+                   </div>
+                       <br />
+                      
+                       <br />
+                       <br />
+                   </div>
+                    <div id="proccessTable" class="span9">
+                  
+                     
+
+                    </div>
+                   
+                    </div>
+                   
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+@*using (Html.BeginForm("ImpExcel", "ObjectRule", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="file" name="file" />
+    <input type="submit" value="OK" />
+}*@
+
+@section scripts{
+    <script src="~/RivkaBase/Scripts/RivkaViewer/RivkaViewer.js"></script>
+    <script>
+        var checkboxValues = new Array();
+        var istype = "";
+        jQuery(document).ready(function ($) {
+            
+          
+          
+            $('#selectType').on('change', function () {
+                var value = $('#selectType').val();
+                var istype = value;
+                if (value != 0) {
+                    jQuery.ajax({
+                        url: "/Rule/ObjectRule/getType",
+                        data: { type: value },
+                        beforeSend: _loading(),
+                        type: "POST",
+                        success: function (data) {
+                            $('#proccessTable').html("");
+                            $('#getType').html("");
+                            $('#getType').html(data);
+                            _loading();
+                                 }
+                    });
+                } else {
+                    $('#proccessTable').html("");
+                    $('#getType').html("");
+                }
+            });
+
+          
+            $('#saverule').on('click', function () {
+               
+                $('input[name="proccess[]"]:checked').each(function () {
+                    //$(this).val() es el valor del checkbox correspondiente
+                    checkboxValues.push($(this).val());
+                  
+                });
+            });
+
+            jQuery("#T9").bind("change.changeImage", function () {
+
+                var fa = new FormData();
+                fa.append('file', jQuery('#T9')[0].files[0]);
+
+
+
+
+                jQuery.ajax({
+
+                    url: "/Rule/ObjectRule/ImpExcel",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fa,
+                    type: "POST",
+                    beforeSend: _loading(),
+
+                    success: function (data) {
+                       
+                        jQuery('#excelTable').html("");
+                        jQuery('#excelTable').html(data);
+                          
+                       
+                        
+                       
+                        _loading();
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                        _loading();
+                    }
+                });
+
+
+                // jQuery("#new_mail").modal("hide");
+
+                return null;
+            });
+        });
+    </script>
+}

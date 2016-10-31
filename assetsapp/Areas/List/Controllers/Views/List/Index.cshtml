@@ -1,0 +1,1048 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Listas";
+    String listNamePattern = "[A-Za-z0-9.-_]*";
+    String listDisplayNamePattern = "[A-Za-z0-9._-\\sáéíóúÁÉÍÓÚñÑ]*";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+  
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["lists"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["lists"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+
+}
+
+<div class="widgets_area">
+    <div class="span12 form_row ">
+        
+    </div>
+    <div id="list_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+            <h3 class="modal-header-text">Agregar Lista</h3>
+        </div>
+
+         <form id="listForm">
+
+            <div class="modal-body">
+                <div class="navbar-inner">
+                    <ul class="nav nav-tabs" id="tabHeader1">
+                        <li class="active" id="generalInfo"><a href="#generalInfoSection" data-toggle="tab">Inf. General</a></li>
+                        <li id="listContent"><a href="#listContentSection" data-toggle="tab">Elementos</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content" id="tabContent1">
+                    <div class="tab-pane active staticFieldsSection perfilMargen" id="generalInfoSection">
+                            <table width="100%">
+                            <tr>
+                                <td width="50%">
+                                    <label>Nombre: </label>
+                                    <div class="staticField">
+                                        <input type="text" id="listName" name="listName" pattern=@listNamePattern required="required" data-original-title="Nombre de la lista, para control del sistema(debe ser único)." rel="tooltip" data-placement="top" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <label>Nombre para mostrar: </label>
+                                    <div class="staticField">
+                                        <input type="text" id="listDisplayName" name="listDisplayName" pattern=@listDisplayNamePattern required="required" data-original-title="Nombre de la lista que será mostrado." rel="tooltip" data-placement="top" />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <input type="checkbox" id="dependencyCheck">
+                                    <label>Activar dependencia</label>
+                                </td>
+                            </tr>
+                            <tr id="dependencyLists">
+                                <td width="50%">
+                                    <label>Lista: </label>
+                                    <div class="staticField">
+                                        <select id="listSelect">
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <label>Elemento: </label>
+                                    <div class="staticField">
+                                        <select id="elementSelect">
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="tab-pane staticFieldsSection perfilMargen" id="listContentSection">
+                        <table width="100%">
+                            <tr>
+                                <td>
+                                    <label>Nombre del elemento: </label>
+                                    <div class="staticField">
+                                        <input type="text" id="elementName" pattern=@listNamePattern data-original-title="Nombre del elemento, este debe ser único." rel="tooltip" data-placement="top" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <label>Nombre para mostrar: </label>
+                                    <div class="staticField">
+                                        <input type="text" id="elementDisplayName" pattern=@listDisplayNamePattern data-original-title="Nombre del elemento que se mostrará en las listas." rel="tooltip" data-placement="top" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn dark_green fileinput-button" id="addElementButton">
+                                        <i class="icon-plus icon-white"></i>
+                                        <span>Añadir</span>
+                                    </div>
+                                    <button type="button" class="btn red delete" id="elementCancelButton">
+                                        <i class="icon-ban-circle icon-white"></i>
+                                        <span>Cancelar </span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <div>
+                                        <button id="importbtn" class="btn btn-mini purple  fileinput-button" data-idcat="0" style="padding: 5px 6px;">
+                                            <i class="icon-cloud-upload icon-white"></i>
+                                            <span>Importar</span>
+                                            <input type="file" id="T9" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="well-content no-search">
+                            <table class="table table-striped table-bordered table-hover" id="orderElementTable">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5">
+                                            <center>Elementos con orden preestablecido</center>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Nombre para mostrar</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                            <table class="table table-striped table-bordered table-hover" id="unorderElementTable">
+                                <thead>
+                                    <tr>
+                                        <th colspan="5">
+                                            <center>Elementos sin orden preestablecido</center>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Nombre para mostrar</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Guardar" class="btn blue" type="submit" id="save_button">
+                <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+            </div>
+
+        </form>
+    </div>
+
+    <!-- List of lists -->
+    <div id="listDiv">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle">Administrar Listas</h3>
+                </div>
+                <div class="span4">
+                    <div class="search">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                        <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="light_blue set_color">
+                    <div class="well-header widgetclient titleclient">
+                        <h5>Listas</h5>
+                        <div id="btngrouplocation" class="btn-group pull-right">
+                            @if (add == "c" && addc=="c")
+                            {
+                                <button class="btn btn-mini dark_green fileinput-button" id="addListButton" data-original-title="Agregar Lista" rel="tooltip" data-placement="top">
+                                    <i class="icon-plus icon-white"></i>
+                                </button>
+                            }
+                            @if (del == "d" && delc=="d")
+                            {
+                                <button type="button" class="btn btn-mini red delete" id="deleteListButton" data-original-title="Eliminar Lista" rel="tooltip" data-placement="top">
+                                    <i class="icon-trash icon-white"></i>
+                                </button>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="well-content no-search">
+                        <table class="table table-striped table-bordered table-hover" id="listTable" style="max-height:400px;">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th style="max-width: 80px;min-width: 80px;">Nombre</th>
+                                    <th style="max-width: 80px;min-width: 80px;">Creador</th>
+                                    <th style="max-width: 80px;min-width: 80px;">Fecha de Creaci&oacute;n</th>
+                                    <th style="max-width: 80px;min-width: 80px;">&Uacute;ltima modificaci&oacute;n</th>
+                                    <th style="max-width: 80px;min-width: 80px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="excelTable" class="modal hide fade" data-backdrop="static" style="min-width: 1000px; left: 35%; display: block;">
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        setTimeout(function () {
+            jQuery("body").unbind("mouseover.body");
+            jQuery("body").bind("mouseover.body", function () { jQuery("body").css("overflow-x", "hidden"); })
+        }, 1000)
+        jQuery("body").mouseover(function () { jQuery("body").css("overflow-x", "hidden"); }).trigger("mouseover");
+
+        var elementNames = new Array();
+        var selectedID = null;
+        var selectedListName = null;
+        var selectedElement = null;
+        var listNameError = null;
+        var upd = "";
+        var add = "";
+        var del = "";
+        @if ((upd != null && upd != "") && (updc != null && updc != ""))
+        { 
+        @(new HtmlString("upd = '" + upd + "';"))
+        }
+        @if ((del != null && del != "") && (delc != null && delc != ""))
+        { 
+        @(new HtmlString("del = '" + del + "';"))
+          }
+           @if ((add != null && add != "") && (addc != null && addc != ""))
+           { 
+        @(new HtmlString("add = '" + add + "';"))
+           } 
+        
+        function restartData() {
+            elementNames = new Array();
+            selectedID = null;
+            selectedListName = null;
+            selectedElement = null;
+            listNameError = null;
+        }
+
+        $(document).ready(function ($) {
+            $("body").trigger("mouseover");
+            $("#dependencyLists select").prop("disabled", "disabled");
+            $("#elementCancelButton").hide();
+
+            function cleanListForm() {
+                $("#listName").val("");
+                $("#listDisplayName").val("");
+                $("#elementName").val("");
+                $("#elementDisplayName").val("");
+                $("#unorderElementTable tbody").empty();
+                $("#orderElementTable tbody").empty();
+
+            }
+
+            function onEditListAction() {
+                if (upd == "u") {
+                    cleanListForm();
+                    restartData();
+                    jQuery("#list_panel").find(".modal-header-text").text("Editar Lista");
+                    $("#final_msg").text("");
+                    $("#elementCancelButton").hide();
+                    tr = $(this).closest("tr");
+                    selectedID = tr.attr("id");
+                    $.ajax({
+                        url: "/List/List/getFullList",
+                        type: "POST",
+                        data: { id: selectedID },
+                        beforeSend: _loading,
+                        success: function (data) {
+                            object = JSON.parse(data);
+                            $("#listName").val(object["name"]);
+                            selectedListName = object["name"];
+                            $("#listDisplayName").val(object["displayName"]);
+
+                            try { //creating unorderElementsTable
+                                $("#unorderElementTable tbody").empty();
+                                unorderArray = object["elements"].unorder;
+                                for (element in unorderArray) {
+                                    for (attr in unorderArray[element]) {
+                                        newTr = newTrElement(attr, unorderArray[element][attr]);
+                                        $("#unorderElementTable").append(newTr);
+                                        elementNames.push(attr);
+                                    }
+                                }
+                            } catch (Exception) { }
+
+                            try { //creating unorderElementsTable
+                                $("#orderElementTable tbody").empty();
+                                orderArray = object["elements"].order;
+                                for (element in orderArray) {
+                                    for (attr in orderArray[element]) {
+                                        newTr = newTrElement(attr, orderArray[element][attr]);
+                                        newTr.addClass("newElement");
+                                        $("#orderElementTable").append(newTr);
+                                        elementNames.push(attr);
+                                        break;
+                                    }
+                                }
+                                orderElements = $("#orderElementTable tbody .icon-upload");
+                                for (i = orderElements.length - 1; i >= 0; --i) {
+                                    orderElements[i].click();
+                                }
+                            } catch (Exception) { }
+
+                            try {
+                                dependency = object["dependency"];
+                                $("#dependencyCheck").prop("checked", true);
+                                $("#dependencyLists select").prop("disabled", false);
+                                $("#listSelect").val("listSelect" + dependency.listID);
+                                loadElementsOption(dependency.listID);
+                                $("#elementSelect").val("elementSelect" + dependency.elementName);
+
+                            } catch (Exception) {
+                                $("#dependencyCheck").prop("checked", false);
+                                $("#dependencyLists select").prop("disabled", "disabled");
+                            }
+
+                            $("#list_panel").modal("show");
+                            $("#generalInfo a:first").click();
+                        },
+                        error: function () {
+                            _alert("error","Ha ocurrido un error");
+                        },
+                        complete: _loading()
+                    });
+                }
+            }
+
+            function onDeleteListAction() {
+                if (del == "d") {
+                    tr = $(this).closest("tr");
+
+                    _confirm({
+                        title: "Eliminar Lista",
+                        message: "¿Seguro que deseas eliminar la lista " + tr.find(".listName").text() + "?",
+                        action: function () {
+                            $.ajax({
+                                url: "deleteList",
+                                type: "GET",
+                                data: { id: tr.attr('id') },
+                                //beforeSend: _loading,
+                                success: function (data) {
+                                    _alert("success", "Eliminado Correctamente");
+                                    loadListTable();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            function elementToDownAction() {
+                tr = $(this).closest("tr");
+                tr.next().after(tr);
+            }
+
+            function elementToUpAction() {
+                tr = $(this).closest("tr");
+                tr.prev().before(tr);
+            }
+
+            function onToUnorderListAction() {
+                tr = $(this).closest("tr");
+                tr.prependTo("#unorderElementTable tbody");
+                tr.removeClass("fromUnorderSaved");
+                tr.find(".icon-download").addClass("icon-upload")
+                    .removeClass("icon-download")
+                    .closest("a")
+                    .attr("data-original-title", "Establecer un orden para este elemento.")
+                    .unbind("click",onToUnorderListAction)
+                    .on("click", onToOrderListAction);
+
+                tr.find(".icon-arrow-up,.icon-arrow-down").closest("a").remove();
+            }
+
+            function onToOrderListAction() {
+                tr = $(this).closest("tr");
+                tr.prependTo("#orderElementTable tbody");
+                tr.find(".icon-upload").addClass("icon-download")
+                    .removeClass("icon-upload")
+                    .closest("a")
+                    .attr("data-original-title", "Quitar orden para este elemento.")
+                    .unbind("click", onToOrderListAction)
+                    .on("click", onToUnorderListAction);
+                tr.find(".tableOptions div.btn-group").append(
+                    $("<a/>").addClass("btn").attr("href", "#").append(
+                        $("<i/>").addClass("icon-arrow-up").on("click", elementToUpAction )
+                    ).attr(
+                        "data-original-title", "Subir una posición."
+                    ).attr(
+                        "rel", "tooltip"
+                    ).attr(
+                        "data-placement", "top"
+                    ).tooltip()
+                ).append(
+                    $("<a/>").addClass("btn").attr("href", "#").append(
+                        $("<i/>").addClass("icon-arrow-down").on("click", elementToDownAction)
+                    ).attr(
+                        "data-original-title", "Bajar una posición."
+                    ).attr(
+                        "rel", "tooltip"
+                    ).attr(
+                        "data-placement", "top"
+                    ).tooltip()
+                );
+
+                if (!tr.hasClass('newElement')) {
+                    tr.addClass("fromUnorderSaved");
+                }
+            }
+
+            function onDeleteElementAction() {
+                tr = $($(this).closest("tr"));
+                name = tr.find(".elementName").text();
+                if (tr.hasClass("newElement")) {
+                    _confirm({
+                        title: "Eliminar Elemento",
+                        message: "¿Estás seguro que deseas eliminar el elemento " + name + "?",
+                        action: function () {
+                            tr.remove();
+                            elementNames.splice(elementNames.indexOf(name), 1);
+                        }
+                    });
+                } else {
+                    if (del == "d") {
+                        _confirm({
+                            title: "Eliminar Elemento",
+                            message: "Este elemento será eliminado en tiempo real ¿Estás seguro que deseas eliminar el elemento " + name + "?",
+                            action: function () {
+                                $.ajax({
+                                    url: "/List/List/removeElement",
+                                    type: "GET",
+                                    data: { ListID: selectedID, elementName: name },
+                                    beforeSend: _loading,
+                                    success: function (data) {
+                                        elementNames.splice(elementNames.indexOf(name), 1);
+                                        tr.remove();
+                                        _loading();
+                                    },
+                                    error: function () {
+                                        _alert("error", "Ha ocurrido un error");
+                                        _loading();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+
+            function onEditElementAction() {
+                tr = $($(this).closest("tr"));
+                $("#elementName").attr("disabled","disabled");
+                $("#elementCancelButton").show();
+                name = tr.find(".elementName").text();
+                displayName = tr.find(".elementDisplayName").text();
+                $("#elementName").val(name);
+                $("#elementDisplayName").val(displayName);
+                selectedElement = tr;
+            }
+
+            function newTrElement(name, displayName) {
+                newTr = $("<tr/>");
+                //creating the checkbox
+                //newTr.append(
+                //    $("<td/>").append(
+                //        $("<div/>").append(
+                //            $("<span/>")
+                //    //.append(
+                //    //            $("<center>").append(
+                //    //                $("<input type='checkbox' class='uniform checker' name='checker'/>")
+                //    //            )
+                //    //        )
+                //        )
+                //    )
+                //);
+                newTr.append($("<td class='elementName'/>").text(name));
+                newTr.append($("<td class='elementDisplayName'/>").text(displayName));
+                newTr.append(
+                    $("<td class='tableOptions'/>").append(
+                        $("<div/>").addClass("btn-group").append(
+                            $("<a/>").addClass("btn").attr("href", "#").append(
+                                $("<i/>").addClass("icon-edit")
+                            ).attr(
+                                "data-original-title", "Editar este elemento."
+                            ).attr(
+                                "rel", "tooltip"
+                            ).attr(
+                                "data-placement", "top"
+                            ).on(
+                                "click", onEditElementAction
+                            ).tooltip()
+                        ).append(
+                            $("<a/>").addClass("btn").attr("href", "#").append(
+                                $("<i/>").addClass("icon-trash")
+                            ).attr(
+                                "data-original-title", "Eliminar este elemento."
+                            ).attr(
+                                "rel", "tooltip"
+                            ).attr(
+                                "data-placement", "top"
+                            ).on(
+                                "click", onDeleteElementAction
+                            ).tooltip()
+                        ).append(
+                            $("<a/>").addClass("btn").attr("href", "#").append(
+                                $("<i/>").addClass("icon-upload")
+                            ).attr(
+                                "data-original-title", "Establecer un orden para este elemento."
+                            ).attr(
+                                "rel", "tooltip"
+                            ).attr(
+                                "data-placement", "top"
+                            ).on(
+                                "click", onToOrderListAction
+                            ).tooltip()
+                        )
+                    )
+                );
+
+                return newTr;
+            }
+
+            function loadElementsOption(listID) {
+                $("#elementSelect").html("");
+                $.ajax({
+                    url: "/List/List/getFullList",
+                    type: "POST",
+                    data: { id: listID },
+                    async:false,
+                    success: function (data) {
+                        tableData = JSON.parse(data);
+                        elements = tableData["elements"]
+                        orderElements = elements["order"];
+                        for (orderElement in orderElements) {
+                            element = orderElements[orderElement];
+                            for (attr in element) {
+                                newOption = $("<option value='elementSelect" + attr + "'/>");
+                                newOption.text(element[attr]);
+                                $("#elementSelect").append(newOption);
+                                break;
+                            }
+                        }
+
+                        newOption = $("<option disabled='disabled'/>");
+                        newOption.text("-----------------------------------------");
+                        $("#elementSelect").append(newOption);
+
+                        orderElements = elements["unorder"];
+                        for (orderElement in orderElements) {
+                            element = orderElements[orderElement];
+                            for (attr in element) {
+                                newOption = $("<option value='elementSelect" + attr + "'/>");
+                                newOption.text(element[attr]);
+                                $("#elementSelect").append(newOption);
+                                break;
+                            }
+                        }
+                        
+                    }
+                });
+            }
+
+            function loadListOption() {
+                $.ajax({
+                    url: "/List/List/getListTable",
+                    type: "POST",
+                    success: function (data) {
+                        tableData = JSON.parse(data);
+                        $("#listSelect").html("");
+                        for (counter = 0; counter < tableData.length ; ++counter) {
+                            newOption = $("<option value='listSelect" + tableData[counter]["_id"] + "'/>");
+                            newOption.text(tableData[counter]["displayName"]);
+                            $("#listSelect").append(newOption);
+                        }
+                        loadElementsOption($("#listSelect").val().substring(10));
+                    }
+                });
+            }
+
+            function loadListTable() {
+                $.ajax({
+                    url: "/List/List/getListTable",
+                    type: "POST",
+                    success: function (data) {
+                        tableData = JSON.parse(data);
+                        $("#listTable").dataTable().fnDestroy();
+                        $("#listTable tbody").empty();
+                        for (counter = 0; counter < tableData.length ; ++counter) {
+
+                            newTr = $("<tr id='" + tableData[counter]["_id"] + "'/>");
+
+                            //creating the checkbox
+                            newTr.append(
+                                $("<td/>").append(
+                                    $("<div/>").append(
+                                        $("<span/>").append(
+                                            $("<center>").append(
+                                                $("<input type='checkbox' class='uniform checker' name='checker'/>")
+                                            )
+                                        )
+                                    )
+                                )
+                            );
+
+                            newTr.append($("<td style='max-width: 80px;min-width: 80px;' class='listName'/>").text(tableData[counter]["name"]));   //name of this list
+                            newTr.append($("<td style='max-width: 80px;min-width: 80px;' />").text(tableData[counter]["creatorId"])); //the list's creator
+                            newTr.append($("<td style='max-width: 80px;min-width: 80px;' />").text(tableData[counter]["createdDate"])); //created date of this list
+                            newTr.append($("<td style='max-width: 80px;min-width: 80px;'/>").text(tableData[counter]["lastModified"])); //created date of this list
+
+                            var update = "";
+                            var delet = "";
+                         
+                            if (upd == "u") {
+                                var update = $("<a/>").addClass("btn").attr("href", "#").append(
+                                                $("<i/>").addClass("icon-edit")
+                                            ).attr(
+                                                "data-original-title", "Editar esta lista."
+                                            ).attr(
+                                                "rel", "tooltip"
+                                            ).attr(
+                                                "data-placement", "top"
+                                            ).tooltip().on("click", onEditListAction);
+                            }
+                            
+                            if (del == "d") {
+                                delet = $("<a/>").addClass("btn").attr("href", "#").append(
+                                                $("<i/>").addClass("icon-trash")
+                                            ).attr(
+                                                "data-original-title", "Eliminar esta lista."
+                                            ).attr(
+                                                "rel", "tooltip"
+                                            ).attr(
+                                                "data-placement", "top"
+                                            ).tooltip().on("click", onDeleteListAction);
+                            }
+
+                            newTr.append(
+                                $("<td style='max-width: 80px;min-width: 80px;' class='tableOptions'/>").append(
+                                    $("<div/>").addClass("btn-group").append(
+                                       update).append(delet)
+                                )
+                            );
+                            $("#listTable tbody").append(newTr);
+                        }
+                        
+                        try {
+
+                            jQuery("#listTable").dataTable({
+                                "sPaginationType": "full_numbers",
+                                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                                "iDisplayLength": 10,
+                                "sScrollY": "400px",
+                                "aoColumnDefs": [{
+                                    'bSortable': false,
+                                    'aTargets': [0]
+                                }],
+                                "oLanguage": {
+                                    "sLengthMenu": "Mostrar _MENU_ registros",
+                                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                                    "sSearch": "Buscar",
+                                    "oPaginate": {
+                                        "sFirst": "Primero",
+                                        "sLast": "Ultimo",
+                                        "sNext": "Siguiente",
+                                        "sPrevious": "Anterior"
+
+                                    },
+                                    "sEmptyTable": "Tabla Sin Datos"
+                                }
+                            });
+                            jQuery('.dataTables_length select').chosen();
+                            setTimeout(function () {
+                                var table = jQuery("#listTable").dataTable();
+                                table.fnAdjustColumnSizing();
+
+                            }, 1000);
+                        } catch (Exception) { console.log(); }
+                    },
+                    error: function () {
+                        console.log("Unable to get data from the server");
+                    }
+                });
+            };
+
+            $("#listSelect").on("change", function () {
+                id = $("#listSelect").val().substring(10);
+                loadElementsOption(id);
+            });
+
+            $("#elementCancelButton").on("click", function () {
+                selectedElement = null;
+                $("#elementName").val("").attr("disabled",false);
+                $("#elementDisplayName").val("");
+                $(this).hide();
+            });
+
+            $("#addListButton").on("click", function () {
+                cleanListForm();
+                $("#final_msg").text("");
+                $("#dependencyCheck").prop("checked", false);
+                $("#dependencyLists select").prop("disabled", "disabled");
+                restartData();
+                jQuery("#list_panel").find(".modal-header-text").text("Agregar Lista");
+                $("#list_panel").modal("show");
+                $("#generalInfo a:first").click();
+                $("#elementCancelButton").hide();
+            });
+
+            $("#deleteListButton").on("click", function () {
+                var selecteds = $(".checker:checked");
+                if (selecteds.length == 0) {
+                    _alert("error","Debe de seleccionar Listas primero para eliminarlas!");
+                    return;
+                }
+
+                _confirm({
+                    title: "Eliminar Registros",
+                    message: "¿Seguro que desea eliminar los registros seleccionados?",
+                    action: function () {
+                        var selectedIdArray = [];
+                        for (i = 0; i < selecteds.length; i = i + 1) {
+                            selectedIdArray.push($(selecteds[i]).closest("tr").attr("id"));
+                        }
+                        _loading();
+                        $.ajax({
+                            url: "/List/List/deleteLists",
+                            datatype: "json",
+                            type: "POST",
+                            data: { array: selectedIdArray },
+                            traditional: true,
+                            success: function (data) {
+                                loadListTable();
+                                _loading();
+                                _alert("success", "Eliminado Correctamente");
+                                restartData();
+
+                            }
+                        });
+                    }
+                });
+            });
+
+            $("#dependencyCheck").on("change", function () {
+                if ($("#dependencyCheck").is(":checked")) {
+                    $("#dependencyLists select").prop("disabled", false);
+                } else {
+                    $("#dependencyLists select").prop("disabled", "disabled");
+                }
+            });
+
+            $("#cancel_button").on("click", function () {
+                $("#list_panel").modal("hide");
+                restartData();
+            });
+
+            $("#addElementButton").on("click", function () {
+                if (!$("#elementName")[0].checkValidity()) {
+                    _alert("error","El nombre del elemento tiene un formato no válido");
+                    return;
+                }
+                
+                if (!$("#elementDisplayName")[0].checkValidity()) {
+                    _alert("error","El nombre de muestra tiene un formato no válido");
+                    return;
+                }
+
+                name = $("#elementName").val();
+                displayName = $("#elementDisplayName").val();
+
+                try{
+                    trName = selectedElement.find(".elementName").text();
+                } catch (Exception) {
+                    trName = null;
+                }
+                if ($.inArray(name, elementNames) != -1 && (selectedElement == null || name != trName)) {
+                    _alert("error", "El nombre del elemento ya existe introduzca otro.");
+                    return;
+                }
+
+                
+                if (name.trim() != "" && displayName.trim() != "") {
+                    elementNames.splice(elementNames.indexOf(name), 1);
+                    elementNames.push(name);
+
+                    if (selectedElement == null) {
+                        newTr = newTrElement(name, displayName);
+                        newTr.addClass("newElement");
+                        $("#unorderElementTable").append(newTr);
+                    } else {
+                        if (tr.hasClass("newElement")) {
+                            selectedElement.find(".elementName").text(name);
+                            selectedElement.find(".elementDisplayName").text(displayName);
+                        } else {
+
+                            _confirm({
+                                title: "Editar Elemento",
+                                message: "Este elemento se modificará en tiempo real. ¿Seguro que desea editar este elemento?",
+                                action: function () {
+                                    $.ajax({
+                                        url: "/List/List/changeElement",
+                                        type: "GET",
+                                        data: { ListID: selectedID, elementName: name, newValue: displayName },
+                                        async: false,
+                                        success: function (data) {
+                                            selectedElement.find(".elementName").text(name);
+                                            selectedElement.find(".elementDisplayName").text(displayName);
+                                            selectedElement = null;
+                                        },
+                                        error: function () {
+                                            _alert("error", "Ha ocurrido un error.");
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    }
+                    $("#elementName").val("");
+                    $("#elementDisplayName").val("");
+                    $("#elementCancelButton").hide();
+                } else {
+                    _alert("error","Debes introducir los datos del nuevo elemento.");
+                }
+                //selectedElement = null;
+                $("#elementName").attr("disabled", false).focus();
+            });
+
+            $("#elementName,#elementDisplayName").on("keypress",function (e) {
+                if (e.which == 13) {
+                    $("#addElementButton").click();
+                    return false;
+                }
+            });
+
+            $("input").click(function () {
+                $(this).select();
+            });
+
+            $("#save_button").on("click", function () {
+                if (!$("#listName")[0].checkValidity() || !$("#listDisplayName")[0].checkValidity()) {
+                    $("#generalInfo a:first").click();
+                    return;
+                }
+                $("#elementName").val("");
+                $("#elementDisplayName").val("");
+            });
+
+            $("#listName").on("change", function () {
+                name = $("#listName").val();
+                if (name != selectedListName) {
+                    $.ajax({
+                        url: "/List/List/listNameUsed",
+                        type: "POST",
+                        async: false,
+                        data: { listName: $("#listName").val() },
+                        success: function (data) {
+                            if (data == "True")
+                                listNameError = "Ya existe una lista con este nombre.";
+                            else
+                                listNameError = null;
+                        }
+                    });
+                } else {
+                    listNameError = null;
+                }
+            });
+
+            $("#listForm").on("submit", function () {
+                message = "";
+                if (listNameError) {
+                    message = listNameError;
+                } else {
+                    formData = "listID=" + selectedID + "&" + $("#listForm").serialize();
+
+                    trsArray = $("#unorderElementTable tbody tr.newElement");
+                    unorderElements = "{";
+                    for (i = 0; i < trsArray.length; ++i) {
+                        unorderElements += "'" + $(trsArray[i]).find(".elementName").text() + "':'" + $(trsArray[i]).find(".elementDisplayName").text() + "'";
+                        if (i < trsArray.length - 1) unorderElements += ",";
+                    }
+                    unorderElements += "}";
+                    formData += "&unorderElements=" + unorderElements;
+
+                    trsArray = $("#orderElementTable tbody tr");
+                    unorderElements = "{";
+                    for (i = 0; i < trsArray.length; ++i) {
+                        unorderElements += "'" + $(trsArray[i]).find(".elementName").text() + "':'" + $(trsArray[i]).find(".elementDisplayName").text() + "'";
+                        if (i < trsArray.length - 1) unorderElements += ",";
+                    }
+                    unorderElements += "}";
+                    formData += "&orderElements=" + unorderElements;
+
+                    changedElementsNames = $("#orderElementTable tr.fromUnorderSaved .elementName");
+                    changedElements = "";
+                    for (i = 0; i < changedElementsNames.length; i++) {
+                        changedElements += $(changedElementsNames[i]).text();
+                        if (i < changedElementsNames.length - 1) {
+                            changedElements += ",";
+                        }
+                    }
+                    formData += "&changedElements=" + changedElements;
+                    if ($("#dependencyCheck").prop("checked")) {
+                        formData += "&dependency={'listID':'" + $("#listSelect").val().substring(10) + "','elementName':'" + $("#elementSelect").val().substring(13) + "'}";
+                    }
+                    $.ajax({
+                        url: "saveList",
+                        type: "POST",
+                        data: { data: formData },
+                        beforeSend: _loading,
+                        success: function (data) {
+                            $("#list_panel").modal("hide");
+                            loadListTable();
+                            loadListOption();
+                            _alert("success","Guardado correctamente.");
+                        },
+                        error: function () {
+                            _alert("error","Ha ocurrido un error");
+                        },
+                        complete: _loading
+                    });
+                }
+
+                $("#final_msg").text(message);
+                return false;
+            });
+
+            loadListTable();
+            loadListOption();
+
+            //START - Import Section
+            jQuery("#T9").bind("change.changeImage", function () {
+
+                var fa = new FormData();
+                //var idcateg = jQuery("#importbtn").data("idcat");
+
+                fa.append('file', jQuery('#T9')[0].files[0]);
+                //fa.append('idcategory', idcateg);
+                var fileup = jQuery('#T9')[0].files[0]
+                var format = fileup.name.split('.');
+
+                var ext = format[format.length - 1];
+                ext = ext.toLowerCase();
+
+                if (ext == "xlsx") {
+                    jQuery.ajax({
+                        url: "/List/List/ImpExcel",
+                        contentType: false,
+                        processData: false,
+                        data: fa,
+                        type: "POST",
+                        beforeSend: _loading(),
+
+                        success: function (data) {
+                            if (data != null) {
+                                jQuery('#excelTable').html("");
+                                jQuery('#excelTable').html(data);
+                                jQuery('#excelTable').modal("show");
+                                jQuery("#T9").val("");
+                                _loading();
+                            } else {
+                                alert("Ocurrio un error, Verifique el Archivo Fuente");
+                                jQuery("#T9").val("");
+                                _loading();
+                            }
+                        },
+                        error: function (errorThrown) {
+                            alert("Ocurrio un error, intenta más tarde.");
+                            jQuery("#T9").val("");
+                            _loading();
+                        }
+                    });
+
+                } else {
+                    alert("Elija Un Archivo de Excel(solo Formato xlsx)");
+                    jQuery("#T9").val("");
+                }
+                return null;
+            });
+            //END - Import Section
+        });
+       
+    </script>
+}

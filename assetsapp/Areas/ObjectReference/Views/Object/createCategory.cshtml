@@ -1,0 +1,479 @@
+﻿<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="btn-group pull-right top-btn">
+                <a class="light_blue btn" id="saveProfile">Guardar</a>
+                <a class="red btn delete" id="cancelButton">Cancelar</a>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="well grey">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Datos del tipo de Activo</h5>
+                </div>
+                <div class="well-content">
+                    <div class="row-fluid">
+                        <div class="span8">
+                    <div class="form-horizontal">
+                        <div class="control-group">
+                            <label class="control-label" for="profileName">Nombre:</label>
+                            <div class="controls">
+                                 <input id="profileName" type="text" placeholder="Nombre del tipo de activo" required>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="categoryImage">Fotografía:</label>
+                            <div class="controls">
+                                 <input type="file" id="categoryImage" name="categoryImage" value="Default" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="depreciacion">Depreciacion:</label>
+                            <div class="controls">
+                                <input id="depreciacion" type="text" placeholder="Depreciacion">
+                            </div>
+                        </div>
+                    </div>
+                            </div>
+                            <div class="span4">
+                                <img id="categoryImagePreview" src=""/>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="well grey">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Campos del tipo de Activo</h5>
+                    <div class="btn-group field green pull-right" id="importButton">
+                        <a href="#" role="button" class="btn btn-mini green" onclick="importProfile()">Importar Campos</a>
+                    </div>
+                </div>
+                <div class="well-content no_padding">
+                    <!-- CUSTOM FIELDS SECTION-->
+                    <div class="row-fluid" id="sortable">
+                        <div>
+                            <div id="change_tab_name" class="modal hide fade" data-backdrop="static">
+                                <div class="modal-header">
+                                    <h3 class="modal-header-text">Nombre del Tab</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <div align="center">
+                                        <input name="tabName" id="tabName" type="text" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <span width="80%" id="final_msg" class="error_msg"></span>
+                                    <input value="Guardar" class="btn blue" type="submit" id="save_button">
+                                    <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+                                </div>
+                            </div>
+                            <div class="contentDrag">
+                                <div id="customTabs-1">
+                                    <div id="tabs">
+                                        <div class="drag_field_here">
+                                            <h3>Arrastra un campo aquí</h3>
+                                        </div>
+                                        <div class="navbar-inner">
+                                            <ul class="nav nav-tabs">
+                                                <li>
+                                                    <a onclick="openModal()" data-toggle="tab" href="#" rel="tooltip" data-original-title="Agregar tab" data-placement="right">
+                                                        <i class="icon-plus"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="tab-content">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="span3" style="width: 30%; float: right">
+                                <div class="well-header widgetclient titleclient">
+                                    <h5>Lista de Campos Custom</h5>
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="light_blue btn-small btn btnNewCamp"><i class="icon-plus icon-white"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <!-- Custom Fields List -->
+                                    <div class="well-content sortable" id="field_list">
+                                        <input type="text" name="filter" class="no-sortable" placeholder="Filtrar Campos" onkeyup="filterBoxes(this.value)" />
+                                        @foreach (var field in Model)
+                                        {
+                                            <div data-name="@field["name"].ToString().ToLower()" class="well light_blue" id='@field["_id"]'>
+                                                <div class="well-header widgetclient titleclient">
+                                                    <h5>@field["name"]</h5>
+                                                    <button type="button" class="close"><i class="icon-remove"></i></button>
+                                                    <input type="checkbox" name="required" rel="tooltip" data-original-title="¿requerido?" data-placement="right" />
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var _customFields = [];
+    var _permissionsHTK = {};
+    var _tabCounter = 0;
+    var _modal = $('#change_tab_name');
+    var _editProfile = {};
+    var _profileId = "";
+
+    $(document).ready(function ($) {
+
+        $("#profileName").focus();
+
+        $("#cancelButton").on("click", function () {
+            if (_profileId == "") {
+                window.location = "/ObjectReference/Object#" + parentCategory;
+            } else {
+                window.location = "/ObjectReference/Object#" + _profileId;
+            }
+        });
+
+        $("#tabName").on("keypress", function (e) {
+            if (e.which == 13) {
+                $("#save_button").click();
+                return false;
+            }
+        });
+
+        $('#sortable .close').click(function () {
+            //isRemovable = $(this).parent('#field_list');
+            //console.log(isRemovable);
+            //if(!isRemovable)
+            $('#field_list').append($(this).offsetParent('.well'));
+        });
+
+        createTabs($);
+
+        @if (ViewData["profile"] != null)
+        {
+            @(new HtmlString("_editProfile =" + ViewData["profile"] + ";"))
+            @(new HtmlString("createProfile(false);"))      
+        }
+
+        if( _editProfile["ext"] != null )
+        jQuery("#categoryImagePreview").attr("src","/Uploads/Images/Categories/" + _editProfile["_id"] + "." + _editProfile["ext"]);
+        
+        /* Make the edit profile scenario fixed */
+        window.addEventListener("scroll", function () {
+            if (this.pageYOffset > 500) {
+                $(".contentDrag").addClass("dragFixed");
+            }
+            else {
+                $(".contentDrag").removeClass("dragFixed");
+            }
+        });
+
+
+    });
+
+    var sortableContainers = "";
+    var $tabs = "";
+    var $tab_items = "";
+    var parentCategory = "@ViewData["parentCategory"]";
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                jQuery('#categoryImagePreview').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    jQuery("#categoryImage").bind("change.changeImage", function () {
+        readURL(this);
+    });
+
+    function saveTab() {
+        name = _modal.find("input[name=tabName]").val().trim();
+        if (name == "") {
+            _modal.find("input[name=tabName]").focus();
+            return false;
+        }
+        if (_modal.action == "edit") {
+            tab = _modal.editing;
+            tab.text(name);
+            jQuery(tab.closest("a").attr("href")).data("tab_name", name);
+        }
+        else {
+            addTab(name);
+        }
+        _modal.modal("hide");
+    }
+
+    function openModal(tab) {
+
+        if (!tab) {
+            _modal.action = "new";
+            _modal.find("input[name=tabName]").val("");
+        }
+        else {
+            tab = jQuery(tab);
+            tab = tab.closest('a').find('span').first();
+            name = tab.text();
+
+            _modal.action = "edit";
+            _modal.editing = tab;
+
+            _modal.find("input[name=tabName]").val(name);
+        }
+        _modal.modal("show");
+        setTimeout(function () {
+            jQuery("#tabName").focus();
+        }, 700);
+
+    }
+
+    function createTabs($) {
+        sortableContainers = $('#sortable .sortable').sortable({
+            items: ".well:not(.no-sortable)",
+            connectWith: "#sortable .sortable",
+            placeholder: "sortable-box-placeholder",
+            opacity: 0.8
+        });
+
+        $tab_items = $("#tabs ul:first li").droppable({
+            accept: "#sortable .sortable div",
+            hoverclass: "ui-state-hover",
+            drop: function (event, ui) {
+                var $item = jQuery(this);
+                var $list = jQuery($item.find("a").attr("href"))
+                  .find(".leftposition");
+
+                ui.draggable.hide("slow", function () {
+                    //$tabs.tabs("option", "active", $tab_items.index($item));
+                    jQuery(this).appendTo($list).show("slow").css('opacity', '1');
+                });
+            }
+        });
+    }
+
+    function getProfileScenario() {
+        var old_tab_name = null;
+        var newTab = {};
+        _customFields = [];
+        sortableContainers.each(function () {
+            if (this.id != "field_list") {
+                var tab_name = (jQuery(this).parent(".contentTab").data("tab_name"));
+                if (tab_name != old_tab_name) {
+                    newTab = {
+                        "tabName": tab_name,
+                        "fields": []
+                    };
+                    old_tab_name = tab_name;
+                    _customFields.push(newTab);
+                }
+
+                jQuery(jQuery(this).context.children).each(function () {
+                    position = jQuery(this).parent('.sortable').data('position');
+                    position = (position == "left") ? 1 : 2;
+                    isRequired = (jQuery(this).find("input[name=required]").prop("checked")) ? 1 : 0;
+                    newTab.fields.push({ "fieldID": this.id, "position": position, "size": 1, "required": isRequired });
+                });
+            }
+        });
+    }
+
+    function removeAllTabs() {
+        jQuery("#tabs .nav .icon-remove").each(function () {
+            removeTab(this);
+        });
+    }
+
+    function removeTab(tab) {
+        tab = jQuery(tab).closest("a");
+        content = jQuery(tab.attr("href"));
+        fields = content.find(".well");
+
+        fields.each(function () {
+            jQuery('#field_list').append(this);
+        });
+
+        if (tab.closest("li").hasClass("active")) {
+            jQuery('#tabs ul').children().first().find('a').click();
+        }
+
+
+        tab.closest("li").remove();
+        content.remove();
+        createTabs(jQuery);
+    }
+
+    function addTab(tabName) {
+        _tabCounter++;
+
+        var tabTitle = '<li><a data-toggle="tab" href="#tabs-' + _tabCounter + '"><span>' + tabName +
+                            '</span><span class="btn" href="#" rel="tooltip" data-original-title="Cambiar Nombre" data-placement="right">' +
+                                '<i class="icon-edit" onclick="openModal(this);"></i></span>' +
+                                '<span href="#" rel="tooltip" data-original-title="Eliminar" data-placement="right">' +
+                                '<i class="icon-remove" onclick="removeTab(this);"></i></span></a></li>';
+
+        var tabContent = '<div id="tabs-' + _tabCounter + '" class="tab-pane contentTab" data-tab_name="' + tabName + '">' +
+                           '<div data-position="left" class="span4 column sortable leftPosition" style="width: 48%;"></div>' +
+                           '<div data-position="right" class="span4 column sortable rightPosition" style="width: 48%;"></div>' +
+                         '</div>';
+
+        tabs = jQuery('#tabs ul').children();
+        tabs.last().before(tabTitle);
+        jQuery('#tabs .tab-content').append(tabContent);
+        jQuery("[rel=tooltip]").tooltip();
+
+        tabs = jQuery('#tabs ul').children();
+        jQuery(tabs[tabs.length - 2]).find("a").click();
+        createTabs(jQuery);
+
+        return "#tabs-" + _tabCounter;
+    }
+
+    function createProfile(imported) {
+
+        if (!imported) {
+            var pName = _editProfile["name"];
+            _profileId = _editProfile["_id"];
+           
+          
+
+            jQuery("#profileName").val(pName);
+            try{
+                debugger;
+                var depreciacionp = (_editProfile["depreciacion"] != undefined) ? _editProfile["depreciacion"] : "";
+                jQuery('#depreciacion').val(depreciacionp);
+            }catch(ex){console.log(ex.toString()); }
+        }
+
+        var cFields = _editProfile["customFields"];
+        _permissionsHTK = _editProfile["permissionsHTK"];
+
+        for (tabs in cFields) {
+            tab = cFields[tabs];
+            idTab = addTab(tab["tabName"]);
+            for (fields in tab["fields"]) {
+                field = tab["fields"][fields];
+                cfield = jQuery("#" + field["fieldID"]);
+                isRequired = field["required"];
+                if (field["position"] == 1)
+                    jQuery(idTab).find(".leftPosition").append(cfield);
+                else
+                    jQuery(idTab).find(".rightPosition").append(cfield);
+
+                if (isRequired && !cfield.find("input[name=required]").prop("checked"))
+                    cfield.find("input[name=required]").click();
+                if (!isRequired && cfield.find("input[name=required]").prop("checked"))
+                    cfield.find("input[name=required]").click();
+            }
+        }
+    }
+
+    function importProfile() {
+        var toImport = parentCategory;
+        if (toImport != 0) {
+            jQuery.ajax({
+                url: "/objectReference/Category/getCategory",
+                type: "POST",
+                data: { idCategory: toImport },
+                beforeSend: function () {
+                    _loading("Importando");
+                },
+                complete: _loading,
+                success: function (data) {
+                    removeAllTabs();
+                    if (data) {
+                        _editProfile = JSON.parse(data);
+                        createProfile(true);
+                    }
+                },
+                error: function (errorThrown) {
+                }
+            });
+        }
+    }
+
+    function filterBoxes(txt) {
+        txt = txt.trim().toLowerCase();
+        jQuery("#field_list .well").each(function () {
+            name = jQuery(this).data("name");
+            if (name.indexOf(txt) !== -1) {
+                jQuery(this).show();
+            }
+            else {
+                jQuery(this).hide();
+            }
+        });
+    }
+
+    function deleteProfile() {
+
+    }
+
+    $("#save_button").click(saveTab);
+    $("#cancel_button").click(function () {
+        _modal.modal("hide");
+    });
+
+    $('#saveProfile').click(function () {
+        getProfileScenario();
+        var profile_name = jQuery('#profileName').val().trim();
+        var depreciacion = jQuery('#depreciacion').val().trim();
+
+        var newProfile = {
+            name: profile_name,
+            customFields: _customFields,
+            depreciacion: depreciacion
+        }
+        newProfile = JSON.stringify(newProfile);
+
+        var formData = new FormData();
+        formData.append("categoryData", newProfile);
+        formData.append("parentCategory", parentCategory);
+        formData.append("idProfile", _profileId);
+        formData.append('file', jQuery('#categoryImage')[0].files[0]);
+
+        if (profile_name != "") {
+            jQuery.ajax({
+                url: "/ObjectReference/Object/saveCategory",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: formData,
+                beforeSend: _loading("Guardando"),
+                success: function (data) {
+                    if (_profileId == "") {
+                        window.location = "/ObjectReference/Object#" + parentCategory;
+                    } else {
+                        window.location = "/ObjectReference/Object#" + _profileId;
+                    }
+                    _loading(),
+                    _alert("success", "Datos Guardados");
+                }
+            });
+        }
+        else
+            jQuery("#profileName").focus();
+        return false;
+    });
+
+</script>

@@ -1,0 +1,54 @@
+﻿@{Layout = null;}
+
+<div class="row-fluid">
+    <div class="span3">
+
+        <div class="portlet-body fuelux">
+            <ul class="tree" id="tree_2">
+            </ul>
+        </div>
+    </div>
+    <div class="span9">
+        <div id="visor">
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="tabHeader1">
+                    <li class="active" id="listaHeader"><a href="#lista" data-toggle="tab">listas</a></li>
+                    <li id="imagenesHeader"><a href="#imagenes" data-toggle="tab">imagenes</a></li>
+                </ul>
+            </div>
+            <div class="tab-content" id="tabContent1">
+                <div class="tab-pane active lista listamargen" id="lista">
+                    <div id="tabla-listas">
+
+                        <table class="table table-striped table-bordered table-hover datatable" id="locationTable">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div id="tablebody"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div id="detalles"></div>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane imagenes listamargen" id="imagenes">
+                    imagenes
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    </div>
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        jQuery("#locationsRoot").tree();
+    });
+
+</script>

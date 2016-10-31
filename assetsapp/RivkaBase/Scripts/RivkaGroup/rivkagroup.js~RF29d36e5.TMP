@@ -1,0 +1,356 @@
+ var tableinit= jQuery("#mailtablex").clone();
+
+ function bindlevel0() {
+            $("[data-group-level=0]").unbind('click.root');
+            $("[data-group-level=0]").bind('click.root', function (e) {
+                debugger;
+                var hasclass = $(this).hasClass("expanded-group");
+                $(this).closest("tr").nextAll("tr").each(function () {
+
+                    if ($(this).find("[data-group-level=0]").length == 0) {
+                        if (hasclass == true) {
+                            $(this).hide()
+                        } else {
+                            $(this).show()
+                        }
+                    } else {
+                        return false;
+                    }
+
+                })
+            });
+             
+        }
+
+function bindlevel3() {
+            $(".level3").unbind('click.level');
+            $(".level3").bind('click.level', function () {
+               
+                $(this).closest("tr").nextAll("tr").each(function () {
+
+                    if ($(this).attr("id") == undefined) {
+                        $(this).toggle()
+                    } else {
+                        return false;
+                    }
+
+                })
+            })
+
+        }
+function bindcolors() {
+            $("[data-group-level=0]").css({
+                'background-color': '#6775A1',
+                'color': 'white',
+                'cursor': 'pointer'
+            })
+            $("[data-group-level=1]").css({
+                'background-color': '#939AB0',
+                'color': 'white',
+                'cursor': 'pointer'
+            })
+            $(".level3 td").css({
+                'background-color': '#B0B6C8',
+                'color': 'white',
+                'cursor': 'pointer'
+            })
+        }
+function bindgroup() {
+
+            $(".subgroup").unbind('click.kk');
+            $(".subgroup").bind('click.kk', function () {
+
+               
+                var subgroup = $(this).closest("tr").next("tr").attr("data-group")
+                if (subgroup != undefined) {
+
+                    var subtr = $('[data-group=' + subgroup + ']')
+                    subtr = $(subtr).filter("tr")
+                    if ($(this).hasClass("expanded-group")) {
+
+                        $(subtr).each(
+                          function () {
+
+                              $(this).hide();
+                          }
+                        )
+                    } else {
+                        var thead = $('#mailtablex thead tr:first');
+                        var tablenew = $("<table/>").append($("<thead/>").append((thead.clone())))
+                        $(tablenew).append($("<tbody/>").append(subtr.clone()))
+                        //$(tablenew).find("tr").each(function(){ $(this).removeAttr("data-group") })
+                        try {
+                            $(tablenew).dataTable();
+
+                        } catch (ex) { console.log(ex) }
+                        try {
+                            if (yearthis != "") {
+                                $(tablenew).dataTable().rowGrouping({ iGroupingColumnIndex: colum, sGroupBy: "year", fnGroupLabelFormat: function (label) { return "           +" + label + "  (Por " + labelthis + " )"; }, bHideGroupingColumn: false });
+
+                            } else {
+                                
+                                $(tablenew).dataTable().rowGrouping({ iGroupingColumnIndex: colum, fnGroupLabelFormat: function (label) { return "           +" + label + " (Por " + labelthis + " )"; }, bHideGroupingColumn: false });
+                            }
+                        } catch (ex) { console.log(ex) }
+                        try{
+                            $(tablenew).find("tbody tr").each(function () {
+
+                               
+
+                                if ($(this).attr("id") != undefined) {
+                                    $(this).addClass("level3")
+                                }
+
+
+                            })
+                        } catch (ex) { }
+                        setTimeout(function () { bindlevel3();},500);
+                        subtr.remove()
+                        $(this).closest("tr").after($(tablenew).find("tbody tr"))
+                    }
+                } else {
+                    
+                    $(this).closest("tr").nextAll("tr").each(
+                    function () {
+
+                        if ($(this).find("td").hasClass("group") == true && $(this).find("td").data("group-level")!=0) {
+                           /* if (show) {
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }*/
+                            $(this).nextAll("tr").each(function () {
+                              
+                                if ($(this).attr("id") == undefined) {
+                                    $(this).hide()
+                                } else {
+                                    return false;
+                                }
+                            });
+                            $(this).toggle();
+
+                        }
+                        if ($(this).closest("tr").filter("[id*=group-id-mailtablex_]").length > 0) {
+
+                            return false;
+                        }
+                    }
+
+                    )
+
+
+                }
+
+            });
+             $(".subgroup").trigger("click");
+
+         
+        }
+function toggleElements(option) {
+            if (option) {
+                try{
+                    $("#mailtablex_length select").val("10").trigger("change");
+                    $("#mailtablex_length").show();
+                    $("#mailtablex_filter").show();
+                    $("#mailtablex thead tr:last").show();
+                    $("#mailtablex_paginate").show();
+                    $("#mailtablex").closest("div").css({ "top": "50px" })
+                }catch(ex){ }
+            } else {
+                try{
+                $("#mailtablex_length select").val("-1").trigger("change");
+                $("#mailtablex_length").hide();
+                $("#mailtablex_filter").hide();
+                $("#mailtablex thead tr:last").hide();
+                $("#mailtablex_paginate").hide();
+                $("#mailtablex").closest("div").css({ "top": "-50px" })
+                } catch (ex) { }
+            }
+        }
+function bindDropdowns(){
+
+        $('#firstFilter select').unbind("change.first");
+        $('#firstFilter select').bind("change.first", function () {
+
+            $('#secondFilter select option').attr("disabled", false);
+            $('#thridFilter select option').attr("disabled", false);
+            $('#secondFilter select').val("99").trigger("change");
+            $('#thridFilter select').val("99").trigger("change");
+            $(".subgroup").unbind('click.kk');
+            if ($(this).val() != 99) {
+                
+                $('#secondFilter select').find("[value=" + $(this).val() + "]").attr("disabled", true)
+                $('#thridFilter select').find("[value=" + $(this).val() + "]").attr("disabled", true)
+
+                $('#secondFilter').show();
+                $('#thridFilter').hide();
+            } else {
+                $('#secondFilter').hide();
+                $('#thridFilter').hide();
+            }
+
+
+
+        });
+        $('#secondFilter select').unbind("change.second");
+        $('#secondFilter select').bind("change.second", function () {
+
+            $('#thridFilter select option').attr("disabled", false);
+           
+            $('#thridFilter select').val("99");
+            $('#thridFilter select').trigger("change")
+            if ($(this).val() != 99) {
+
+                $('#thridFilter select').find("[value=" + $(this).val() + "]").attr("disabled", true)
+                $('#thridFilter select').find("[value=" + $('#firstFilter select').val() + "]").attr("disabled", true)
+
+                $('#thridFilter').show();
+            } else {
+               
+                $('#thridFilter').hide();
+            }
+
+
+
+        });
+       
+        $('#group').unbind("click.group");
+        $('#group').bind("click.group", function () {
+            _loading();
+
+            try{
+             //tableinit= jQuery("#mailtablex").clone()
+
+            }catch(ex){ 
+               console.log(ex);
+             }
+            var first = $('#firstFilter select').val();
+            var second = $('#secondFilter select').val()
+            var thrid = $('#thridFilter select').val()
+            $(".subgroup").unbind('click.subgroup');
+            debugger;
+            if (first != 99) {
+
+                var labelfirst = $('#mailtablex thead tr:first th:eq(' + first + ')').text()
+                var param1 = "iGroupingColumnIndex:" + first + ",bExpandableGrouping: true,bHideGroupingColumn: false,fnGroupLabelFormat: function(label) { return ' +'+ label + '  (Por " + labelfirst + ")'; }, ";
+                var param2 = "";
+                var year = ($('#year1').is(":checked")) ? "sGroupBy: 'year'," : "";
+                if (second != 99) {
+                    year = ($('#year2').is(":checked")) ? "sGroupBy: 'year'," : year;
+                    var labelsecond = $('#mailtablex thead tr:first th:eq(' + second + ')').text()
+
+                    param2 = "iGroupingColumnIndex2:" + second + ",bExpandableGrouping2: true,bHideGroupingColumn2: false,fnGroupLabelFormat2: function(label) { return '     +'+ label + '  ( Por " + labelsecond + ")'; }, ";
+                     if (thrid != 99) {
+                         yearthis = ($('#year3').is(":checked")) ? "sGroupBy: 'year'," : "";
+                         var labelthrid = $('#mailtablex thead tr:first th:eq(' + thrid + ')').text()
+                         colum=thrid;
+                          
+                         labelthis = labelthrid;
+                         setTimeout(function () { bindgroup() }, 2000);
+                         setTimeout(function () { bindlevel0() }, 2000);
+                         
+                    } else {
+                      
+                    }
+
+                    
+                }  
+
+                var script = "$('#mailtablex').dataTable().rowGrouping({" +
+                param1 + param2 + year +
+                "bExpandSingleGroup: false,iExpandGroupOffset: -1,asExpandedGroups: ['']})"
+
+                try{
+                    
+                    toggleElements(0);
+                    
+                }catch(ex){ }
+                try {
+                    
+                    $.globalEval(script);
+                    var thead=$("#mailtablex thead tr:first").clone()
+                    $("#mailtablex thead tr:first").hide()
+                    $("#mailtablex thead tr:first").before($(thead))
+
+                } catch (ex) {
+                    console.log(ex.toString())
+                }
+                setTimeout(function () { bindcolors() }, 500);
+               
+            } else {
+
+                alert("elija una Columna")
+            }
+            setTimeout(function(){  _loading(); },1000)
+        })
+
+         
+    $("#ungroup").unbind('click.un');
+    $("#ungroup").bind('click.un', function () {
+                debugger;
+        if(tableinit!=""){
+
+                try{
+                    
+                
+
+                 //   $("#mailtablex").html("")
+                  //  $("#mailtablex").html($(tableinit));
+                    $("#mailtablex_wrapper").remove();
+                    $("#reports").find("div:first").after($(tableinit).clone());
+                     var th = $('#mailtablex thead tr').clone()
+                     $('#mailtablex thead').append(th)
+                    var colindex=$("#mailtablex thead tr:first th").length-1;
+                    var columnsi="";
+            for(var i=0;i<colindex;i++)
+              {
+               columnsi+= "{ type: 'text' },"
+                             
+              }
+              columnsi+= "{ type: 'text' }"
+                               
+        var evaltable="$(\"#mailtablex\").dataTable({"+
+                "\"sPaginationType\": \"full_numbers\","+
+                "\"sDom\": \"<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>\","+
+               " \"iDisplayLength\": 10,"+
+               " \"bSortable\": false,"+
+                "aLengthMenu: ["+
+               " [10, 50, 100, -1],"+
+               " [10, 50, 100, \"Todos\"]"+
+               " ],"+
+               " \"oLanguage\": {"+
+                "    \"sLengthMenu\": \"Mostrar _MENU_ registros\","+
+                 "   \"sInfo\": \"Mostrando del _START_ al _END_ de _TOTAL_ registros\","+
+                 "   \"sSearch\": \"Filtro\","+
+                 "   \"oPaginate\": {"+
+                  "      \"sFirst\": \"Primero\","+
+                  "      \"sLast\": \"Ultimo\","+
+                  "      \"sNext\": \"Siguiente\","+
+                   "    \"sPrevious\": \"Anterior\""+
+                  "   },"+
+                  "  \"sEmptyTable\": \"Tabla Sin Datos\""+
+                "}"+
+                 "}).columnFilter({"+
+                  " sPlaceHolder: \"head:after\","+
+                  "  aoColumns: ["+
+                  " "+ columnsi+" "+
+                   "        ]"+
+                " });";
+                 
+                    
+                try {
+                    
+                    $.globalEval(evaltable);
+                     $('#mailtablex input').css("width", "100%")
+                } catch (ex) {
+                    console.log(ex.toString())
+                }
+
+                }catch(ex){
+
+
+                }
+             }
+
+            });
+      }

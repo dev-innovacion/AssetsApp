@@ -1,0 +1,575 @@
+﻿
+@{Layout = null;}
+
+@model Dictionary<string,string>
+@{
+    ViewBag.Title = "UserReport";
+    Dictionary<string,string> col = new Dictionary<string,string>();
+
+    col.Add("user", "Usuario");
+    col.Add("name", "Nombre");
+    col.Add("lastname", "Apellidos");
+    col.Add("email", "Email");
+    col.Add("profileId", "Perfil");
+    col.Add("CreatedDate", "Fecha Alta");
+
+    int index = 0;
+    string idus = "";
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+        idus = Session["_id"].ToString();
+    }
+    
+}
+
+ 
+                        <br />
+                        <center>
+                            <div id="optionsdiv1" class=" white span12" style="padding-left: 2%; margin-top: -2.5%; margin-left: 7%; ">
+                                <div  class="span4">
+                                    <div id="profilesFilter">
+                                        <div class="hida" style="padding-left: 2%;">
+                                            <input id="profilecheck" type="checkbox" style="right:5px;" />
+                                            Perfiles: 
+                                        </div>
+                                        <div style="max-height:100px;overflow:auto">
+                                            <select multiple class="span11" style="width:100%">
+
+
+                                                @foreach (var item in Model)
+                                                {
+                                                    <option value="@item.Key">@item.Value</option>
+
+                                                }
+                                            </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                        <div class="span4" style="padding-left:2%;">
+                                           
+                                            <div id="fieldFilter">
+                                                <div class="hida" style="padding-left: 2%;">
+                                                    <input id="fieldcheck" type="checkbox" style="right:5px;" />
+                                                   Campos A Visualizar:  </div>
+                                                 <select multiple class="span11">
+                                                    @foreach (var item in col)
+                                                            {
+                                                                <option value="@item.Key">@item.Value</option>
+
+                                                            }
+                                                </select>
+                                            </div>
+                                                 
+                                                  
+                                            
+                                        </div>
+
+                                <div class="span6" style="padding-left:2%;">
+
+                                    <div id="locsFilter">
+                                        <div class="hida" style="padding-left: 2%;">
+                                            <input id="locscheck" type="checkbox" style="right:5px;" />
+                                           Conjuntos:
+                                        </div>
+                                        <select multiple class="span11">
+                                            @foreach (var item in ViewData["locations"] as Dictionary<string,string>)
+                                            {
+                                                <option value="@item.Key">@item.Value</option>
+
+                                            }
+                                        </select>
+                                    </div>
+
+
+
+                                </div>
+
+                              
+                                    </div>
+                        </center>
+
+
+                   
+               
+                <div class=" no_padding row-fluid" style="background-color:white !important">
+                    <div class="float_right" style="padding-right:4%">
+                        <input type="submit" class="btn button_green"  id="generate" value="Generar Reporte" />
+                     
+                        <!--<input type="submit" class="btn blue" id="saver" value="Guardar Reporte" />-->
+
+                    </div>
+                </div>
+               
+            
+          
+
+        
+      
+    
+
+
+          
+
+            <script>
+               
+                var first = 0;
+               
+                jQuery(document).ready(function ($) {
+                    $("#fieldFilter select").select2()
+                    $("#locsFilter select").select2();
+                    $("#profilesFilter select").select2();
+                  
+                    var idus = ""
+                   @(new HtmlString("idus='"+idus+"';"))
+    
+                    $('#NoWheelPropagation').perfectScrollbar({ wheelSpeed: 1000 });
+
+                    var valid = 1;
+                    var valid1 = 1;
+                    var checkboxValues = new Array();
+                    var checkboxValuesfilter = new Array();
+                    var checkboxValueslocs = new Array();
+                    $('#myCarousel').carousel({
+                        interval: 200000
+                    })
+                    $('#profilecheck').change(function () {
+                        debugger;
+                        if ($(this).is(":checked")) {
+                            var alls = Array();
+                            jQuery("#profilesFilter option").each(function () { alls.push(jQuery(this).val()) });
+                            $("#profilesFilter select").select2("val",alls);
+                        } else {
+                            $("#profilesFilter select").select2("val", null);
+                        }
+
+                    });
+                    $('#fieldcheck').change(function () {
+                        debugger;
+                        if ($(this).is(":checked")) {
+                            var alls = Array();
+                            jQuery("#fieldFilter option").each(function () { alls.push(jQuery(this).val()) });
+                            $("#fieldFilter select").select2("val", alls);
+                        } else {
+                            $("#fieldFilter select").select2("val", null);
+                        }
+
+                    });
+                    $('#locscheck').change(function () {
+                        debugger;
+                        if ($(this).is(":checked")) {
+                            var alls = Array();
+                            jQuery("#locsFilter option").each(function () { alls.push(jQuery(this).val()) });
+                            $("#locsFilter select").select2("val", alls);
+                        } else {
+                            $("#locsFilter select").select2("val", null);
+                        }
+
+                    });
+                  /*  $('#all1').change(function () {
+
+                      
+
+                        $('input[name="optionsprofile[]"]').each(function () {
+                            debugger;
+
+                            if (valid == 0) {
+                                this.checked = true;
+
+                            } else {
+                                this.checked = false;
+                            }
+
+                        });
+
+                        if (valid == 0) {
+                            valid++;
+                        } else {
+                            valid = 0;
+                        }
+                        jQuery('#profilesFiltersx3 .multiSel').html("");
+                        jQuery('#profilesFiltersx3 .hida').css("display", "initial");
+
+                             });
+                    $('#all').change(function () {
+
+
+
+                        $('input[name="options[]"]').each(function () {
+                            debugger;
+
+                            if (valid1 == 0) {
+                                this.checked = true;
+
+                            } else {
+                                this.checked = false;
+                            }
+
+                        });
+
+                        if (valid1 == 0) {
+                            valid1++;
+                        } else {
+                            valid1 = 0;
+                        }
+                        jQuery('#optionsdivx3 .multiSel').html("");
+                        jQuery('#optionsdivx3 .hida').css("display", "initial");
+
+                    });*/
+                   
+                    $('#generate').on('click', function () {
+
+                        debugger;
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        var profile = $("#selectprofile").val();
+
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate == "" || enddate == null) {
+                            enddate = "01/01/3000";
+                        }
+                        
+                      /*  $('input[name="options[]"]:checked').each(function () {
+                            var objdata = new Object();
+                            objdata.data = $(this).val();
+                            objdata.value = $(this).data("option");
+                            checkboxValues.push(objdata);
+                            index++;
+
+                        });*/
+                        var fieldsObj = jQuery("#fieldFilter select").select2("data");
+                        var profileObj = $("#profilesFilter select").select2("data");
+                        var locsObj = jQuery("#locsFilter select").select2("data");
+                          for (i = 0; i < fieldsObj.length; i++) {
+                            var objdata = new Object();
+                            objdata.data = fieldsObj[i].id;
+                            objdata.value = fieldsObj[i].text;
+                            checkboxValues.push(objdata);
+
+                          }
+                          for (i = 0; i < profileObj.length; i++) {
+                              var objdata = new Object();
+                              objdata.data = profileObj[i].id;
+                              objdata.value = profileObj[i].text;
+                              checkboxValuesfilter.push(objdata);
+
+
+                          }
+                          for (i = 0; i < locsObj.length; i++) {
+                              var objdata = new Object();
+                              objdata.data = locsObj[i].id;
+                              objdata.value = locsObj[i].text;
+                              checkboxValueslocs.push(objdata);
+
+
+                          }
+                     
+                   
+
+                        var jsondata = JSON.stringify(checkboxValues);
+                        var jsondatafilter = JSON.stringify(checkboxValuesfilter);
+                        var jsondatalocs = JSON.stringify(checkboxValueslocs);
+
+                        if (checkboxValues.length > 0 && checkboxValuesfilter.length > 0) {
+                            
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GenerateUserReport",
+                                data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata , locations:jsondatalocs},
+                                beforeSend: _loading(),
+                                type: "POST",
+                                success: function (data) {
+                                    $('#Report').html("");
+                                    $('#Report').html(data);
+
+                                    checkboxValues.length = 0;
+                                    checkboxValuesfilter.length = 0;
+                                    checkboxValueslocs.length = 0;
+                                    if (jQuery(".header_actions a i").first().attr("Class") == "icon-chevron-right")
+                                    { $(".header_actions a").first().click(); }
+                                    _loading();
+
+                                }
+
+
+                            });
+                        } else {
+
+                            if (checkboxValues.length == 0) {
+                                alert("Elija por lo menos un Campo!!!");
+                            } else {
+                                alert("Elija por lo menos un Perfil!!!");
+                            }
+                        }
+                    });
+                    $('#selectreport').on('change', function () {
+
+                        var value = $('#selectreport').val();
+
+                        if (value != 0) {
+                            jQuery.ajax({
+
+                                url: "/Reports/Reports/GetReport",
+                                data: { id: value },
+                                type: "POST",
+                                success: function (data) {
+
+
+                                   
+                                    if (data != "" && data != null) {
+                                        var data = JSON.parse(data);
+                                        var jsondatafilter = data["profiles"];
+                                        var startdate = data["startdate"];
+                                        var enddate = data["enddate"];
+                                        var jsondata = data["cols"];
+
+                                        jQuery.ajax({
+
+                                            url: "/Reports/Reports/GenerateUserReport",
+                                            data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata },
+                                            beforeSend: _loading(),
+                                            type: "POST",
+                                            success: function (data) {
+                                                $('#Report').html("");
+                                                $('#Report').html(data);
+
+                                                checkboxValues.length = 0;
+                                                checkboxValuesfilter.length = 0;
+                                                $('#selectreport').val("0");
+                                                $(".header_actions a").first().click()
+                                                _loading();
+
+                                            }
+
+
+                                        });
+
+                                    } else {
+                                        alert("Error Al Generar el Reporte!!!");
+                                    }
+
+
+                                }
+
+
+                            });
+                        }
+                    });
+                    $('#saver').on('click', function () {
+
+                        jQuery("#namereport").modal("show");
+
+
+                    });
+                    $('#save').unbind('click.save');
+                    $('#save').bind('click.save', function () {
+
+                       
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        var profile = $("#selectprofile").val();
+                        var namereport = "";
+                        namereport = $("#getnamex").val();
+
+                        if (namereport != "" && namereport != null) {
+                            if (startdate == "" || startdate == null) {
+                                startdate = "Indefinida";
+
+                            }
+                            if (enddate == "" || enddate == null) {
+                                enddate = "Indefinida";
+                            }
+                         /*   var index = 0;
+                            $('input[name="options[]"]:checked').each(function () {
+                                var objdata = new Object();
+                                objdata.data = $(this).val();
+                                objdata.value = $(this).data("option");
+                                checkboxValues.push(objdata);
+                                index++;
+
+                            });
+                            var index2 = 0;
+                            $('input[name="optionsprofile[]"]:checked').each(function () {
+                                var objdata = new Object();
+                                objdata.data = $(this).val();
+                                objdata.value = $(this).data("option");
+
+                                checkboxValuesfilter.push(objdata);
+                                index2++;
+
+                            });*/
+                            var fieldsObj = jQuery("#fieldFilter select").select2("data");
+                            var profileObj = $("#profilesFilter select").select2("data");
+                            for (i = 0; i < fieldsObj.length; i++) {
+                                var objdata = new Object();
+                                objdata.data = fieldsObj[i].id;
+                                objdata.value = fieldsObj[i].text;
+                                checkboxValues.push(objdata);
+
+                            }
+                            for (i = 0; i < profileObj.length; i++) {
+                                var objdata = new Object();
+                                objdata.data = profileObj[i].id;
+                                objdata.value = profileObj[i].text;
+                                checkboxValuesfilter.push(objdata);
+
+
+                            }
+
+
+
+
+                            var jsondata = JSON.stringify(checkboxValues);
+                            var jsondatafilter = JSON.stringify(checkboxValuesfilter);
+
+
+                            if (checkboxValues.length > 0 && checkboxValuesfilter.length > 0) {
+                                jQuery.ajax({
+
+                                    url: "/Reports/Reports/SaveReport",
+                                    data: { namereport: namereport, filter: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata, type: "Usuarios" },
+                                    beforeSend: _loading(),
+                                   
+                                    type: "POST",
+                                    success: function (data) {
+
+                                        _alert("success", data);
+
+                                        checkboxValues.length = 0;
+                                        checkboxValuesfilter.length = 0;
+                                        jQuery("#namereport").modal("hide");
+                                        $("#getnamex").val("");
+                                        jQuery.ajax({
+
+                                            url: "/Reports/Reports/UserReport",
+                                            data: {id:idus, datestart: startdate, dateend: enddate },
+                                            beforeSend: _loading(),
+                                            type: "POST",
+                                            success: function (data) {
+                                                $('#Report1').html("");
+                                                $('#Report').html("");
+                                                $('#Report1').html(data);
+
+                                                checkboxValues.length = 0;
+                                                _loading();
+
+                                            }
+                                        });
+                                       
+                                        _loading();
+                                          
+                                        
+
+
+                                    }
+
+
+                                });
+                             
+                            } else {
+
+                                if (index == 0) {
+                                    alert("Elija por lo menos un Campo!!!");
+                                } else {
+                                    alert("Elija por lo menos un Perfil!!!");
+                                }
+                            }
+                           
+                        } else {
+                            alert("Escriba un Nombre!!!");
+                        }
+                    });
+
+
+                    /*Dropdowns multi*/
+                    $("#profilesFiltersx3 .dropdown dt a").on('click', function () {
+                        debugger;
+                        $("#profilesFiltersx3 .dropdown dd ul").slideToggle('fast');
+                    });
+
+                    $("#profilesFiltersx3 .dropdown dd ul li a").on('click', function () {
+                        $("#profilesFiltersx3 .dropdown dd ul").hide();
+                    });
+
+                    function getSelectedValue(id) {
+                        return $("#" + id).find("dt a span.value").html();
+                    }
+
+                    $(document).bind('click', function (e) {
+                        var $clicked = $(e.target);
+                        if (!$clicked.parents().hasClass("dropdown")) $("#profilesFiltersx3 .dropdown dd ul").hide();
+                    });
+
+
+                    $('#profilesFiltersx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+                        // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+                        var title = $(this).closest('#profilesFiltersx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+                        //title = $(this).val() + ",";
+                        title = $(this).data("option") + ",";
+
+                        if ($(this).is(':checked')) {
+                            var html = '<span title="' + title + '">' + title + '</span>';
+                            $('#profilesFiltersx3 .multiSel').append(html);
+                            $("#profilesFiltersx3 .hida").hide();
+                        }
+                        else {
+                            $('span[title="' + title + '"]').remove();
+                            var ret = $("#profilesFiltersx3 .hida");
+                            $('#profilesFiltersx3 .dropdown dt a').append(ret);
+
+                        }
+                    });
+
+
+
+                    $("#optionsdivx3 .dropdown dt a").on('click', function () {
+                      
+                        $("#optionsdivx3 .dropdown dd ul").slideToggle('fast');
+                    });
+
+                    $("#optionsdivx3 .dropdown dd ul li a").on('click', function () {
+                        $("#optionsdivx3 .dropdown dd ul").hide();
+                    });
+
+                    function getSelectedValue(id) {
+                        return $("#" + id).find("dt a span.value").html();
+                    }
+
+                    $(document).bind('click', function (e) {
+                        var $clicked = $(e.target);
+                        if (!$clicked.parents().hasClass("dropdown")) $("#optionsdivx3 .dropdown dd ul").hide();
+                    });
+
+
+                    $('#optionsdivx3 .mutliSelect input[type="checkbox"]').on('click', function () {
+
+                        // var title = $(this).closest('.mutliSelect').find('input[type="checkbox"]').val(),
+                        var title = $(this).closest('#optionsdivx3 .mutliSelect').find('input[type="checkbox"]').data("option"),
+                        //title = $(this).val() + ",";
+                        title = $(this).data("option") + ",";
+
+                        if ($(this).is(':checked')) {
+                            var html = '<span title="' + title + '">' + title + '</span>';
+                            $('#optionsdivx3 .multiSel').append(html);
+                            $("#optionsdivx3 .hida").hide();
+                        }
+                        else {
+                            $('span[title="' + title + '"]').remove();
+                            var ret = $("#optionsdivx3 .hida");
+                            $('#optionsdivx3 .dropdown dt a').append(ret);
+
+                        }
+                    });
+
+                    $("#fieldcheck").click();
+                });
+
+
+
+            </script>

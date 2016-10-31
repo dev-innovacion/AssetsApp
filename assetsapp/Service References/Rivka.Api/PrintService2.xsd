@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/WCFServiceHost" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/WCFServiceHost" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://webservice.assetsapp.com/ws/PrintService.svc?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:complexType name="Status">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AddAntenna" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AddPrinter" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CloseLabel" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Connect" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Disconnect" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="GetAntenna" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="GetPrinter" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="GetVariables" type="xs:boolean" />
+      <xs:element minOccurs="0" name="OpenLabel" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Print" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Quantity" type="xs:int" />
+      <xs:element minOccurs="0" name="Read" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SetEPC" nillable="true" type="xs:string" />
+      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Variables" nillable="true" type="q1:ArrayOfstring" />
+      <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="Write" nillable="true" type="q2:ArrayOfstring" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Status" nillable="true" type="tns:Status" />
+  <xs:complexType name="ArrayOfAntennaClass">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="AntennaClass" nillable="true" type="tns:AntennaClass" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAntennaClass" nillable="true" type="tns:ArrayOfAntennaClass" />
+  <xs:complexType name="AntennaClass">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="IP" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Model" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="AntennaClass" nillable="true" type="tns:AntennaClass" />
+</xs:schema>

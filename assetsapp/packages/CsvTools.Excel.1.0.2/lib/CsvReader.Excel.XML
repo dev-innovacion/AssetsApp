@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CsvReader.Excel</name>
+    </assembly>
+    <members>
+        <member name="M:DataAccess.ExcelExtensions.ReadExcel(DataAccess.DataTableBuilder,System.String)">
+            <summary>
+            Reads the first worksheet in the .xlsx file and returns it. This only supports .xlsx files (Office 2007, with open xml standard) 
+            and not .xls files (which had a closed file format that required COM). 
+            Also supports reading .csv files.
+            This is safe to use on a server. 
+            </summary>
+            <param name="builder"></param>
+            <param name="filename">filename </param>
+            <returns>table for the first sheet in the workbook. Table's name is the sheet name.</returns>
+        </member>
+        <member name="M:DataAccess.ExcelExtensions.ReadExcel(DataAccess.DataTableBuilder,System.IO.Stream)">
+            <summary>
+            Reads the first worksheet in the .xlsx file and returns it. This only supports .xlsx files (Office 2007, with open xml standard) 
+            and not .xls files (which had a closed file format that required COM). 
+            This is safe to use on a server. 
+            </summary>
+            <param name="builder"></param>
+            <param name="input">stream to read file from</param>
+            <returns>table for the first sheet in the workbook. Table's name is the sheet name.</returns>
+        </member>
+        <member name="M:DataAccess.ExcelExtensions.ReadExcelAllSheets(DataAccess.DataTableBuilder,System.String)">
+            <summary>
+            Reads all sheets in the excel workbook and returns as a ordered collection of data tables.
+            </summary>
+            <param name="builder">placeholder</param>
+            <param name="filename">excel file to load</param>
+            <returns>Ordered collection of tables corresponding to non-empty sheets. Table name corresponds to sheet name.</returns>
+        </member>
+        <member name="M:DataAccess.ExcelExtensions.ReadExcelAllSheets(DataAccess.DataTableBuilder,System.IO.Stream)">
+            <summary>
+            Reads all sheets in the excel workbook and returns as a ordered collection of data tables.
+            </summary>
+            <param name="builder">placeholder</param>
+            <param name="input">stream to read from</param>
+            <returns>Ordered collection of tables corresponding to non-empty sheets. Table name corresponds to sheet name.</returns>
+        </member>
+    </members>
+</doc>

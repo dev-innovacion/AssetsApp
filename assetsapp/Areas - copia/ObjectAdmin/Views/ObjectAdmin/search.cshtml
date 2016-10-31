@@ -1,0 +1,11 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "search";
+    String result = "[]";
+    try
+    {
+        result = ViewData["resultjson"].ToString();
+    }
+    catch { }
+}
+@(new HtmlString(result))

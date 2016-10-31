@@ -1,0 +1,1015 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model List<List<List<List<string>>>>
+@{
+      ViewBag.Title = "Escenario del Inventario";
+       int numfile = 0;
+        List<string> headsdb = ViewData["heads"] as List<string>;
+        string[] nametab = headsdb.ToArray();
+        List<string> nametablesdbs = ViewData["nametablsdbs"] as List<string>;
+        string[] nametablesarray = nametablesdbs.ToArray();
+        int indexnames = 0;
+        int ids = Model.Count();
+        int idsca = 0;
+        int idtables = 0;
+      string numnot=  ViewData["notfound"].ToString();
+      string numnews= ViewData["numnews"].ToString();
+      string numlocs= ViewData["numlocs"].ToString();
+      string numtotal=  ViewData["numtotal"].ToString();
+      string idinventory = ViewData["idinventory"].ToString();
+      bool isadmin = false;
+      try
+      {
+          isadmin = Convert.ToBoolean( ViewData["valid"].ToString());
+      }
+      catch { }
+    }
+    <div id="bodymail">
+        <!-- Tabs -->
+        <div class="float_left"><h4>ID Inventario:</h4>@idinventory</div>
+        <div class="btn-group float_right top-btn" id="buttonStatus">
+        </div>
+        <br />
+        <div class="row-fluid" style="padding-left:0px;">
+            <br />
+            <div id="" class="span3" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                <div style="margin:5px;text-align:center">
+                    <h4 style="font-weight:bold; color: #0072c6">@numtotal</h4>
+                    <h5>#Activos encontrados:</h5>
+                    
+                </div>
+            </div>
+            @*<div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                <div style="margin:5px;text-align:center">
+                    <h4 style="font-weight:bold; color: #0072c6">@numnews</h4>
+
+                    <h5>#Activos Nuevos:</h5>
+                     </div>
+            </div>
+            <div id="" class="span3" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                <div style="margin:5px;text-align:center">
+                    <h4 style="font-weight:bold; color: #0072c6">@numlocs</h4>
+
+                    <h5>#Activos Reubicados:</h5>
+                       </div>
+            </div>*@
+            <div id="" class="span3" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                <div style="margin:5px;text-align:center">
+                    <h4 style="font-weight:bold; color: #0072c6">@numnot</h4>
+
+                    <h5>#Activos no encontrados:</h5>
+                      </div>
+            </div>
+        </div>
+        <br />
+        <div class="float_right" style="padding-right:1%;padding-top:5px;">
+
+            <input type="submit" class="btn button_green" id="generateexcel" value="Exportar a Excel" />
+        </div>
+       
+        
+        <div class="navbar-inner " >
+            <ul class="nav nav-tabs" id="myTab">
+                @{int idget = 0;}
+                @if(isadmin) { 
+              
+                for (int i = 0; i < ids; i++) {
+                    if (i == 0) {    
+                <li class="active" id="@i-tab"><a href="#@i" data-toggle="tab">@nametab[i].ToString()</a></li>
+                       
+                    }
+                    else { 
+                    <li id="@i-tab"><a href="#@i" data-toggle="tab">@nametab[i].ToString()</a></li>
+                        
+                }
+                idget=i+1;
+                }
+                }
+                <li id="@idget-tab"><a href="#@idget" data-toggle="tab">Encontrados</a></li>
+
+                @{idget = idget + 1;}
+                <li id="@idget-tab"><a href="#@idget" data-toggle="tab">No Encontrados</a></li>
+                
+                @{idget=idget+1;}
+                @*@if(isadmin) { 
+                <li id="@idget-tab"><a href="#@idget" data-toggle="tab">Nuevos Act.</a></li>
+
+                idget = idget + 1;
+                <li id="@idget-tab"><a href="#@idget" data-toggle="tab">Reubicaciones.</a></li>
+                }*@
+            </ul>
+        </div>
+        <!-- Tabs Content -->
+<div class="tab-content">
+        <!--Users Section -->
+
+@{int index = 0; int validate = 0;}
+@if (isadmin) { 
+foreach (var tables in Model)
+{
+    string active = "";
+
+    if (index == 0)
+    {
+        active = "active";
+    }
+        <div class="tab-pane @active" id="@index">
+            @{string idca = "myCarousel" + idsca.ToString();}
+            <div id="@idca">
+               
+                <!--<h10>@nametab[index].ToString()</h10>:-->
+                <div class="carousel-inner" style="right:1%;">
+                    @{int carous = 0;int validatex = 0;}
+                    
+                    @foreach (var data in tables)
+                    {
+                        validatex = 0;
+                        string classca = "item";
+                        if (carous == 0)
+                        {
+                            classca = "item active";
+
+                        }
+                        <div class="@classca">
+                            @{string name = "tabla" + carous;}
+                       <center>  <div style="background-color: #eaeaea; font-weight: bold; font-size: medium; border-bottom: 3px solid #0072c6;">   <h5>Tabla: @nametablesarray[indexnames].ToString();</h5></div></center>
+                           <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:600px; max-height: 600px; overflow: hidden">
+                             @if ("htk_Inventarios1" == nametablesarray[indexnames].ToString())
+                             {
+                                 <div class="row-fluid">
+
+                                     <div class="span6" style="border-right:3px solid #0072c6">
+                                         <h10>Activos:</h10>
+                                         <div id="">
+
+                                             <br />
+
+
+                                             <table id="mailtablex-@idtables" class="table  table-striped table-hover dataTable">
+
+                                                 <thead>
+
+                                                     <tr style="background:#0072c6;color:white;">
+                                                         @foreach (var item in data)
+                                                         {
+                                                             foreach (var x in item)
+                                                             {
+                                                         <th class="table-fixed-medium">@x</th>
+                                                             }
+                                                             break;
+                                                         }
+                                                     </tr>
+                                                 </thead>
+                                                 <tbody>
+                                                     @{int hnot = 0;}
+                                                     @foreach (var row in data)
+                                                     {
+                                                         if (hnot != 0)
+                                                         {
+                                                     <tr class="mailtr">
+                                                         @foreach (var column in row)
+                                                                 {
+                                                                 <td class="table-fixed-medium">@column.ToString()</td>
+
+                                                                 }
+                                                     </tr>
+                                                         }
+                                                         hnot++;
+                                                         validate++;
+                                                     }
+
+                                                 </tbody>
+                                                 @{idtables++;}
+                                             </table>
+                                             <!--end-->
+                                             @if (validate == 0)
+                                             {
+                                             <br /><br /><br />
+                                             <center><h4>Tabla Sin Registros ..</h4></center>
+                                             }
+                                         </div>
+                                     </div>
+                                     <div class="span6" >
+                                         <h10>Inventario:</h10>
+
+                                     </div>
+
+                                 </div>
+                             }
+                             else { 
+                               <div id="">
+
+                                   <br />
+
+
+                                <table id="mailtablex-@idtables" class="table  table-striped table-hover dataTable">
+
+                                    <thead>
+
+                                        <tr style="background:#0072c6;color:white;">
+                                            @foreach (var item in data)
+                                {
+                                    foreach (var x in item)
+                                    {
+                                        <th class="table-fixed-medium">@x</th>
+                                    }
+                                    break;
+                                }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{int hnot = 0;}
+                                        @foreach (var row in data)
+                            {
+                                if (hnot != 0) {
+                                    <tr class="mailtr">
+                                        @foreach (var column in row)
+                                    {
+                                        <td class="table-fixed-medium">@column.ToString()</td>
+
+                                    }
+                                    </tr>
+                               }
+                                hnot++;
+                                validatex++;
+                            }
+
+                                    </tbody>
+                                    @{idtables++;}
+                                </table>
+
+                                <!--end-->
+                             @if (validatex == 0)
+                             {
+                                 <br /><br /><br />
+                                 <center><h4>Tabla Sin Registros ..</h4></center>
+                             }
+                            </div>
+                             }
+                             
+                               </div>
+                        </div>
+                                        
+                                        carous++;
+                                        indexnames++;
+                    }
+                </div>
+
+           <!--  <a class="carousel-control left" style="top:175px; left: 0%; width: 18px; background: none;" href="#@idca"
+                   data-slide="prev">&lsaquo;</a>
+                <a class="carousel-control right" style="top:175px; width:18px;background:none;" href="#@idca"
+                   data-slide="next">&rsaquo;</a>-->
+                @{idsca = idsca + 1;}
+                </div>
+        </div>
+    index++;
+}
+    }
+
+    <!--tables extras-->
+    <div class="tab-pane item" id="@index">
+        @{string idcax = "myCarousel" + idsca.ToString();}
+        <div id="@idcax">
+
+            <!--<h10>Activos No Encontrados</h10>:-->
+            <div class="carousel-inner" style="right:1%;">
+                @{int carousx = 0; validate = 0;}
+
+                @foreach (var data in ViewData["exists"] as List<List<List<string>>>)
+                {
+
+                    <div class="item active">
+
+                        <center>  <div style="background-color: #eaeaea; font-weight: bold; font-size: medium; border-bottom: 3px solid #0072c6;">   <h5>Tabla: Activos Encontrados</h5></div></center>
+                        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:400px; max-height: 400px; overflow: hidden">
+
+
+
+
+
+                            <div id="">
+                                <br />
+
+
+
+                                <table id="mailtablex-@idtables" class="table  table-striped table-hover dataTable">
+
+                                    <thead>
+
+                                        <tr style="background:#0072c6;color:white;">
+                                            @foreach (var item in data)
+                                            {
+                                                foreach (var x in item)
+                                                {
+                                                    <th class="table-fixed-medium">@x</th>
+                                                }
+                                                break;
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{int hnot = 0;}
+                                        @foreach (var row in data)
+                                        {
+                                            if (hnot != 0)
+                                            {
+                                                <tr class="mailtr">
+                                                    @foreach (var column in row)
+                                                    {
+                                                        <td class="table-fixed-medium">@column.ToString()</td>
+
+                                                    }
+                                                </tr>
+                                            }
+                                            hnot++;
+                                            validate++;
+                                        }
+
+                                    </tbody>
+                                    @{idtables++;}
+                                </table>
+                                <!--end-->
+                                @if (validate == 0)
+                                {
+                                    <br /><br /><br />
+                                    <center><h4>Tabla Sin Registros ..</h4></center>
+                                }
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+                                carousx++;
+
+                }
+            </div>
+             <!-- <a class="carousel-control left" style="top:175px; left: 0%; width: 18px; background: none;" href="#@idcax"
+               data-slide="prev">&lsaquo;</a>
+            <a class="carousel-control right" style="top:175px; width:18px;background:none;" href="#@idcax"
+               data-slide="next">&rsaquo;</a>-->
+            @{idsca = idsca + 1;}
+
+
+
+
+
+        </div>
+
+    </div>
+
+
+
+
+   
+
+    @{index++;}
+
+    <div class="tab-pane item" id="@index">
+    @{string idcax1 = "myCarousel" + idsca.ToString();}
+    <div id="@idcax1">
+
+        <!--<h10>Activos No Encontrados</h10>:-->
+        <div class="carousel-inner" style="right:1%;">
+            @{int carousx1 = 0; validate = 0;}
+
+            @foreach (var data in ViewData["notexists"] as List<List<List<string>>>)
+                {
+
+                <div class="item active">
+
+                    <center>  <div style="background-color: #eaeaea; font-weight: bold; font-size: medium; border-bottom: 3px solid #0072c6;">   <h5>Tabla: Activos No Encontrados</h5></div></center>
+                    <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:400px; max-height: 400px; overflow: hidden">
+
+
+
+
+                        
+                        <div id="">
+                            <br />
+
+
+
+                            <table id="mailtablex-@idtables" class="table  table-striped table-hover dataTable">
+
+                                <thead>
+
+                                    <tr style="background:#0072c6;color:white;">
+                                        @foreach (var item in data)
+                                                        {
+                                                            foreach (var x in item)
+                                                            {
+                                                                <th class="table-fixed-medium">@x</th>
+                                                            }
+                                                            break;
+                                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{int hnot1 = 0;}
+                                    @foreach (var row in data)
+                                                    {
+                                                        if (hnot1 != 0)
+                                                        {
+                                                            <tr class="mailtr">
+                                                                @foreach (var column in row)
+                                                                {
+                                                                    <td class="table-fixed-medium">@column.ToString()</td>
+
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        hnot1++;
+                                                        validate++;
+                                                    }
+
+                                </tbody>
+                                @{idtables++;}
+                            </table>
+                            <!--end-->
+                            @if (validate == 0)
+                                            {
+                                <br /><br /><br />
+                                <center><h4>Tabla Sin Registros ..</h4></center>
+                                            }
+                        </div>
+
+                     
+
+                    </div>
+
+                </div>
+                
+                                   carousx++;
+                                     
+            }
+            </div>
+       <!--    <a class="carousel-control left" style="top:175px; left: 0%; width: 18px; background: none;" href="#@idcax1"
+                   data-slide="prev">&lsaquo;</a>
+                <a class="carousel-control right" style="top:175px; width:18px;background:none;" href="#@idcax1"
+                   data-slide="next">&rsaquo;</a>-->
+                @{idsca = idsca + 1;}
+
+
+                           
+                           
+
+    </div>
+    
+            </div>
+@if (isadmin)
+{
+    int index2 = index + 1;
+
+                <div class="tab-pane item" id="@index2">
+                    @{string idca2 = "myCarousel" + idsca.ToString();}
+                    <div id="@idca2">
+
+                        <!--<h10></h10>:-->
+                        <div class="carousel-inner" style="right:1%;">
+                            @{int carous2 = 0; validate = 0;}
+
+                            @foreach (var data1 in ViewData["newact"] as List<List<List<string>>>)
+                {
+
+                                <div class="item active">
+
+                                    <center>  <div style="background-color: #eaeaea; font-weight: bold; font-size: medium; border-bottom: 3px solid #0072c6;">   <h5>Tabla: Activos Nuevos</h5></div></center>
+                                    <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:400px; max-height: 400px; overflow: hidden">
+
+
+
+
+                                        <div id="">
+
+                                            <br />
+
+
+                                            <table id="mailtablex-@idtables" class="table table-striped table-hover dataTable">
+
+                                                <thead>
+
+                                                    <tr style="background:#0072c6;color:white;">
+                                                        @foreach (var item in data1)
+                                                        {
+                                                            foreach (var x in item)
+                                                            {
+                                                                <th class="table-fixed-medium">@x</th>
+                                                            }
+                                                            break;
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{int hnotx = 0;}
+                                                    @foreach (var row in data1)
+                                                    {
+                                                        if (hnotx != 0)
+                                                        {
+                                                            <tr class="mailtr">
+                                                                @foreach (var column in row)
+                                                                {
+                                                                    <td class="table-fixed-medium">@column.ToString()</td>
+
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        hnotx++;
+                                                        validate++;
+                                                    }
+
+                                                </tbody>
+                                                @{idtables++;}
+                                            </table>
+                                            <!--end-->
+                                            @if (validate == 0)
+                                            {
+                                                <br /><br /><br />
+                                                <center><h4>Tabla Sin Registros ..</h4></center>
+                                            }
+                                        </div>
+
+                                  
+
+                                    </div>
+
+                                </div>
+                                            carous2++;
+                                           
+                        }
+                            </div>
+                          <!--         <a class="carousel-control left" style="top:175px; left: 0%; width: 18px; background: none;" href="#@idca2"
+                                   data-slide="prev">&lsaquo;</a>
+                                <a class="carousel-control right" style="top:175px; width:18px;background:none;" href="#@idca2"
+                                   data-slide="next">&rsaquo;</a>-->
+                                @{idsca = idsca + 1;}
+                            </div>
+                         
+
+    </div>
+
+    int index3 = index2 + 1;
+    <div class="tab-pane item" id="@index3">
+        @{string idca3 = "myCarousel" + idsca.ToString();}
+        <div id="@idca3">
+
+            <!--<h10></h10>:-->
+            <div class="carousel-inner" style="right:1%;">
+                @{int carous3 = 0; validate = 0;}
+
+                @foreach (var data2 in (List<List<List<string>>>) ViewData["locstable"] )
+                {
+
+                    <div class="item active">
+
+                        <center>  <div style="background-color: #eaeaea; font-weight: bold; font-size: medium; border-bottom: 3px solid #0072c6;">   <h5>Tabla: Reubicaciones</h5></div></center>
+                        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:400px; max-height: 400px; overflow: hidden">
+
+
+
+
+                            <div id="">
+
+                                <br />
+
+
+                                <table id="mailtablex-@idtables" class="table  table-striped table-hover dataTable">
+
+                                    <thead>
+
+                                        <tr style="background:#0072c6;color:white;">
+                                            @foreach (var item in data2)
+                                            {
+                                                foreach (var x in item)
+                                                {
+                                                    <th class="table-fixed-medium">@x</th>
+                                                }
+                                                break;
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{int hnotx = 0;}
+                                        @foreach (var row in data2)
+                                        {
+                                            if (hnotx != 0)
+                                            {
+                                                <tr class="mailtr">
+                                                    @foreach (var column in row)
+                                                    {
+                                                        <td class="table-fixed-medium">@column.ToString()</td>
+
+                                                    }
+                                                </tr>
+                                            }
+                                            hnotx++;
+                                            validate++;
+                                        }
+
+                                    </tbody>
+                                    @{idtables++;}
+                                </table>
+                                <!--end-->
+                                @if (validate == 0)
+                                {
+                                    <br /><br /><br />
+                                    <center><h4>Tabla Sin Registros ..</h4></center>
+                                }
+                            </div>
+
+                        
+
+                        </div>
+
+                    </div>
+                                carous3++;
+
+                }
+            </div>
+            <!--  <a class="carousel-control left" style="top:175px; left: 0%; width: 18px; background: none;" href="#@idca3"
+               data-slide="prev">&lsaquo;</a>
+            <a class="carousel-control right" style="top:175px; width:18px;background:none;" href="#@idca3"
+               data-slide="next">&rsaquo;</a>-->
+            @{idsca = idsca + 1;}
+        </div>
+
+
+    </div>
+
+
+    }
+
+                               
+    </div>
+   <!--end-->
+    @if (index == 0)
+    {
+         <br /><br /><br />
+                                 <center><h4>Archivos No Encontrados..</h4></center>
+    }
+    </div>
+
+
+
+
+
+<script>
+    
+    var inventoryId = "@idinventory";
+   
+     function activeCompletAction() {
+        jQuery("#complete_buttonSQL").click(function () {
+            _confirm({
+                title: "Completar Inventario",
+                message: "¿Seguro que desea completarlo?, \n no se podrán realizar cambios después!",
+                action: function () {
+                    jQuery.ajax({
+                        url: "/Inventory/SceneInventory/setComplete",
+                        data: { idInventory: inventoryId },
+                        type: 'POST',
+                        beforeSend: _loading(),
+                        success: function (data) {
+                            _loading();
+                            loadInventory();
+                            jQuery("#buttonStatus").html(
+                                '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                                '¡Completado! <i class="icon-ok icon-white"></i>' +
+                            '</button>');
+                        },
+                        error: function () {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                }
+            });
+        });
+     }
+    
+         @for(int i=0;i<idsca;i++){
+             @(new HtmlString("jQuery('#myCarousel"+i.ToString()+"').carousel({ interval: 20000});"))    
+             /* jQuery('#myCarousel').carousel({
+                  interval: 200000
+              });*/
+        
+         }
+    jQuery(function () {
+        jQuery('#myTab a:first').tab('show')
+    });
+    jQuery(document).ready(function ($) {
+     
+       jQuery.ajax({
+            url: "/Inventory/SceneInventory/getInventoryRow",
+            data: { idInventory: inventoryId },
+            type: 'POST',
+            beforeSend: _loading(),
+            success: function (data) {
+                data = JSON.parse(data);
+
+                if (data["status"].toString() == "Completado") {
+                    jQuery("#buttonStatus").html(
+                        '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                        '¡Completado! <i class="icon-ok icon-white"></i>' +
+                    '</button>');
+                } else {
+                    jQuery("#buttonStatus").html(
+                         '<button class="btn btn-mini red fileinput-button" id="complete_buttonSQL" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                         '¡Pendiente! <i class="icon-save icon-white"></i>' +
+                     '</button>');
+                    activeCompletAction();
+                }
+
+              //  window.location.href = "/Inventory/SceneInventory/setSdf?idInventory=" + inventoryId;
+                _loading();
+
+            },
+            error: function () {
+                _loading();
+               // jQuery("#filesdf").html("");
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+        $('#generateexcel').on('click', function () {
+            var inventoryId = "";
+            @(new HtmlString("inventoryId='"+idinventory+"'"))
+            _loading();
+            jQuery.ajax({
+
+                url: "/Inventory/SceneInventory/generatePdf",
+                data: { idInventory: inventoryId },
+                type: 'POST',
+
+                success: function (data) {
+                   // window.open('/Uploads/Reports/' + data, '_blank');
+                    window.location.href = '/Uploads/Reports/' + data;
+                    _loading();
+
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un Error, Intente Mas tarde");
+                    _loading();
+                }
+
+
+            });
+
+        });
+
+        jQuery('.overOn').perfectScrollbar({ wheelSpeed: 1000 });
+        var d = 0;
+        jQuery("body").hover( function () {
+            if (d == 0) {
+                jQuery('.dataTable').dataTable({
+                    "sPaginationType": "full_numbers",
+                    "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                    "iDisplayLength": 10,
+                    aLengthMenu: [
+                    [10, 50, 100, -1],
+                    [10, 50, 100, "Todos"]
+                    ],
+                    "oLanguage": {
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sSearch": "Filtro",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Ultimo",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+
+                        },
+                        "sEmptyTable": "Tabla Sin Datos"
+                    }
+                });
+                d++;
+            }
+        });
+           
+       
+        try {
+
+            if (jQuery("#mailtablex-4").length) {
+                var table = jQuery("#mailtablex-4").dataTable()
+                table.fnDestroy()
+                var th = $('#mailtablex-4 thead tr').clone()
+                $('#mailtablex-4 thead').append(th)
+                jQuery('#mailtablex-4').dataTable({
+                    "sPaginationType": "full_numbers",
+                    "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                    "iDisplayLength": 10,
+                    aLengthMenu: [
+                    [10, 50, 100, -1],
+                    [10, 50, 100, "Todos"]
+                    ],
+                    "oLanguage": {
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sSearch": "Filtro",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Ultimo",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+
+                        },
+                        "sEmptyTable": "Tabla Sin Datos"
+                    }
+                }).columnFilter({
+                    sPlaceHolder: "head:after",
+                    aoColumns: [
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" }
+                    ]
+                });
+
+                $('#mailtablex-4 input').css("width", "100%")
+            }
+            if (jQuery("#mailtablex-1").length) {
+                var table = jQuery("#mailtablex-1").dataTable()
+                table.fnDestroy()
+                var th = $('#mailtablex-1 thead tr').clone()
+                $('#mailtablex-1 thead').append(th)
+                jQuery('#mailtablex-1').dataTable({
+                    "sPaginationType": "full_numbers",
+                    "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                    "iDisplayLength": 10,
+                    aLengthMenu: [
+                    [10, 50, 100, -1],
+                    [10, 50, 100, "Todos"]
+                    ],
+                    "oLanguage": {
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sSearch": "Filtro",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Ultimo",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+
+                        },
+                        "sEmptyTable": "Tabla Sin Datos"
+                    }
+                }).columnFilter({
+                    sPlaceHolder: "head:after",
+                    aoColumns: [
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" },
+                              { type: "text" } 
+                    ]
+                });
+
+                $('#mailtablex-1 input').css("width", "100%")
+            }
+        } catch (exception) {
+
+        }/*
+        try{
+            jQuery('#mailtablex-1').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }], "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        }catch(exception){
+           
+        }
+        try {
+            jQuery('#mailtablex-2').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }], "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        } catch (exception) {
+          
+        }
+        try {
+            jQuery('#mailtablex-3').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }], "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        } catch (exception) {
+          
+        }
+        try {
+            jQuery('#mailtablex-4').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }], "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        } catch (exception) {
+          
+        }
+        try {
+            jQuery('#mailtablex-5').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }],
+                "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        } catch (exception) {
+
+        } try {
+            jQuery('#mailtablex-6').dataTable({
+                "sPaginationType": "bootstrap",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+
+                "aoColumnDefs": [{
+                    'bSortable': false,
+                    'aTargets': [-1, 0]
+                }],
+                "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Buscar"
+                }
+            });
+        } catch (exception) {
+
+        }*/
+        
+      //  jQuery(".tableHeader").css("padding-right", "10px");
+      //  jQuery(".tableHeader").css("padding-bottom", "20px");
+      
+           
+      
+       
+    });
+
+   
+    </script>

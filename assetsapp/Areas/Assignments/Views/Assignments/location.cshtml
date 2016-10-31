@@ -1,0 +1,845 @@
+﻿@using Kendo.Mvc.UI;
+@using Kendo.Mvc;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model JArray
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.ObjectAdmin.Models;
+
+
+@{
+    int count = 0;
+
+
+}
+<!-- Common Kendo UI Web CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.common.min.css" rel="stylesheet" />
+<!-- Default Kendo UI Web theme CSS -->
+<link href="~/Content/kendo/2014.1.318/kendo.default.min.css" rel="stylesheet" />
+<!-- Kendo UI Web combined JavaScript -->
+<script src="~/Scripts/kendo/2014.1.318/kendo.web.min.js"></script>
+<script src="~/Scripts/kendo/2014.1.318/kendo.treeview.min.js"></script>
+
+<div class="widgets_area">
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Control de Activos</h3>
+            </div>
+            <div class="span4">
+                @*<div class="search">
+                        <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typeahead span8" placeholder="Búsqueda" data-source='[@foreach (var mails in (Dictionary<string, string>)ViewData["objsReference"])
+                                                                                                                                                {
+                                                                                                                                                    if (count == 0)
+                                                                                                                                                    {@(new HtmlString('"' + mails.Value + '"')) count++;
+                                                                                                                                                    }
+                                                                                                                                                    else
+                                                                                                                                                    {@(new HtmlString("," + '"' + mails.Value + '"'))}  }]' />
+                        ><button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span3">
+                <div class="span12">
+                    <div class="light_blue set_color">
+                        <div class="well-header widgetclient titleclient">
+                            <h5>Ubicaciones</h5>
+                        </div>
+                        @{count = 0;}
+                        <div class="well-content no-search">
+                            <input type="text" style="width:100%;margin-bottom:7px;" data-provide="typeahead" id="globalSearch2" name="globalSearch2" class="typeahead span8" placeholder="Búsqueda" data-source='[@foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                                                                                                                                        {
+                                                                                                                                            if (count == 0)
+                                                                                                                                            {@(new HtmlString('"' + mails.Value + '"')) count++;
+                                                                                                                                            }
+                                                                                                                                            else
+                                                                                                                                            {@(new HtmlString("," + '"' + mails.Value + '"'))}  }]' />
+                            <div class="k-header">
+                                <div id="category_tree">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="span9">
+                <div class="row-fluid" style="">
+                    <div class="span12">
+                        <div class="light_blue set_color">
+                            <div class="well-header widgetclient titleclient">
+                                <h5 id="category_header">Activos</h5>
+                                <div class="btn-group" id="thisCategoryOptions">
+                                    <!-- View Buttons -->
+                                    <button class="btn btn-mini purple" id="userpopup" data-original-title="Asignar Usuario" rel="tooltip" data-placement="top">
+                                        <i class=" icon-user icon-white"></i>
+                                        <span></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="span12">
+                        <ul class="breadcrumb" id="categoryRoute">
+                            <li id="root" class="active" data-id="null">Home</li>
+                        </ul>
+                    </div>
+                    <div class="span12 well-content no_padding">
+                        <span id="totalact" style="font-size:large;float: left;display:none"></span>
+                        <span style="float: right;display:none">
+                            Rangos de Activos a Mostrar
+                            <select id="pagination">
+                                <option value=" 1" data-skip="1">1-500</option>
+
+                            </select>
+                        </span>
+                        <div class="row-fluid">
+
+                            <div id="resultsPreview" class="resultsPreview">
+                                <div id="divcont1"><label id="lblcont1"></label></div>
+                                <div id="divcont2"><label id="lblcont2"></label></div>
+                                <div id="divcont3"><label id="lblcont3"></label></div>
+                                <div id="divcont4"><label id="lblcont4"></label></div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="objectsTab">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="object_panel" class="modal modal-objectadmin  hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="titleProcess"></h4>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="navbar-inner">
+                    <ul class="nav nav-tabs" id="tabDetalles">
+                        <li class="active" id="tabProcess"><a href="#process" data-toggle="tab">Inf. General</a></li>
+                    </ul>
+                </div>
+                <!-- Tabs Content -->
+                <div class="tab-content" id="tabContentDetalles">
+                    <!--Processes Section -->
+                    <div class="tab-pane active" id="process">
+                        <table class="line">
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" style="width: 50%; text-align:center">
+                                        <img id="_HTKImagePreview" style="max-height:200px" />
+                                    </td>
+                                    <td>
+                                        <h10>Tipo de Activo (Categoria):</h10>
+                                        <div class="line">
+                                            <label id="lbltipo"></label>
+                                        </div>
+                                        <br />
+                                        <h10>Status:</h10>
+                                        <div class="line">
+                                            <label id="lblstatusobj"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Descripción:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblname"></label>
+                                            <input type="text" class="edit" id="txtname" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>ID Artículo:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblobject_id"></label>
+                                            <input type="text" class="edit" id="txtobject" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>ID Perfil:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblperfil"></label>
+                                            <input type="text" class="edit" id="txtperfil" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>No. de Solicitud:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lbldemand"></label>
+                                            <input type="text" class="edit" id="txtdemand" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Proveedor:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblproveedor"></label>
+                                            <select id="selectProveedor">
+                                                @ViewData["proveedorList"]
+                                            </select>
+
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>No. de pedido:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblpedido"></label>
+                                            <input type="text" class="edit" id="txtpedido" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>No. de Recepción:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblrecep"></label>
+                                            <input type="text" class="edit" id="txtrecepcion" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>No.act ERP:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblerp"></label>
+                                            <input type="text" class="edit" id="txterp" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Tipo de etiquetado:</h10>
+                                        <div class="line">
+                                            <label id="lbletipo"></label>
+                                        </div>
+
+                                    </td>
+                                    @*<td>
+                                            <h10>Responsable:</h10>
+                                            <div class="line">
+                                                <label class="etiq" id="username"></label>
+
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div id="btncambiar" class='btn blue fileinput-button'>Cambiar</div>
+                                        </td>*@
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Marca:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblmarca"></label>
+                                            <input type="text" class="edit" id="txtmarca" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Modelo:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblmodelo"></label>
+                                            <input type="text" class="edit" id="txtmodelo" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>No. de Serie:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="seriename"></label>
+                                            <input type="text" class="edit" id="txtserie" />
+                                        </div>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <h10>No. de Factura:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblfactura"></label>
+                                            <input type="text" class="edit" id="txtfactura" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>RH:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblrh"></label>
+                                            <input type="text" class="edit" id="txtrh" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Cantidad:</h10>
+                                        <div class="line">
+                                            <label id="lblcantidad"></label>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Precio de Compra:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblprecio"></label>
+                                            <input type="text" class="edit" id="txtprecio" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h10>Fecha de Compra:</h10>
+                                        <div class="line">
+                                            <label class="etiq" id="lblfecha"></label>
+                                            <input class="edit" type="date" id="txtfecha" />
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <h10>Departamento:</h10>
+                                        <div>
+                                            <label class="etiq" id="lbldepartment"></label>
+                                            <select id="selectDepartamento">
+                                                @ViewData["departList"]
+                                            </select>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="2">
+                                        <h10>Ubicacion:</h10>
+                                        <div>
+                                            <label id="locationobject" data-id=""></label>
+                                            @*<select class="edit" id="selectLocation"></select>*@
+                                            @*<div id="divlocations" class="edit">
+                                                    <label class="etiq" id="locationobject"></label>
+                                                    <div id="btncambiar2" class='btn blue fileinput-button'>
+                                                        Cambiar
+                                                    </div>
+                                                </div>*@
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <h10>Folio (fue dado de alta):</h10>
+                                        <div class="line">
+                                            <label id="lblfolio"></label>
+                                        </div>
+                                        <br />
+                                        <h10><span>Folio(Historial de movimientos):</span> </h10>
+                                        <div class="line">
+                                            <label id="lblfolio2"></label>
+                                            <br />
+                                            <label id="lblfolio3" style="color:red;"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <h10>EPC:</h10>
+                                        <div>
+                                            <label id="EPCobject"></label>
+                                        </div>
+                                        @*<h10>Serie:</h10>
+                                              <button type="button" name="serieupdate" style="color: white; height: 20px; padding-left: 5px; padding-right: 5px; padding-top: 0px;" class="btn blue" data-original-title="Modificar #Serie" rel="tooltip" data-placement="top"><i class="icon-edit"></i></button>
+
+                                            <div>
+
+                                            </div>
+                                             <div id="seriechange" class="row-fluid" style="margin-top:0px !important;display:none">
+                                                 <div class="span10">
+                                                 <input style="width:110%" name="serieinput" type="number" value="" min="0">
+                                                 </div>
+                                                 <div class="span2">
+                                                     <button type="button" name="seriebtn" style="color:white" class="square-button green" data-original-title="Actualizar #Serie" rel="tooltip" data-placement="top"><i class="icon-ok"></i></button>
+
+                                                 </div>
+                                              </div>*@
+                                    </td>
+                                    <td>
+                                        <h10>Creador:</h10>
+                                        <div>
+                                            <label id="creatorUserProcess"></label>
+                                        </div>
+                                        <div>
+                                            <label id="creatorNameProcess"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+
+
+                                        <h10>Fecha de Creación:</h10>
+                                        <div>
+                                            <label id="createDateProcess"></label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h10>Tipo de Activo:</h10>
+                                        <div>
+
+                                            <select class="edit" id="assetSelect" name="assetType">
+                                                <option value="null">Seleccione...</option>
+                                                @{ListTable listTable = new ListTable();
+                                                String rowArray = listTable.Get("name", "_HTKassetsType");
+                                                JArray rowString = JsonConvert.DeserializeObject<JArray>(rowArray);
+                                                JArray listas = new JArray();
+                                                foreach (JObject obj in rowString)
+                                                {
+                                                    listas = JsonConvert.DeserializeObject<JArray>(obj["elements"]["unorder"].ToString());
+                                                }
+                                                }
+                                                @foreach (JObject puesto in listas)
+                                                {
+                                                    foreach (KeyValuePair<string, JToken> token in puesto)
+                                                    {
+                                                        <option value='@token.Key'>@token.Value</option>
+
+                                                    }
+
+                                                }
+                                            </select>
+                                            <label class="etiq" id="lblassetType"></label>
+                                        </div>
+
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Guardar" class="btn blue edit" type="button" id="savebutton" data-dismiss="modal">
+                <input value="Aceptar" class="btn blue" type="button" id="cancel_buttonProcess" data-dismiss="modal">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="operationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="operation-title">Operaciones</h4>
+            </div>
+            <div class="modal-body">
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td width="50%">
+                                <label>Operación:</label>
+                                <div class="staticField">
+                                    <select id="operationSelecter">
+                                        <option value="Sumatoria">Sumatoria</option>
+                                        <option value="Promedio">Promedio</option>
+                                        <option value="Minimo">Mínimo</option>
+                                        <option value="Maximo">Máximo</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                <label>Seleccione un campo para realizar la operación:</label>
+                                <div class="staticField">
+                                    @*<select id="operationFieldSelecter">
+                                            @foreach (JObject field in (JArray)ViewData["fields"])
+                                                {
+                                                <option value=' @field["name"].ToString()' data-fieldname="@field["label"].ToString()">@field["label"].ToString()</option>
+                                                }
+                                        </select>*@
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="row-fluid">
+                    <div class="span8 error_msg" id="operation_result">
+                    </div>
+                    <div class="span4">
+                        <input value="Añadir" class="btn blue" type="button" id="operation_button" data-dismiss="modal">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="profilesPanel" class="modal modal-mini hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Selecciona el usuario a asignar:</h3>
+    </div>
+    <div class="modal-body">
+        <div id="divprofiles">
+            <select id="selectprofiles" class="chosen">
+
+                @{count = 0;}
+                @*@foreach (var item in (Dictionary<string, string>)ViewData["users"])
+                    {
+
+                        if (count == 0)
+                        {
+                        <option value="0">Elige un perfil</option>
+                            count++;
+                        }
+                        <option value="@item.Key">@item.Value</option>
+
+                    }*@
+
+            </select>
+        </div>
+
+        </br>
+        <div id="tablausers">
+            <table id="UserSelecterTable" class="table table-striped table-bordered table-hover">
+                <tr>
+                    <td colspan='3'>
+                        <p class='passCenter'></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" id="final_msg" class="error_msg"></span>
+        <input value="Guardar" class="btn blue" id="save_button">
+        <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button">
+    </div>
+</div>
+
+<div id="locationsPanel2" class="modal modal-mini hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Selecciona la nueva ubicacion:</h3>
+    </div>
+    <div class="modal-body">
+
+        <div id="tablausers">
+            <label class="lanelMargen">Ubicaciones </label>
+            <div class="divTree4">
+                <div class="well-content no-search">
+                    <select id="ubicacionSelect" name="ubicacionSelect">
+                        <option value=null>Seleccione</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <span width="80%" id="final_msg" class="error_msg"></span>
+        <input value="Guardar" class="btn blue" id="save_button3">
+        <input value="Cancelar" data-dismiss="modal" class="btn grey" type="button" id="cancel_button3">
+    </div>
+</div>
+
+
+<div id="responmmodal" class="modal hide fade" data-backdrop="static">
+    <div class="modal-header">
+        <h3 class="modal-header-text">Seleccionar Responsable nuevo</h3>
+    </div>
+    <div class="modal-body">
+        <label>Responsable: </label>
+        <div class="staticField">
+            <select id="userSelect" name="userSelect"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input value="Guardar" data-iddemand="" class="btn dark_green" type="button" id="responyes_button">
+        <input value="Cancelar" class="btn grey" type="button" id="responnon_button">
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/RivkaBase/Scripts/RivkaViewer2/RivkaViewer.js"></script>
+    <script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+
+    <script type="text/javascript">
+
+        var model = {
+            parentCategory: location.hash == "" ? "null" : location.hash.substring(1),
+        };
+
+
+
+        function LoadSubLocations() {
+            jQuery.ajax({
+                url: "/ObjectAdmin/ObjectAdmin/loadLocations",
+                type: "POST",
+                async: false,
+                data: { conjunto: model.parentCategory },
+                success: function (data) {
+                    jQuery("#selectLocation").html(data);
+                }
+            });
+        }
+
+
+
+        var route = {
+
+            onRouteElementClickAction: function () {
+                var liElement = jQuery(this).closest("li");
+                model.parentCategory = liElement.data("id") == null ? "null" : liElement.data("id");
+                location.hash = model.parentCategory;
+                liElement.nextAll().remove();
+
+                var liText = liElement.find("a").text();
+                liElement.addClass("active");
+                liElement.empty();
+                liElement.text(liText);
+
+                model.init();
+
+                var id = model.parentCategory;
+
+                //  tree.selectNode(id);
+                var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(id);
+                jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid));
+            },
+
+            openCategoryFromThis: function (node) {
+                model.parentCategory = jQuery(node).data("id");
+                location.hash = model.parentCategory;
+                model.init();
+            },
+
+            appendNode: function (obj) {
+                try {
+                    id = obj.id;
+                } catch (Exception) {
+                    return null;
+                }
+                try {
+                    name = obj.name;
+                } catch (Exception) {
+                    return null;
+                }
+                var newCategoryElement = jQuery("<li/>").addClass("active").text(name).attr("data-id", id);
+
+                var lastElement = jQuery("#categoryRoute li:last");
+                lastElementText = lastElement.text();
+                lastElement.removeClass("active");
+                lastElement.empty();
+                lastElement.append(jQuery("<a/>").text(lastElementText).on("click", route.onRouteElementClickAction));
+                lastElement.append(
+                    jQuery("<span/>")
+                        .addClass("divider")
+                        .text(">")
+                );
+                jQuery("#categoryRoute").append(newCategoryElement);
+            },
+
+            setFullRoute: function (object) {
+                var liElement = jQuery("#root");
+                liElement.nextAll().remove();
+                if (!liElement.hasClass("active")) {
+                    var liText = liElement.find("a").text();
+                    liElement.addClass("active");
+                    liElement.empty();
+                    liElement.text(liText);
+                }
+
+                for (var i = object.length - 1; i >= 0; i--) {
+                    route.appendNode(object[i]);
+                }
+
+                var lastElement = jQuery("#categoryRoute li:last");
+                lastElementText = lastElement.text();
+                jQuery("#category_header").text(lastElementText);
+            }
+        };
+
+        jQuery(document).ready(function (jQuery) {
+            function obtenerNodes(nodoid) {
+                var iduser = "@Session["_id"].ToString()";
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/getNodeContent2",
+                    type: "POST",
+                    data: { id: nodoid, userid: iduser },
+                    async: false,
+                    success: function (data) {
+                        var locations = JSON.parse(data);
+
+                        datos = locations;
+
+                        if (datos.hijos.length > 0) {
+                            var dataItem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(nodoid);
+                            jQuery("#category_tree").data("kendoTreeView").append(datos.hijos, jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid));
+                        }
+
+                    },
+                    error: function (data) {
+                        //_alert("error","Ha ocurrido un error");
+                    }
+                });
+            }
+
+            function InitNodes(nodoid) {
+                var iduser = "@Session["_id"].ToString()";
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/getNodeContent2",
+                    type: "POST",
+                    data: { id: nodoid, userid: iduser },
+                    success: function (data) {
+                        var result = JSON.parse(data);
+
+                        var locations = result.hijos;
+                        model.parentCategory = result.id;
+                        model.init();
+                        datos = locations;
+                        var objetos = {
+                            id: result.id, text: result.name, expanded: true, "spriteCssClass": "objectimg", "hasChildren": true, items: datos
+                        }
+                        jQuery("#category_tree").kendoTreeView({
+                            dataSource: [
+                                objetos
+                                    //{
+                                    //    id: "null", text: "Home", expanded: true, "spriteCssClass": "objectimg", "hasChildren": true, items: datos
+                                    //}
+                            ]
+                    ,
+                            dataTextField: "text",
+                            loadondemand: true,
+                            select: onSelect,
+                            expand: onExpand
+                        });
+                    },
+                    error: function (data) {
+                        //_alert("error","Ha ocurrido un error");
+                    }
+                });
+            }
+            // profilemodal.bindAll();
+            //  jQuery("#object_panel").hide();
+            function onSelect(e) {
+                var dataItem = this.dataItem(e.node);
+                var id = dataItem.id;
+
+                location.hash = id;
+                model.parentCategory = id;
+
+                model.init();
+                if (jQuery("#category_tree").data("kendoTreeView").findByUid(dataItem.uid).children('.k-group').length == 0) {
+                    obtenerNodes(dataItem.id);
+                }
+
+            }
+
+            function onExpand(e) {
+
+            }
+
+
+            var nodo = "null";
+
+            InitNodes(nodo);
+
+
+            function setTree(id) {
+                jQuery.ajax({
+                    url: "/ObjectAdmin/ObjectAdmin/getRoute",
+                    data: { parentCategory: id },
+                    type: "POST",
+                    success: function (data) {
+                        var data = JSON.parse(data);
+
+                        for (i = data["route"].length - 1; i >= 0; i--) {
+                            var getitem = jQuery("#category_tree").data("kendoTreeView").dataSource.get(data["route"][i].id);
+                            if (jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid).children('.k-group').length == 0) {
+                                obtenerNodes(getitem.id);
+
+
+                            }
+                            if (i == 0) { jQuery("#category_tree").data("kendoTreeView").select(jQuery("#category_tree").data("kendoTreeView").findByUid(getitem.uid)); }
+                        }
+
+
+                        //     tree.openRoute(data["route"]);
+                    }, error: function () { _alert("error", "Ha ocurrido un error"); }
+                });
+            }
+
+
+
+
+
+
+            jQuery("#globalSearch2").on('keypress', function (e) {
+                if (e.which == 13) {
+                    var cad = jQuery(this).val();
+                    var listmailsf = [];
+                    var id = "null";
+                    @foreach (var mails in (Dictionary<string, string>)ViewData["locations"])
+                {
+                    string value=mails.Value.Replace("\"", "'");
+                    value=mails.Value.Replace("'", "\'");
+                        @(new HtmlString("listmailsf.push('" + mails.Key + "|" + value + "');\n"));
+                  }
+
+
+                    for (var i = 0; i < listmailsf.length; i++) {
+                        var cadenas = listmailsf[i].split('|');
+
+                        if (cadenas[1] == cad) {
+                            id = cadenas[0];
+                        }
+
+                    }
+                    setTree(id);
+                    location.hash = id;
+                    model.parentCategory = id;
+
+                    model.init();
+                }
+            });
+
+
+        });
+
+        //----------------------------------------------------------------------------------------------
+        function headers1() {
+            setTimeout(function () {
+                var table = jQuery("#objectsTab_rvtable").dataTable();
+                table.fnAdjustColumnSizing();
+
+            }, 2000);
+
+
+        }
+    </script>
+}
+
+

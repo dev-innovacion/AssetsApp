@@ -1,0 +1,49 @@
+C:\Users\homedepot\Documents\Visual Studio 2012\Projects\autobuildHTK-client\autobuildHTK-client\bin\autobuildHTK-client.dll
+C:\Users\homedepot\Documents\Visual Studio 2012\Projects\autobuildHTK-client\autobuildHTK-client\bin\autobuildHTK-client.pdb
+C:\Users\homedepot\Documents\Visual Studio 2012\Projects\autobuildHTK-client\autobuildHTK-client\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\homedepot\Documents\Visual Studio 2012\Projects\autobuildHTK-client\autobuildHTK-client\obj\Release\autobuildHTK-client.dll
+C:\Users\homedepot\Documents\Visual Studio 2012\Projects\autobuildHTK-client\autobuildHTK-client\obj\Release\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\autobuildHTK-client.dll.config
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\itextsharp.dll
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\RazorPDF.dll
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\bin\RZLib.dll
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\obj\Release\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\autobuildHTK-clientk\obj\Release\autobuildHTK-client.pdb
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\bin\autobuildHTK-client.dll
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\bin\autobuildHTK-client.pdb
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\bin\itextsharp.dll
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\bin\RazorPDF.dll
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\bin\RZLib.dll
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\obj\Release\autobuildHTK-client.dll
+C:\Users\Abiss\Documents\Visual Studio 2012\Projects\HTKproyects\Cinepolis\obj\Release\autobuildHTK-client.pdb
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\autobuildHTK-client.dll.config
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\autobuildHTK-client.dll
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\autobuildHTK-client.pdb
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\itextsharp.dll
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\RazorPDF.dll
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\bin\RZLib.dll
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\obj\Release\autobuildHTK-client.dll
+C:\Users\Alfredo\Documents\Rivka\Cinepolis\obj\Release\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\autobuildHTK-client.dll.config
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\itextsharp.dll
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\RazorPDF.dll
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\bin\RZLib.dll
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\obj\Release\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\obj\Release\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\respaldoedwin\htks\ios3\trunk\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\autobuildHTK-client.dll.config
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\itextsharp.dll
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\RazorPDF.dll
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\RZLib.dll
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.dll
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.pdb
+C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache

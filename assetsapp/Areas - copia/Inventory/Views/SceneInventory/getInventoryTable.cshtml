@@ -1,0 +1,160 @@
+﻿@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+
+<div class="well-content no-search">
+    <table class="table table-striped table-bordered table-hover datatable" style="max-height:400px">
+        <thead>
+            <tr>
+                <th>Fecha Inicial</th>
+                <th>Fecha Final</th>
+                <th>Ubicación</th>
+                <th>Asignado desde</th>
+                <th>Asignado por</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (JObject data in Model)
+            {
+                <tr data-id="@data["_id"]">
+                    
+                    <td class="dateStart"> 
+                        @if (data["outDate"].ToString() == "true")
+                        {
+                            <label style="color:red; margin-right:5px;"> <i class="icon-warning-sign"></i></label>
+                        }
+                        
+                         @if (data["status"].ToString() == "Completado"){
+                             <label style="color:green; margin-right:5px;"> <i class="icon-ok"></i></label>
+                         }
+                        @if (data["status"].ToString() == "Pendiente" && data["outDate"].ToString() == "false"){
+                             <label style="color:blue; margin-right:5px;"> <i class="icon-edit"></i></label>
+                         }
+                        @data["dateStart"] 
+                    </td>
+                    <td class="dateEnd">@data["dateEnd"]</td>
+                    <td class="locationName">@data["locationName"]</td>
+                    <td class="CreatedDate">@data["CreatedDate"]</td>
+                    <td class="creatorName">@data["creatorName"]</td>
+                    <td class="status">@data["status"]</td>
+                    <td>
+                        @if (data["status"].ToString() != "Completado")
+                        {
+                        <div class="btn-group">
+                            <a class="btn" id="getInventoryData" href="#" onclick="getSQLinventory(this)" data-original-title="Descargar inventario" rel="tooltip" data-placement="top"><i class="icon-download-alt"></i></a>
+                            <span class=" btn btn-file" data-original-title="Subir inventario" rel="tooltip" data-placement="top">
+                                <span class="icon-folder-open"></span>
+                                <input name='uploads[]' class="uploadFile" id="uploadFiles" type="file" multiple />
+                            </span>
+                            @try
+                            {
+                                if (data["Upload"].ToString() == "true")
+                                {
+                            <a class="btn" id="checkInventoryData" href="#" onclick="checkSQLinventory(this)" data-original-title="Ver reporte" rel="tooltip" data-placement="top"><i class="icon-briefcase"></i></a>
+                                }
+                            }
+                            catch (Exception e) { }
+                        </div>
+                        }
+                        else
+                        {
+                            @*<label style="color:green">¡Completado! </label>*@
+                            <a class="btn" id="checkInventoryData" href="#" onclick="checkSQLinventory(this)" data-original-title="Ver repoerte" rel="tooltip" data-placement="top"><i class="icon-briefcase"></i></a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    jQuery("[rel=tooltip]").tooltip();
+
+    function checkSQLinventory(thisInventory) {
+        inventoryId = jQuery(thisInventory).closest("tr").data("id");
+        setReportSQL(inventoryId);
+    }
+
+    jQuery(".alertDate").tooltip();
+
+    try {
+
+        jQuery(".table").dataTable({
+            "sPaginationType": "full_numbers",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+            "sScrollY": "400px",
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [0]
+            }],
+            "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Ultimo",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+
+                },
+                "sEmptyTable": "Tabla Sin Datos"
+            }
+        });
+        jQuery('.dataTables_length select').chosen();
+    } catch (Exception) { console.log(); }
+
+    jQuery(".uploadFile").change(function () {
+        cant = 0;
+        idInventory = jQuery(this).closest("tr").data("id");
+        var fd = new FormData();
+        fd.append("idInventory", idInventory);
+
+        for (xy = 0; xy < jQuery(this)[0].files.length; xy++) {
+            fd.append(jQuery(this)[0].files[xy].name, jQuery(this)[0].files[xy]);
+            ext = jQuery(this)[0].files[xy].name;
+            ext = ext.split('.').pop(-1);
+            //check ".ext"
+            if (ext != "rar" && ext != "zip" && ext != "sdf") {
+                _alert("error", "Formato de archivo invalido!");
+                return false;
+            }
+            //check only one compresss
+            if (ext == "rar" || ext == "zip") cant++;
+            if (cant > 1) {
+                _alert("error", 'No se permiten más de un archivo! (".rar" o ".zip")');
+                cant = 0;
+                return false;
+            }
+        }
+
+        _loading();
+        jQuery.ajax({
+            url: "/Inventory/SceneInventory/saveFiles",
+            type: "POST",
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                _loading();
+                jQuery(this).val("");
+                _alert("success", "Subido Correctamente");
+                setReportSQL(idInventory);
+                loadInventory();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+        jQuery(this).val('');
+    });
+
+</script>
+

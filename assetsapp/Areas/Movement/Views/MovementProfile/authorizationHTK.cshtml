@@ -1,0 +1,462 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.User.Models;
+@using RivkaAreas.Movement.Models;
+
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="light_blue set_color">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Lista de Autorizaciones</h5>
+                    <div class="btn-group">
+                        <button class="btn btn-mini dark_green fileinput-button" data-toggle="modal" data-target="#myModal" data-original-title="Agregar Autorización" rel="tooltip" data-placement="top">
+                            <i class="icon-plus icon-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="span12">
+            <div id="authorizationContent">
+                <div id="alertAuthorization">
+
+                    <h4>No se tienen autorizaciones registradas...</h4>
+                </div>
+                <table class="table table-striped table-bordered table-hover datatable" id="authorizationContentTable">
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="cancel_buttonAuthorization"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+                <h4 class="modal-title" id="myModalLabel">Agregar Autorización</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="navbar-inner">
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active" id="tabinfo"><a href="#information" data-toggle="tab">Información</a></li>
+                    </ul>
+                </div>
+                <!-- Tabs Content -->
+                <div class="tab-content" id="tab-content">
+                    <!-- Information Section -->
+                    <div class="tab-pane active" id="information">
+                        <div>
+                            <table class="line">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <h10>Puesto: </h10>
+                                            <select id="profileSelect" name="profileId">
+                                                <option value="selectOption">Seleccione...</option>
+                                                @{UserProfileTable listTable = new UserProfileTable();
+                                                  String rowArray = listTable.GetRows();
+                                                  JArray rowString = JsonConvert.DeserializeObject<JArray>(rowArray);
+                                                  }
+                                                @foreach (JObject puesto in rowString)
+                                                {
+                                                    <option value='@puesto["_id"]'>@puesto["name"]</option>
+
+                                                }
+                                            </select>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td> 
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h10>Tipo: </h10>
+                                            <select id="typeNotification" name="typeNotification">
+                                                <option value="authorization">Autorización</option>
+                                                <option value='notification'>Notificación</option>
+                                                <option value='approval'>Visto Bueno</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="gray-location">
+                                        <td><input type="checkbox" id="priceRange" />
+                                            <h10>Rango de precios</h10>
+                                            <br />
+                                            Mínimo <input type="text" value="0.00" id="minPrice" disabled="disabled"/>
+                                        </td>
+                                        <td>
+                                            <br />
+                                            Máximo <input type="text" value="0.00" id="maxPrice" disabled ="disabled" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <h10>No. de días </h10>
+                                            <br />
+                                            <input type="number" min="0" value="0" id="numDay" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span width="80%" id="final_msg" class="error_msg"></span>
+                <input value="Guardar" class="btn blue" type="submit" id="save_buttonUsers">
+                <input value="Cancelar" class="btn grey" type="button" id="cancel_buttonUsers" data-dismiss="modal">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/RivkaBase/Scripts/RivkaTree/RivkaTree.js"></script>
+<script>
+    var Table = jQuery("#authorizationContentTable");
+    var newTbody = jQuery("<tbody/>");
+    var newHead = jQuery("<thead/>");
+    var authorizationSave = [];
+    var tableSet = false;
+    var tableEditId = "";
+    var tableEdit;
+
+    jQuery(document).ready(function ($) {
+        debugger;
+
+        jQuery("#minPrice").maskMoney({ prefix: '$ ', allowNegative: false, thousands: ',', decimal: '.', affixesStay: false });
+        jQuery("#maxPrice").maskMoney({ prefix: '$ ', allowNegative: false, thousands: ',', decimal: '.', affixesStay: false });
+
+        jQuery("#profileSelect").change(function () {
+            selectedProfile = jQuery(this).val();
+
+        });
+
+        jQuery('#priceRange').change(function () {
+            if (jQuery("#priceRange").is(':checked')) {
+                jQuery('#minPrice').removeAttr("disabled");
+                jQuery('#maxPrice').removeAttr("disabled");
+            } else {
+                jQuery('#minPrice').val("0.00").attr("disabled", "disabled");
+                jQuery('#maxPrice').val("0.00").attr("disabled", "disabled");
+            }
+        });
+
+
+        jQuery("#cancel_buttonAuthorization").click(function () {
+            //Reset all
+            jQuery("#profileSelect").val("selectOption");
+            jQuery("#typeNotification").val("authorization");
+            jQuery("#priceRange").prop("checked", false);
+            jQuery("#minPrice").val("0.00").attr("disabled", "disabled");
+            jQuery("#maxPrice").val("0.00").attr("disabled", "disabled");
+            jQuery("#numDay").val(0);
+            var tableEditId = "";
+
+            jQuery(function () {
+                jQuery('#myTab a:first').tab('show')
+            });
+        });
+
+        jQuery("#cancel_buttonUsers").click(function () {
+            //Reset all
+            jQuery("#profileSelect").val("selectOption");
+            jQuery("#typeNotification").val("authorization");
+            jQuery("#minPrice").val("0.00");
+            jQuery("#maxPrice").val("0.00");
+            jQuery("#numDay").val(0);
+            var tableEditId = "";
+
+            jQuery(function () {
+                jQuery('#myTab a:first').tab('show')
+            });
+        });
+
+        jQuery('#save_buttonUsers').click(function () {
+            if (jQuery('#profileSelect').val().toString() == "selectOption") {
+                _alert("error", "Debe de seleccionar un puesto primero!");
+                return;
+            }
+            numMinPrice = jQuery('#minPrice').val();
+            numMinPrice = numMinPrice.replace(/,/g, '');
+            numMinPriceVal = 0 + parseFloat(numMinPrice);
+            numMaxPrice = jQuery('#maxPrice').val();
+            numMaxPrice = numMaxPrice.replace(/,/g, '');
+            numMaxPriceVal = 0 + parseFloat(numMaxPrice);
+            if (jQuery("#priceRange").is(':checked')) {
+                if (numMaxPrice <= numMinPrice || numMaxPrice == null || numMaxPrice == "" || numMinPrice == null || numMinPrice == "") {
+                    _alert("error", "Verifica el rango del Precio!")
+                    return;
+                }
+            }
+
+            id = "null";
+            estado = "Dinámico"
+
+            if (tableEditId != "") {
+                id = tableEditId;
+                jQuery(tableEdit).closest('tr').remove();
+                if (tableEditId != "null" && tableEditId != null) estado = "Cambios sin guardar";
+
+                tableEditId = "";
+            }
+
+            if (tableSet == false) createTable();
+            Table.show();
+            jQuery('#alertAuthorization').hide();
+
+            //...........
+            numDayVal = jQuery('#numDay').val();
+            typeNotificationVal = jQuery('#typeNotification').val();
+            if (jQuery("#priceRange").is(':checked')) {
+                minPriceVal = jQuery('#minPrice').val();
+                maxPriceVal = jQuery('#maxPrice').val();
+                rangePrice = "$" + minPriceVal + " - " + "$" + maxPriceVal;
+            } else {
+                rangePrice = "No definido";
+                minPriceVal = "null";
+                maxPriceVal = "null";
+            }
+            //...........
+
+            Table.append(jQuery("<tr/>").attr("data-position", jQuery('#profileSelect').val()).attr("data-id", id)
+                    .attr("data-minprice", minPriceVal).attr("data-maxprice", maxPriceVal).attr("data-numday", numDayVal).attr("data-typenotification", typeNotificationVal)
+                .append(jQuery("<th/>").text(jQuery('#profileSelect :selected').text()))
+                .append(jQuery("<th/>").text(jQuery('#typeNotification :selected').text()))
+                .append(jQuery("<th/>").text(rangePrice))
+                .append(jQuery("<th/>").text(numDayVal))
+                .append(jQuery("<th/>").text(estado))
+
+                .append(jQuery("<th/>").append(jQuery("<div>")
+                    .addClass("btn-group")
+                        .append(jQuery("<a>").addClass("btn").attr("onclick", "editAuthorization(this)")
+                            .append(jQuery("<i>").addClass("icon-edit")))
+                        .append(jQuery("<a>").addClass("btn").attr("onclick", "deleteAuthorization(this)")
+                            .append(jQuery("<i>").addClass("icon-trash")))
+                )));
+
+            jQuery('#myModal').modal('hide');
+            _alert("success", "Guardado Correctamente");
+
+            //Reset all
+            jQuery("#profileSelect").val("selectOption");
+            jQuery("#typeNotification").val("authorization");
+            jQuery("#priceRange").prop("checked", false);
+            jQuery("#minPrice").val("0.00").attr("disabled", "disabled");
+            jQuery("#maxPrice").val("0.00").attr("disabled", "disabled");
+            jQuery("#numDay").val(0);
+
+            jQuery(function () {
+                jQuery('#myTab a:first').tab('show')
+            });
+        });
+
+        //Set info Tabs
+        jQuery(function () {
+            jQuery('#myTab a:first').tab('show')
+        });
+
+    }); //close document
+
+    //Table Creation
+    function createTable() {
+        tableSet = true;
+        Table.append(newHead);
+        Table.append(newTbody);
+        newHead.append(jQuery("<tr/>")
+            .append(jQuery("<th/>").text("Puesto"))
+            .append(jQuery("<th/>").text("Tipo"))
+            .append(jQuery("<th/>").text("Rango Precios"))
+            .append(jQuery("<th/>").text("No. Días"))
+            .append(jQuery("<th/>").text("Estado"))
+            .append(jQuery("<th/>").text("Funciones"))
+            );
+    }
+
+    function setAuthorizationTable(authorizationId) {
+        if (authorizationId.length != 0) {
+            createTable();
+            Table.show();
+            jQuery('#alertAuthorization').hide();
+            for (x = 0 ; x < authorizationId.length; x++) {
+
+                idAuthorization = authorizationId[x];
+
+                jQuery.ajax({
+                    url: "/Movement/MovementProfile/getAuthorization",
+                    datatype: "json",
+                    type: "POST",
+                    data: { id: idAuthorization },
+                    traditional: true,
+                    async: false,
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        setEditTable(data);
+                        _loading();
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+            }
+        }
+    }
+
+    function setEditTable(data) {
+        
+        if (data["min_price"].toString() == "null" || data["max_price"].toString() == "null")
+            rangePrice = "No definido";
+        else
+            rangePrice = "$" + data["min_price"].toString() + " - " + "$" + data["max_price"].toString();
+
+        Table.append(jQuery("<tr/>").attr("data-position", data["position"].toString()).attr("data-id", data["_id"].toString())
+                       .attr("data-minprice", data["min_price"]).attr("data-maxprice", data["max_price"]).attr("data-numday", data["days"]).attr("data-typenotification", data["type"])
+                  .append(jQuery("<th/>").text(jQuery("#profileSelect option[value='" + data["position"].toString() + "']").text()))
+                  .append(jQuery("<th/>").text(jQuery("#typeNotification option[value='" + data["type"].toString() + "']").text()))
+                  .append(jQuery("<th/>").text(rangePrice))
+                  .append(jQuery("<th/>").text(data["days"].toString()))
+                  .append(jQuery("<th/>").text("Guardado"))
+
+                  .append(jQuery("<th/>").append(jQuery("<div>")
+                      .addClass("btn-group")
+                          .append(jQuery("<a>").addClass("btn").attr("onclick", "editAuthorization(this)")
+                              .append(jQuery("<i>").addClass("icon-edit")))
+                          .append(jQuery("<a>").addClass("btn").attr("onclick", "deleteAuthorization(this)")
+                              .append(jQuery("<i>").addClass("icon-trash")))
+                  )));
+    }
+
+    function getAuthorizations() { //Get the autorizations and save it in the collection
+        cantAutorization = jQuery('#authorizationContentTable tbody tr').length;
+
+        for (cantAuto = 0 ; cantAutorization > cantAuto; cantAuto++) {
+            idProfile = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('position');
+
+            //Add data information
+            minPriceVal = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('minprice');
+            maxPriceVal = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('maxprice');
+            numDayVal = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('numday');
+            typeNotificationVal = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('typenotification');
+            idAuthorization = jQuery(jQuery('#authorizationContentTable tbody tr')[cantAuto]).data('id');
+
+            result = '{' +
+                '"position" : "' + idProfile + '",' +
+                '"min_price" : "' + minPriceVal + '",' +
+                '"max_price" : "' + maxPriceVal + '",' +
+                '"days" : "' + numDayVal + '" ,' +
+                '"type":"' + typeNotificationVal + '",' +
+                '}';
+
+            saveAuthorization(result, idAuthorization);
+        }
+    }
+
+    function saveAuthorization(result, idAuthorization) {
+        jQuery.ajax({
+            url: "/Movement/MovementProfile/saveAuthorization",
+            datatype: "json",
+            type: "POST",
+            data: { jsonString: result, id: idAuthorization },
+            traditional: true,
+            async: false,
+            beforeSend: _loading(),
+            success: function (data) {
+                authorizationSave.push(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function deleteAuthorization(authorization) {
+        _confirm({
+            title: "Eliminar Autorización",
+            message: "¿Seguro que desea eliminarlo?",
+            action: function () {
+
+                jQuery(authorization).closest("tr").remove();
+                idAuthorization = jQuery(authorization).closest("tr").data('id');
+                if (_profileId != "") deleteAuthorizationTable(idAuthorization);
+
+                if (jQuery('#authorizationContentTable tbody tr').length == 0) {
+                    jQuery('#alertAuthorization').show();
+                    Table.hide();
+                }
+            }
+        });
+    }
+
+    function deleteAuthorizationTable(idAuthorization) {
+        jQuery.ajax({
+            url: "/Movement/MovementProfile/deleteAuthorization",
+            datatype: "json",
+            type: "POST",
+            data: { idMovement: _profileId, id: idAuthorization },
+            traditional: true,
+            beforeSend: _loading(),
+            success: function (data) {
+                _loading();
+                _alert("success", "Eliminado Correctamente");
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    function editAuthorization(authorization) {
+        idProfile = jQuery(authorization).closest("tr").data("position");
+        minPriceVal = jQuery(authorization).closest("tr").data('minprice');
+        maxPriceVal = jQuery(authorization).closest("tr").data('maxprice');
+        numDayVal = jQuery(authorization).closest("tr").data('numday');
+        typeNotificationVal = jQuery(authorization).closest("tr").data('typenotification');
+        movementid = jQuery(authorization).closest("tr").data('id');
+        tableEdit = authorization;
+
+        jQuery("#profileSelect").val(idProfile);
+
+        jQuery("#typeNotification").val(typeNotificationVal);
+        jQuery("#numDay").val(numDayVal);
+
+        if (minPriceVal == null || maxPriceVal == null) {
+            jQuery("#priceRange").prop("checked", false);
+            jQuery("#minPrice").val("0.00").attr("disabled", "disabled");
+            jQuery("#maxPrice").val("0.00").attr("disabled", "disabled");
+        } else {
+            jQuery("#priceRange").prop("checked", true);
+            jQuery("#minPrice").val(minPriceVal).removeAttr("disabled");
+            jQuery("#maxPrice").val(maxPriceVal).removeAttr("disabled");
+        }
+
+
+        jQuery('#myModal').modal('show');
+        tableEditId = movementid;
+
+        jQuery(function () {
+            jQuery('#myTab a:first').tab('show')
+        });
+
+    }
+
+</script>

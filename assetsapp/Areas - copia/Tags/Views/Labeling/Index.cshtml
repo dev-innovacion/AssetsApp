@@ -1,0 +1,464 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="table">
+                <div class="row-fluid">
+                    <div class="span12">
+                        <h3 class="ModuleTitle pull-left">Nacimiento de Objeto</h3>
+                        <div id="btnAgregar" class="btn blue pull-right">
+                            <i class="icon-plus"></i> Agregar
+                        </div>
+                        <div id="btnUbicaciones" class="btn pull-right hide">
+                            <i class="icon-globe"></i> Ubicación
+                        </div>
+                        <div id="btnUsuarios" class="btn pull-right hide">
+                            <i class="icon-user"></i> Usuarios
+                        </div>                        
+                    </div>
+                </div>
+                <br />
+                <div class="row-fluid" style="min-height:300px; border:1px solid #EEE;">
+                    <table id="objectTable" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width:60px; text-align: center"> Mantener <input type="checkbox" id="checkall"/></th>
+                                <th>Objeto de Referencia</th>
+                                <th>Usuario</th>
+                                <th>Ubicación</th>
+                                <th style="width:20%">
+                                    <span class="printerOption">Cantidad</span>
+                                    <span class="antennaOption antennaOptionHide">EPC</span>
+                                </th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <br />
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div id="btnSave" class="btn green pull-right antennaOption antennaOptionHide">
+                            <i class="icon-save"></i> Guardar
+                        </div>
+                        <div id="btnPrint" class="btn green pull-right printerOption">
+                            <i class="icon-print"></i> Imprimir
+                        </div>
+
+                        <select class="select" id="devices">
+                            <option value="0">Selecciona un dispositivo</option>
+                            <optgroup label="Impresoras">
+                            </optgroup>
+                            <optgroup label="Antenas">
+                            </optgroup>
+                        </select>
+
+                    </div>                
+                </div>
+            </div>
+           
+        </div>
+    </div>
+
+<div id="objectmodal"></div>
+<div id="locatmodal"></div>
+<div id="usermodal"></div>
+</div>
+
+
+<script type="text/javascript">
+    var devices;
+    
+    //Get the EPC List
+    function epcList() {
+        var epcs = jQuery("[name=epc]");
+        var epcValues = [];
+
+        epcs.each(function () {
+            if (this.value != "")
+                epcValues.push(this.value);
+        });
+
+        return epcValues;
+    }
+
+
+    jQuery(document).ready(function (jQuery) {
+
+        // Object to control the available devices
+        devices = {
+            select: jQuery("#devices"),
+            selected: null,
+            group: null,
+
+            // Add a new Printer Option in the select
+            addPrinter: function(printer){
+                this.select.find("optgroup[label=Impresoras]").append(
+                        jQuery("<option>").html(printer)
+                    );
+            },
+
+            // Add a new Antenna Option in the select
+            addAntenna: function (antenna) {
+                this.select.find("optgroup[label=Antenas]").append(
+                        jQuery("<option>", {value: antenna.ip}).html(antenna.model)
+                    );
+            },
+
+            // Clear all options in the select
+            clearDevices: function(){
+                this.select.find("optgroup[label=Impresoras]").html("");
+                this.select.find("optgroup[label=Antenas]").html("");
+            },
+
+            // Search for all available devices and loads in the select element
+            getDevices: function () {
+                jQuery.ajax({
+                    url: "/Tags/Labeling/GetDevices",
+                    type: "POST",
+                    beforeSend: function () { },
+                    success: function (data) {
+                        var available = JSON.parse(data);
+
+                        //Clear all devices options
+                        devices.clearDevices();
+                        //Add the found devices
+                        if (available.printer != undefined)
+                            devices.addPrinter(available.printer);
+
+                        if (available.antenna.length > 0) {
+                            for(var a in available.antenna)
+                                devices.addAntenna(available.antenna[a]);
+                        }
+                            
+
+                        if (available.antenna == undefined && available.printer == undefined)
+                            _alert("error", "No hay dispositivos conectados");
+
+                    },
+                    error: function () { },
+                    complete: function () { }
+                });
+            },
+
+            // Initializes the required events
+            init: function () {
+                this.select.unbind("change.device");
+                this.select.bind("change.device", function () {
+                    devices.selected = this.value;
+                    var group = jQuery(this.selectedOptions[0]).closest("optgroup").attr("label");
+                    if (group == "Antenas") {
+                        devices.group = "antenna";
+                        jQuery(".antennaOption").removeClass("antennaOptionHide");
+                        jQuery(".printerOption").addClass("printerOptionHide");
+                    }
+                    else {
+                        devices.group = "printer";
+                        jQuery(".antennaOption").addClass("antennaOptionHide");
+                        jQuery(".printerOption").removeClass("printerOptionHide");
+                    }
+                });
+
+                this.getDevices();
+            }
+        };
+        //:: End of the object "devices" ::
+
+        //Event to check all checkboxes
+        jQuery("#objectTable #checkall").on("click", function () {
+            if (jQuery(this).prop("checked")) {
+                jQuery("#objectTable tbody").find("input[type=checkbox]").prop("checked", true);
+            }
+            else
+                jQuery("#objectTable tbody").find("input[type=checkbox]").prop("checked", false);
+        });
+
+        //Event to add more Reference Objects
+        jQuery("#btnAgregar").on('click.modal', function () {
+            _loading();
+            jQuery.ajax({
+                url: "/Tags/Labeling/getObjectModal",
+                type: "POST",
+                success: function (data) {
+                    jQuery("#objectmodal").html(data);
+                    jQuery("#btnAgregar").unbind("click.modal");
+                    jQuery("#btnAgregar").bind("click.modal", function () {
+                        objectModal.openModal();
+                    });
+                },
+                error: function (errorThrown) {
+                    _alert("error", "Ha ocurrido un error.");
+                },
+                complete: function () {
+                    _loading();
+                }
+            });
+        });
+
+        //Event to open the Location modal and relates with objects
+        jQuery("#btnUbicaciones").on('click.open', function () {
+            if (jQuery("#objectTable tbody input:checked").length > 0) {
+                jQuery.ajax({
+                    url: "/Tags/Labeling/LocationModal",
+                    type: "POST",
+                    success: function (data) {
+                        jQuery("#locatmodal").html(data);
+                        jQuery("#btnUbicaciones").unbind('click.open')
+                        jQuery("#btnUbicaciones").bind('click.open', function () {
+                            if (jQuery("#objectTable tbody input:checked").length > 0)
+                                locatmodal.showModal();
+                            else
+                                _alert("error", "Seleccione al menos 1 elemento");
+                        });
+                    },
+                    error: function (errorThrown) {
+                        _alert("error", "Ha ocurrido un error.");
+                    }
+                });
+            }
+            else
+                _alert("error", "Seleccione al menos 1 elemento");
+
+        });
+
+        //Event to open the Users modal and relates with objects
+        jQuery("#btnUsuarios").bind('click.open', function () {
+            if (jQuery("#objectTable tbody input:checked").length > 0) {
+                jQuery.ajax({
+                    url: "/Tags/Labeling/GetUsersModal",
+                    type: "POST",
+                    success: function (data) {
+                        jQuery("#usermodal").html(data);
+                        jQuery("#btnUsuarios").unbind("click.open");
+                        jQuery("#btnUsuarios").bind("click.open", function () {
+                            if (jQuery("#objectTable tbody input:checked").length > 0) 
+                                userModal.showModal();
+                            else
+                                _alert("error", "Seleccione al menos 1 elemento");
+                        });
+                    },
+                    error: function (errorThrown) {
+                        _alert("error", "Ha ocurrido un error.");
+                    }
+                });
+            }
+            else
+                _alert("error", "Seleccione al menos 1 elemento");
+
+        });
+
+        //Event to print the selected items
+        jQuery("#btnPrint").unbind('click.print');
+        jQuery("#btnPrint").bind('click.print', function () {
+
+            // If one device is selected
+            if (devices.selected != null && devices.selected != 0) {
+                var rows = new Array();
+
+                var table = jQuery("#objectTable").find("tbody");
+                if (table.find("tr").length > 0) {
+                    table.find("tr").each(function () {
+                        var object = {};
+                        object["objname"] = jQuery(this).find("select[name=object] :selected").text();;
+                        object["objid"] = jQuery(this).find("select[name=object]").val();
+
+                        var user = jQuery(this).find("select[name=user]").val();
+                        if (user != "0")
+                            object["userid"] = user;
+
+                        var location = jQuery(this).find("select[name=location]").val();
+                        if (location != "0")
+                            object["location"] = location;
+
+                        object["quantity"] = jQuery(this).find(".quantitytd input").val();
+
+                        rows.push(object);
+
+                    });
+
+                    var jsondata = JSON.stringify(rows);
+
+                    _confirm({
+                        title: "Imprimir Etiquetas",
+                        message: "Desea Imprimir estas etiquetas?",
+                        action: function () {
+                            jQuery.ajax({
+                                url: "/Tags/Labeling/PrintLabel",
+                                data: { data: jsondata },
+                                type: "POST",
+                                beforeSend: function () { _loading(); },
+                                success: function (data) {
+                                    data = JSON.parse(data);
+                                    _alert(data["tipo"], data["cadena"]);
+                                },
+                                error: function (errorThrown) {
+                                    _alert("error", "Ha ocurrido un error.");
+                                },
+                                complete: function () { _loading(); }
+                            });
+                        }
+                    });
+                }
+                else
+                    _alert("error", "Agregue al menos 1 elemento para imprimir");
+            }
+            else
+                _alert("error", "Seleccione al menos 1 dispositivo");
+
+           
+        });
+
+        //Event to save the selected items (via Antenna)
+        jQuery("#btnSave").unbind("click.save")
+        jQuery("#btnSave").bind("click.save", function () {
+            var epcs = jQuery("[name=epc]");
+            var epcValues = [];
+            var toSave = true;
+            var table = jQuery("#objectTable").find("tbody");
+            if (table.find("tr").length > 0) {
+
+                //Check if one EPC is missing
+                /*epcs.each(function () {
+                    var newEPC = jQuery(this).val();
+                    if (newEPC == "") {
+                        jQuery(this).focus();
+                        _alert("error", "Faltan de asignar EPCs");
+                        toSave = false;
+                        jQuery(this).addClass("red");
+                        return false;
+                    }
+                    //Check if some EPC are duplicated
+                    if (epcValues.indexOf(newEPC) >= 0) {
+                        _alert("error", "EPCs duplicados");
+                        toSave = false;
+                        jQuery(this).addClass("red");
+                        return false;
+                    }
+                    jQuery(this).removeClass("red");
+                    epcValues.push(newEPC);
+
+                });
+                */
+                //Send to save the new EPCs
+                if (toSave) {
+                    var rows = [];
+
+                    table.find("tr").each(function () {
+                        var object = {};
+
+                        if (jQuery(this).find(".quantitytd input[name=epc]").val() != "") {
+                            object["objectReference"] = jQuery(this).find("select[name=object]").val();
+
+                            object["name"] = jQuery(this).find("select[name=object] :selected").text();
+                            object["EPC"] = jQuery(this).find(".quantitytd input[name=epc]").val();
+
+                            var user = jQuery(this).find("select[name=user]").val();
+                            if (user != "0")
+                                object["userid"] = user;
+
+                            var location = jQuery(this).find("select[name=location]").val();
+                            if (location != "0")
+                                object["location"] = location;
+
+                            rows.push(object);
+                        }
+
+                    });
+
+                    if (rows.length > 0) {
+
+                        _confirm({
+                            title: "Guardar Activos",
+                            message: "Desea guardar estos activos?",
+                            action: function () {
+                                jQuery.ajax({
+                                    url: "/Tags/Labeling/SaveLabels",
+                                    method: "POST",
+                                    data: { objects: JSON.stringify(rows) },
+                                    beforeSend: function () { _loading(); },
+                                    success: function (data) {
+                                        var result = JSON.parse(data);
+
+                                        jQuery("[name=epc]").removeClass("red").removeClass("green");
+
+                                        if (result.status == "duplicated" || result.status == "invalid") {
+                                            if (result.status == "duplicated")
+                                                _alert("warning", "Algunos EPCs están duplicados y no han sido guardados");
+                                            else
+                                                _alert("warning", "Algunos EPCs son inválidos o duplicados y no han sido guardados");
+
+                                            //Show invalid and duplicated EPCs
+                                            var duplicated = result.duplicated;
+                                            for (var d in duplicated) {
+                                                //jQuery("[name=epc][value=" + duplicated[d] + "]").addClass("red");
+                                                jQuery("[name=epc]").each(function () {
+                                                    if (this.value == duplicated[d]) {
+                                                        jQuery(this).addClass('red');
+                                                        return false;
+                                                    }
+                                                });
+                                            }
+                                            //Show saved EPCs and Clear
+                                            var toClear = jQuery("[name=epc]:not([class*=red])").addClass("green");
+                                            toClear.each(function () {
+                                                var row = jQuery(this).closest("tr");
+                                                row.find("select[name=user]").chosen().val(0);
+                                                row.find("select[name=user]").trigger("liszt:updated");
+                                                row.find("[name=epc]").val("");
+
+                                                if (!row.find("[type=checkbox]").prop("checked"))
+                                                    row.remove();
+                                            });
+
+                                        }
+                                        else if (result.status == "success") {
+                                            jQuery("[name=epc]").addClass('green').removeClass('red');
+
+                                            //Clear fields
+                                            jQuery("select[name=user]").chosen().val(0);
+                                            jQuery("select[name=user]").trigger("liszt:updated");
+                                            jQuery("[name=epc]").val("");
+
+                                            //remove rows
+                                            var toRemove = jQuery("#objectTable tbody input[type=checkbox]:not(:checked)");
+                                            toRemove.each(function () {
+                                                jQuery(this).closest("tr").remove();
+                                            });
+
+                                            _alert("success", "Todos los objetos han sido guardados");
+                                        }
+                                        else {
+                                            _alert("error", "Ocurrio un error al guardar los datos");
+                                        }
+
+                                    },
+                                    error: function () { _alert("error", "Ocurrio un error, intenta más tarde"); },
+                                    complete: function () { _loading(); }
+                                });
+                            }
+                        });
+
+                    }
+                    else
+                        _alert("error", "No hay datos que guardar");
+                    
+                }
+                    
+            }
+            else
+                _alert("error", "Seleccione al menos 1 elemento para guardar");
+
+        });
+
+    //***********************************
+    // Initialze all the required objects
+    //***********************************
+        jQuery("#btnAgregar").click();
+        devices.init();
+    });
+</script>

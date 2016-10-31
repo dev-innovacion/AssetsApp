@@ -1,0 +1,166 @@
+﻿@using MongoDB.Bson
+@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+@{
+    JObject extras = ViewData["extras"] as JObject;
+}
+<div class="well-content" style="max-width:760px;">
+    <div class="navbar-inner">
+        <ul class="nav nav-tabs" id="tabHeader2">
+            <li class="active" id="tabledata"><a href="#lista1" data-toggle="tab">Activos</a></li>
+            <li id="extradata"><a href="#extras" data-toggle="tab">Autorizadores</a></li>
+           
+
+        </ul>
+    </div>
+    <div class="tab-content" id="tabContent2">
+        <div class="tab-pane active lista listamargen" id="lista1">
+            <table id="mailtablexobjs" class="table table-striped table-hover dataTable" style="max-height: 400px; max-width: 900px;">
+
+                <thead>
+                    <tr>
+
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Id Articulo:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Id de Registro:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Nombre:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Conjunto:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Ubicacion:</th>
+                        @if (ViewBag.type == "transferencia")
+                        {
+                            <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Conjunto Destino:</th>
+                            <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Ubicacion Destino:</th>
+
+                        }
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">#Serie:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">EPC:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Cantidad:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Marca:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Modelo:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Estatus:</th>
+
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;"></th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;"></th>
+
+
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+
+                        foreach (JObject item in Model)
+                        {
+                            <tr class="mailtr">
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["object_id"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["id"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["name"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["conjunto"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["location"]</td>
+                                @if (ViewBag.type == "transferencia")
+                                {
+                                    <td class="table-fixed-medium getmail" style="text-align:center;">@item["conjuntoDestiny"]</td>
+                                    <td class="table-fixed-medium getmail" style="text-align:center;">@item["locationDestiny"]</td>
+
+                                }
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["serie"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["EPC"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["quantity"]</td>
+
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["marca"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["modelo"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@item["status"]</td>
+
+
+
+
+                                @try
+                                {
+                                    JToken value;
+                                    if (item.TryGetValue("denied_note", out value))
+                                    {
+                                        <td class="table-fixed-medium getmail" style="text-align:center;">Denegado Motivo: @item["denied_note"]</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="table-fixed-medium getmail" style="text-align:center;">Aprobado</td>
+                                    }
+                                    if (item.TryGetValue("denied_user", out value))
+                                    {
+                                        <td class="table-fixed-medium getmail" style="text-align:center;">Denegado Por: @item["denied_user"]["name"]</td>
+                                    }
+                                    else
+                                    {
+                                        <td class="table-fixed-medium getmail" style="text-align:center;">Aprobado Por Todos</td>
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+
+                                }
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane  " id="extras">
+            <table id="mailtablexobjs2" class="table table-striped table-hover dataTable" style="max-height: 400px; max-width: 900px;">
+
+                <thead>
+                    <tr>
+
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Autorizadores:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Fecha Autorizacion:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">VOBO:</th>
+                        <th class="table-fixed-medium getmail" style="background: #8793A0; color: white;  text-align: center;font-size:12px;">Fecha de VOBO:</th>
+                         
+                       
+
+
+                    </tr>
+                </thead>
+                <tbody>
+                   
+
+                       
+                            <tr class="mailtr">
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@extras["authorizations"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@extras["AuthorizedDate"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@extras["approval"]</td>
+                                <td class="table-fixed-medium getmail" style="text-align:center;">@extras["ApprovedDate"]</td>
+                               
+                            </tr>
+                        
+                    
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+    <script>
+        try {
+            jQuery("#mailtablexobjs,#mailtablexobjs2").dataTable({
+                "sPaginationType": "full_numbers",
+                "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                "iDisplayLength": 10,
+                "oLanguage": {
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                    "sSearch": "Filtro",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Ultimo",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+
+                    },
+                    "sEmptyTable": "Tabla Sin Datos"
+                }
+            });
+        } catch (e) { }
+    </script>

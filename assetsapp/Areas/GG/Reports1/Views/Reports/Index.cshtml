@@ -1,0 +1,1167 @@
+﻿@{
+    ViewBag.Title = "Index";
+
+    Dictionary<string, string> listmenu = new Dictionary<string, string>();
+    Dictionary<string, string> listmenucustom = new Dictionary<string, string>();
+
+    string[] options = { "Usuarios", "Perfiles", "Inventarios", "Ubicaciones" , "Objetos De Referencia" , "Hardware", "Activos" };
+    string[] value = { "Users", "Profiles", "Inventory", "Locations" , "ReferenceObjects" , "Hardware", "ObjectReal" };
+    string[] optionscustom = { "Movimientos" };
+    string[] valuecustom = { "Movement" };
+    for (int i = 0; i < options.Length; i++)
+    {
+
+        listmenu.Add(options[i], value[i]);
+    }
+    for (int i = 0; i < optionscustom.Length; i++)
+    {
+
+        listmenucustom.Add(optionscustom[i], valuecustom[i]);
+    }
+
+    string idus = "";
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+        idus = Session["_id"].ToString();
+    }
+    
+}
+
+<div id="namereport" class="modal hide fade" data-backdrop="static">
+    <div class="modal-header">
+        <h3 class="modal-header-text">Guardar Reporte</h3>
+    </div>
+    <div class="modal-body">
+        <div>
+            <label>Nombre:</label>
+            <input type="text" id="getnamex" data-provide="typeahead" name="search" class="typehead span5 " placeholder="Escribe Un Nombre" />
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <input value="Guardar" class="btn blue" type="submit" id="save">
+        <input value="Cancelar" class="btn grey" type="button" id="cancelm">
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span12">
+        <div class="span8">
+
+            <h3 class="ModuleTitle">Reportes </h3>
+        </div>
+        <div class="span4">
+            <div class="float_right" style="display:none;">
+
+                <select id="selectreport" class="chosen">
+                    @{int index = 0;}
+                    @foreach (var x in (Dictionary<string, string>)ViewData["reports"])
+                    {
+
+                        if (index == 0)
+                        {
+                            <option value="0">Cargar Reporte</option>
+                            index++;
+                        }
+                        <option value="@x.Key">@x.Value</option>
+
+                    }
+                    @if (index == 0)
+                    {
+                        <option value="0">No Hay Reportes</option>
+                        index++;
+                    }
+                </select>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="well-content no_padding row-fluid">
+    <div class="well-header widgetclient titleclient">
+        <h5>Tipos De Reportes</h5>
+
+    </div>
+    <div class="well-content no_padding row-fluid">
+        <div id="divfirst" class="span12">
+
+
+            <center >
+                <div id="optionsdiv" class="well light_blue span12" style="padding-left:2%;padding-right:4%">
+                    <div class="span4">
+                        <div class="span12 no-search" style="padding-left:0px;padding-top:30px;padding-bottom:20px;">
+                            <select id="selectTypereport" class="chosen" style="text-align:center">
+
+
+                                <option value="0">Elige un Tipo de Reporte</option>
+                                <option value="3">Reportes General de Activos</option>
+                                <option value="11">C. Movimientos(Cafi-Escritorio)</option>
+
+                                <option value="4">Consulta maestra de Movimientos</option>
+                                 <!--  <option value="7">Consulta de Salidas Temporales</option>-->
+
+                                 <option value="6">Inventario - Cotejo de Activos</option>
+
+                                <option value="1">Crear Reporte Simple</option>
+
+                                <option value="2">Crear Reporte Avanzado</option>
+
+                               
+
+                            </select>
+
+
+                        </div>
+                    </div>
+                    <div id="divstart" class="span4" style="display:block">
+                        <div style="padding-left: 0px; padding-top: 30px;">
+                            <p>
+                                <i id="clearstart" class="icon-remove float_left" title="borrar fecha inicial" style="font-size: large; cursor: pointer;"></i>
+
+                             <input class="start span10" id="start" style="display:block" type="text" placeholder="Fecha de Inicio" readonly /></p>
+                         </div>
+
+                    </div>
+                    <div id="divend" class="span4" style="padding-left: 8px; padding-top: 30px; display: block">
+                        <div>
+                            <p>
+                                <i id="clearend" class="icon-remove float_left" title="borrar fecha final" style="font-size: large; cursor: pointer;"></i>
+
+                            <input id="end" class=".end span10" style="display:block" type="text" placeholder="Fecha Final" readonly /></p>
+                               </div>
+
+                    </div>
+                </div>
+            </center>
+            <br />
+            <hr size="3" />
+        </div>
+
+        <div id="reportsimple" class="hidden">
+
+            <div id="optionsdiv" class="well light_blue span12" style="padding-left: 6.5%">
+                <div id="modulsimple" class="span3" style="padding-bottom: 30px;display:block">
+                    <div class="span12 no-search" style="padding-left: 0px; padding-top: 20px;">
+                        <select id="selectType" class="chosen">
+
+                            @{var count = 0;}
+                            @foreach (var item in listmenu)
+                            {
+
+                                if (count == 0)
+                                {
+                                    <option value="0">Elige un Modulo</option>
+                                    count++;
+                                }
+                                <option value="@item.Value">@item.Key</option>
+
+
+
+
+
+
+
+                            }
+
+
+                        </select>
+
+
+                    </div>
+                </div>
+                <div class="span9">
+                    <div id="Report1">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- <div id="reportcustom" class="hidden">
+
+             <div id="optionsdiv" class="well light_blue span12" style="padding-left:14%;">
+                 <div class="span4">
+                     <div class="span12 no-search" style="padding-left:8px;padding-top:20px;">
+                         <select id="selectType1" class="chosen">
+
+                             @{var countx = 0;}
+                             @foreach (var item in listmenucustom)
+                             {
+
+                                 if (countx == 0)
+                                 {
+                                     <option value="0">Elige un Modulo</option>
+                                     countx++;
+                                 }
+                                 <option value="@item.Value">@item.Key</option>
+
+
+
+
+
+
+
+                             }
+
+
+                         </select>
+
+
+                     </div>
+                 </div>
+
+             </div>
+
+         </div>-->
+        <hr size="3" />
+        <br />
+        <div id="Report2">
+        </div>
+        <br />
+
+
+    </div>
+
+</div>
+
+
+<div id="Report">
+</div>
+
+
+
+
+
+
+
+<script>
+
+    var checkboxValues = new Array();
+    var valid = 0;
+   
+    jQuery(document).ready(function ($) {
+        //  $(".calendario").datepicker();
+        bindzoom();
+        var idus = ""
+                @(new HtmlString("idus='" + idus + "';"))
+
+                var nowTemp = new Date();
+                var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+
+                var checkin = $('#start').datepicker({
+                  
+                    onRender: function (date) {
+                        return date.valueOf() < now.valueOf() ? 'enabled' : '';
+                    }
+                }).on('changeDate', function (ev) {
+                  
+                   // if (ev.date.valueOf() >= checkout.date.valueOf()) {
+                        var newDate = new Date(ev.date)
+                        newDate.setDate(newDate.getDate() );
+                        checkout.setValue(newDate);
+                    //}
+                    checkin.hide();
+                    $('#end')[0].focus();
+                }).data('datepicker');
+                var checkout = $('#end').datepicker({
+                    onRender: function (date) {
+                        return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+                    }
+                }).on('changeDate', function (ev) {
+                    checkout.hide();
+                }).data('datepicker');
+
+
+                jQuery("#clearstart").unbind("click.start");
+                jQuery("#clearstart").bind("click.start", function () {
+
+                    jQuery("#start").val("");
+
+                });
+                jQuery("#clearend").unbind("click.end");
+                jQuery("#clearend").bind("click.end", function () {
+
+                    jQuery("#end").val("");
+
+                });
+                jQuery("#selectType").on('change', function () {
+                   
+                    var startdate = $("#start").val();
+                    var enddate = $("#end").val();
+                    var value = $("#selectType").val();
+                    if (startdate == "" || startdate == null) {
+                        startdate = "01/01/1900";
+
+                    }
+                    if (enddate != "" || enddate != null) {
+                        enddate = "01/01/3000";
+                    }
+
+                    if (value == "Users") {
+                        // $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/UserReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+
+                                //  $('#Report1').removeClass("loading-custom");
+                                _loading();
+
+                            }
+                        });
+                    }
+                    if (value == "Inventory") {
+                        // $('#Report1').addClass("loading-custom");
+
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/InventoryReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //    $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    if (value == "Locations") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/LocationsReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //     $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    if (value == "ReferenceObjects") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/ObjectsRefReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //      $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+
+                    if (value == "ObjectReal") {
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/ObjectsRealReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+
+                                //  $('#Report1').removeClass("loading-custom");
+                                _loading();
+
+                            }
+                        });
+                    } if (value == "Movement1") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/CustomReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //    $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    /*if (value == "Movement") {
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            beforeSend: _loading(),
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                _loading();
+
+                            }
+                        });
+                    }*/
+                    if (value == "Messages") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MessageReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //        $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    if (value == "Profiles") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/ProfileReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report').html("");
+                                $('#Report2').html("");
+
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //    $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    if (value == "Hardware") {
+                        //   $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/HwReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //     $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    if (value == "Processes") {
+                        //  $('#Report1').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/ProcessesReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                //        $('#Report1').removeClass("loading-custom");
+                                _loading();
+                            }
+                        });
+                    }
+                    /* } else {
+                         var v = 0;
+
+                         alert("Ingrese Fecha De Inicio y Fin!!");
+                         jQuery("#selectType_chzn span").html("Elige un Modulo");
+                         $("li.result-selected").removeClass("result-selected");
+                          $("#selectType_chzn_o_0").addClass("result-selected");
+
+                         $("#selectType option[value=" + v + "]").attr("selected", true);
+
+                     }*/
+                   
+                });
+
+                $('#all').change(function () {
+
+
+
+                    $('input[name="options[]"]').each(function () {
+                      
+
+                        if (valid == 0) {
+                            this.checked = true;
+
+                        } else {
+                            this.checked = false;
+                        }
+                        /*  if ($(this).is(':checked')) {
+                              //  $(this).removeAttr('checked');
+
+                             // this.checked = false;
+
+                          } else {
+                            //  $(this).attr('checked', 'checked');
+
+                                  this.checked = true;
+
+                          }*/
+
+                    });
+
+                    if (valid == 0) {
+                        valid++;
+                    } else {
+                        valid = 0;
+                    }
+                });
+
+                $("#cancelm").click(function () {
+                    jQuery("#namereport").modal("hide");
+
+                });
+
+              /*  $('#generate').on('click', function () {
+
+
+
+
+                    $('input[name="options[]"]:checked').each(function () {
+                        var objdata = new Object();
+                        objdata.data = $(this).val();
+                        objdata.value = $(this).data("option");
+                        checkboxValues.push(objdata);
+
+                    });
+
+
+
+                    var jsondata = JSON.stringify(checkboxValues);
+                   jQuery.ajax({
+
+                        url: "/Reports/Reports/GenerateReport",
+                        data: { data: jsondata },
+                        beforeSend: _loading(),
+                        type: "POST",
+                        success: function (data) {
+                            $('#Report').html("");
+                            $('#Report').html(data);
+
+                            checkboxValues.length = 0;
+                            _loading();
+
+                        },
+                        error: function () {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                });*/
+
+                jQuery("#selectTypereport").on('change', function () {
+                    var value = $("#selectTypereport").val();
+                    $("#start").val("");
+                    $("#end").val("");
+                    if (value == 1) {
+                        $("#modulsimple").show();
+                        $('#Report2').html("");
+                        $("#optionsdiv").removeAttr('style');
+                        $('#Report1').html("");
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $('#reportsimple').removeClass("span9");
+                        $("#Report1").parent().addClass("span9")
+                        $('#divstart').hide();
+                        $('#divend').hide();
+
+                        $('#Report').html("");
+                        $('#reportsimple').removeClass("hidden");
+                       
+                        //  $('#reportcustom').addClass("hidden");
+
+                    } else if (value == 2) {
+                        $('#reportsimple').addClass("hidden");
+                        $("#optionsdiv").removeAttr('style');
+                        $("#modulsimple").hide();
+                        $('#reportsimple').removeClass("span9");
+                        $("#Report1").parent().addClass("span9")
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $('#divstart').show();
+                        $('#divend').show();
+
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/CustomReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report2').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    } else if (value == 4) {
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $('#reportsimple').attr("class", "");
+                      //  $("#Report1 #optionsdiv").find("div").first().attr("class", "span12")
+                        $("#modulsimple").hide();
+                       $("#optionsdiv").css("margin-left", "0.0%");
+                        $('#divstart').show();
+                       $('#divend').show();
+
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementMasterReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    } else if (value == 11) {
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $('#reportsimple').attr("class", "");
+                        //  $("#Report1 #optionsdiv").find("div").first().attr("class", "span12")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "0.0%");
+                        $('#divstart').show();
+                        $('#divend').show();
+
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementMigrationReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    } else if (value == 7) {
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').removeClass("span3")
+                        $('#divfirst').addClass("span12")
+                        $("#Report1").parent().removeClass("span9")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "2.0%");
+                     //   $('#divstart').hide();
+                     //   $('#divend').hide();
+
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementTemporalReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    }
+                    else if (value == 5) {
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').removeClass("span12")
+                        $('#divfirst').addClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "32.5%");
+                        $('#divstart').hide();
+                        $('#divend').hide();
+
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/MovementHistoryReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    } else if (value == 3) {
+                      /*  $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').removeClass("span12")
+                        $('#divfirst').addClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left","32.5%");
+                        $('#divstart').hide();
+                        $('#divend').hide();*/
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $('#reportsimple').attr("class", "");
+                        //  $("#Report1 #optionsdiv").find("div").first().attr("class", "span12")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "0.0%");
+                        $('#divstart').show();
+                        $('#divend').show();
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+
+                        _loading();
+                       
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/ObjectsRealReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    } else if (value == 6) {
+                        /*$('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').removeClass("span12")
+                        $('#divfirst').addClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "32.5%");
+                        $('#divstart').hide();
+                        $('#divend').hide();*/
+                        $('#reportsimple').removeClass("hidden");
+                        $('#reportsimple').addClass("span9");
+                        $('#divfirst').addClass("span12")
+                        $('#divfirst').removeClass("span3")
+                        $("#Report1").parent().removeClass("span9")
+                        $('#reportsimple').attr("class", "");
+                        //  $("#Report1 #optionsdiv").find("div").first().attr("class", "span12")
+                        $("#modulsimple").hide();
+                        $("#optionsdiv").css("margin-left", "0.0%");
+                        $('#divstart').show();
+                        $('#divend').show();
+                        var v = 0;
+                        jQuery("#selectType").val(0);
+                        jQuery("#selectType_chzn span").html("Elige un Modulo");
+                        $("li.result-selected").removeClass("result-selected");
+                        $("#selectType_chzn_o_0").addClass("result-selected");
+
+                        $("#selectType option[value=" + v + "]").attr("selected", true);
+                        //   $('#reportcustom').removeClass("hidden");
+                        var startdate = $("#start").val();
+                        var enddate = $("#end").val();
+                        if (startdate == "" || startdate == null) {
+                            startdate = "01/01/1900";
+
+                        }
+                        if (enddate != "" || enddate != null) {
+                            enddate = "01/01/3000";
+                        }
+                        //  $('#Report2').addClass("loading-custom");
+                        _loading();
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/InventoryReport",
+                            data: { id: idus, datestart: startdate, dateend: enddate },
+
+                            type: "POST",
+                            success: function (data) {
+                                $('#Report1').html("");
+                                $('#Report2').html("");
+                                $('#Report').html("");
+                                $('#Report1').html(data);
+
+                                checkboxValues.length = 0;
+                                // $('#Report2').removeClass("loading-custom");
+                                _loading();
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+                        });
+                    }
+                });
+
+                $('#selectreport').unbind('change.report');
+
+                $('#selectreport').on('change.report', function () {
+
+                    var value = $('#selectreport').val();
+
+                    if (value != 0) {
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/GetReport",
+                            data: { id: value },
+                            type: "POST",
+                            beforeSend: _loading(),
+
+                            success: function (data) {
+
+                              
+
+                                if (data != "" && data != null) {
+                                    var data = JSON.parse(data);
+                                    var jsondatafilter = data["profiles"];
+                                    var jsondatamovs = data["movements"];
+                                    var jsondataobjs = data["objects"];
+                                    var jsondatalocs = data["locations"];
+                                    var jsondatausers = data["users"];
+                                    
+                                    var startdate = data["startdate"];
+                                    var enddate = data["enddate"];
+                                    var jsondata = data["cols"];
+                                    var typereport = data["CategoryReport"];
+                                    var urlreport = "";
+                                    switch (typereport) {
+
+                                        case "Usuarios":
+                                            urlreport = "GenerateUserReport";
+                                            break;
+                                        case "Objetos_Reales":
+                                            urlreport = "GenerateObjectsRealReport";
+                                            break;
+                                        case "Perfiles":
+                                            urlreport = "GenerateProfileReport";
+                                            break;
+                                        case "Procesos":
+                                            urlreport = "GenerateProcessesReport";
+                                            break;
+                                        case "Objetos_Ref":
+                                            urlreport = "GenerateObjectsRefReport";
+                                            break;
+                                        case "Movimientos":
+                                            urlreport = "GenerateMovementReport";
+                                            break;
+                                        case "Ubicaciones":
+                                            urlreport = "GenerateLocationsReport";
+                                            break;
+                                        case "Inventarios":
+                                            urlreport = "GenerateInventoryReport";
+                                            break;
+                                        case "Hardwares":
+                                            urlreport = "GenerateHwReport";
+                                            break;
+                                        case "Movements":
+                                            urlreport = "GenerateCustomReport";
+                                            break;
+                                    }
+                                    if (urlreport != "") {
+
+                                        if (urlreport == "GenerateCustomReport") {
+                                            var objresult = {};
+                                            var list_status = [
+                                                { id: "Pendiente", value: "Pendiente" },
+                                                { id: "Aprobada", value: "Aprobada" },
+                                                { id: "Denegada", value: "Denegada" },
+                                                { id: "Cancelada", value: "Cancelada" }
+                                            ];
+                                            validate = 1;
+                                            
+                                            var jsonstatus = JSON.stringify(list_status);
+                                            jQuery.ajax({
+
+                                                url: "/Reports/Reports/" + urlreport,
+                                                data: { startdate: startdate, enddate: enddate, movements: jsondatamovs, objects: jsondataobjs, locations: jsondatalocs, users: jsondatausers, status: jsonstatus },
+                                                type: "POST",
+                                                success: function (data) {
+                                                    $('#Report').html("");
+                                                    $('#Report').html(data);
+
+                                                    //  checkboxValues.length = 0;
+                                                    $('#selectreport').val("0");
+                                                    _loading();
+
+                                                }
+
+
+                                            });
+                                        } else {
+                                            jQuery.ajax({
+
+                                                url: "/Reports/Reports/" + urlreport,
+                                                data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata },
+                                                type: "POST",
+                                                success: function (data) {
+                                                    $('#Report').html("");
+                                                    $('#Report').html(data);
+
+                                                    //  checkboxValues.length = 0;
+                                                    $('#selectreport').val("0");
+                                                    _loading();
+
+                                                }
+
+
+                                            });
+                                        }
+                                    }
+
+                                } else {
+                                    alert("Error Al Generar el Reporte!!!");
+                                }
+
+
+                            },
+                            error: function () {
+                                _loading();
+                                _alert("error", "Ha ocurrido un error");
+                            }
+
+
+                        });
+                    }
+                });
+
+            });
+</script>
+
+
+
+

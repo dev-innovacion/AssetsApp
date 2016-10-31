@@ -1,0 +1,333 @@
+﻿@{
+
+    Layout = null;
+}
+@{
+    string path = "";
+   try {
+        path =ViewData["url"] as string;
+        path = path.Replace(@"\", @"\\");
+   }
+   catch (Exception ex) { }
+   
+   
+    List<List<string>> newsEpcs = new List<List<string>>();
+    List<List<string>> duplicateEpcs = new List<List<string>>();
+    List<List<string>> duplicateids = new List<List<string>>();
+    if (ViewData["newsEpc"] as List<List<string>> != null) {  
+    newsEpcs = ViewData["newsEpc"] as List<List<string>>;}
+     if (ViewData["duplicateEpc"] as List<List<string>> != null) {  
+     duplicateEpcs = ViewData["duplicateEpc"] as List<List<string>>;
+     }
+     if (ViewData["duplicateids"] as List<List<string>> != null)
+     {
+         duplicateids = ViewData["duplicateids"] as List<List<string>>;
+     }
+     
+}
+<div>
+<div class="navbar-inner ">
+    <ul class="nav nav-tabs" id="myTab">
+      
+       <li class="active" id="tab1"><a href="#newstab" data-toggle="tab">Nuevos Objetos</a></li>
+
+        
+        <li id="tab2"><a href="#duptab" data-toggle="tab">Objetos Con EPC Existente</a></li>
+        <li id="tab3"><a href="#dupidtab" data-toggle="tab">Objetos Con ID Existente</a></li>
+     
+    </ul>
+</div>
+<div class="tab-content" >
+    <div class="tab-pane active tabfirst perfilMargen" id="newstab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:290px; max-height: 290px; overflow: hidden">
+
+            <table id="newstable" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+                        <th class="table-icon hidden-480"><input type="checkbox" name="selectnews" class="uniform"> </th>
+
+                        @foreach (var item in newsEpcs)
+                        {
+                            foreach (var x in item)
+                            {
+                                <th class="table-fixed-medium">@x</th>
+                            }
+                            break;
+                        }
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot = 0;}
+                    @foreach (var row in newsEpcs)
+                    {
+                        if (hnot != 0)
+                        {
+                            <tr class="mailtr">
+                                <td class="table-icon hidden-480">
+                                    <input type="checkbox"  class="selectact" value="1">
+                                </td>
+                                @foreach (var column in row)
+                                {
+                                    <td class="table-fixed-medium">@column.ToString()</td>
+
+                                }
+                            </tr>
+                        }
+                        hnot++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (newsEpcs.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+            
+
+        </div>
+        
+      
+    </div>
+    <div class="tab-pane  tab perfilMargen" id="dupidtab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:290px; max-height: 290px; overflow: hidden">
+            <table id="duplicatetable1" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+                    <th class="table-icon hidden-480"><input type="checkbox" name="selectduplicateepc" class="uniform"> </th>
+                        @foreach (var item1 in duplicateids)
+                        {
+                            foreach (var x1 in item1)
+                            {
+                                <th class="table-fixed-medium">@x1</th>
+                            }
+                            break;
+                        }
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot2 = 0;}
+                    @foreach (var row in duplicateids)
+                    {
+                        if (hnot2 != 0)
+                        {
+                            <tr class="mailtr">
+                                <td class="table-icon hidden-480">
+                                    <input type="checkbox" class="selectact" value="1">
+                                </td>
+                                @foreach (var column in row)
+                                {
+                                    <td class="table-fixed-medium">@column.ToString()</td>
+
+                                }
+                            </tr>
+                        }
+                        hnot2++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (duplicateids.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+        </div>
+
+
+    </div>
+    <div class="tab-pane  tablast perfilMargen" id="duptab">
+        <div class="overOn contentHolder well-content no_padding row-fluid" style="min-height:290px; max-height: 290px; overflow: hidden">
+            <table id="duplicatetable" class="table table-striped table-hover dataTable datatable">
+
+                <thead>
+                    <tr class="widgetclient" style="color: white;">
+                        <th class="table-icon hidden-480"><input type="checkbox" name="selectduplicateid" class="uniform"> </th>
+
+                        @foreach (var item1 in duplicateEpcs)
+                        {
+                            foreach (var x1 in item1)
+                            {
+                                <th class="table-fixed-medium">@x1</th>
+                            }
+                            break;
+                        }
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int hnot1 = 0;}
+                    @foreach (var row in duplicateEpcs)
+                    {
+                        if (hnot1 != 0)
+                        {
+                            <tr class="mailtr">
+                                <td class="table-icon hidden-480">
+                                    <input type="checkbox" class="selectact" value="1">
+                                </td>
+                                @foreach (var column in row)
+                                {
+                                    <td class="table-fixed-medium">@column.ToString()</td>
+
+                                }
+                            </tr>
+                        }
+                        hnot1++;
+
+                    }
+
+                </tbody>
+
+            </table>
+            @if (duplicateEpcs.Count() == 0)
+            {
+                <br /><br /><br />
+                <center><h4>Tabla Sin Registros ..</h4></center>
+            }
+        </div>
+
+       
+    </div>
+</div>
+    @if (newsEpcs.Count() != 0 || duplicateEpcs.Count()!=0 || duplicateids.Count()!=0)
+    {
+
+        <div class="float_right">
+            <br />
+            <button class="btn blue topbarclient" id="createObj" data-original-title="Crear Activos(omite los Duplicados)" rel="tooltip" data-placement="top">
+                <i class="icon-spinner icon-white"></i>
+                <span>Crear Activos...</span>
+
+            </button>
+            <button class="btn blue red" id="cancelbtn">
+                <i class="icon-warning-sign icon-white"></i>
+                <span>Cancelar...</span>
+
+            </button>
+        </div>
+    }
+</div>
+<script>
+    jQuery(function () {
+        jQuery('#myTab a:first').tab('show')
+    });
+    jQuery('.overOn').perfectScrollbar({ wheelSpeed: 1000 });
+    try {
+        jQuery('#newstable').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    try {
+        jQuery('#duplicatetable').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    try {
+        jQuery('#duplicatetable1').dataTable({
+            "sPaginationType": "bootstrap",
+            "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+            "iDisplayLength": 10,
+
+            "aoColumnDefs": [{
+                'bSortable': false,
+                'aTargets': [-1, 0]
+            }], "oLanguage": {
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sSearch": "Buscar"
+            }
+        });
+    } catch (exception) {
+
+    }
+    jQuery(".tableHeader").css("padding-right", "10px");
+    jQuery(".tableHeader").css("padding-bottom", "20px");
+
+    try {
+        jQuery("#cancelbtn").click(function () {
+
+            window.location.reload();
+        });
+        jQuery("#createObj").click(function () {
+            var path = "@path";
+         
+             jQuery.ajax({
+
+                url: "/Tags/Tags/generateObjs",
+                // data: { maildata : jsonmail},
+               
+                 data: { url: path},
+               
+                type: "POST",
+                beforeSend: _loading(),
+
+                success: function (data) {
+
+                    if(data=="error"){
+                        _alert("error","Ocurrio un error,suba de nuevo el archivo e intente de nuevo");
+                        _loading();
+                    }else{
+
+
+                        _alert("success", "Activos Creados Con Exito!!!")
+                        jQuery("#result").html("");
+                        _loading();
+                    }
+                   
+                   
+
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error,intentelo mas tarde");
+                    _loading();
+                }
+            });
+
+
+        });
+    } catch (ex) { }
+    jQuery("[name=selectnews]").unbind("change.news");
+    jQuery("[name=selectnews]").bind("change.news", function () {
+
+
+    });
+    jQuery(document).ready(function () {
+
+
+
+    })
+</script>

@@ -1,0 +1,588 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using RivkaAreas.User.Models;
+@model JArray
+
+@{
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+
+    var add = "";
+    foreach (string x in allp["objects"]["grant"])
+    {
+
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+
+    var addc = "";
+    foreach (string x in dataclientjo["objects"]["grant"])
+    {
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+}
+
+<style type="text/css">
+    .dataTables_scrollBody {
+        height: 250px !important;
+    }
+
+    #rcorners1 {
+        border-radius: 10px;
+        background: #D9D9D9;
+        padding: 20px;
+        height: 130px;
+    }
+
+    #txtSignature {
+        border: 0;
+        border-bottom: 2px solid black;
+        width: 200px;
+    }
+
+    #btnempleado {
+        border-top: 1px solid #96d1f8;
+        background: #057835;
+        background: -webkit-gradient(linear, left top, left bottom, from(#057835), to(#057835));
+        background: -webkit-linear-gradient(top, #057835, #057835);
+        background: -moz-linear-gradient(top, #057835, #057835);
+        background: -ms-linear-gradient(top, #057835, #057835);
+        background: -o-linear-gradient(top, #057835, #057835);
+        padding: 5px 10px;
+        -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+        border-radius: 8px;
+        -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+        -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+        box-shadow: rgba(0,0,0,1) 0 1px 0;
+        text-shadow: rgba(0,0,0,.4) 0 1px 0;
+        color: white;
+        font-size: 14px;
+        font-family: Arial;
+        text-decoration: none;
+        vertical-align: middle;
+    }
+
+        #btnempleado:hover {
+            border-top-color: #57565B;
+            background: #57565B;
+            color: #ccc;
+        }
+
+        #btnempleado:active {
+            border-top-color: #1b435e;
+            background: #1b435e;
+        }
+
+    #btnImprimir {
+        background: #898791;
+        background-image: -webkit-linear-gradient(top, #898791, #1a1a1c);
+        background-image: -moz-linear-gradient(top, #898791, #1a1a1c);
+        background-image: -ms-linear-gradient(top, #898791, #1a1a1c);
+        background-image: -o-linear-gradient(top, #898791, #1a1a1c);
+        background-image: linear-gradient(to bottom, #898791, #1a1a1c);
+        -webkit-border-radius: 9;
+        -moz-border-radius: 9;
+        border-radius: 9px;
+        font-family: Arial;
+        color: #ffffff;
+        font-size: 20px;
+        padding: 3px 12px 6px 12px;
+        text-decoration: none;
+    }
+
+        #btnImprimir:hover {
+            background: #077535;
+            background-image: -webkit-linear-gradient(top, #077535, #033819);
+            background-image: -moz-linear-gradient(top, #077535, #033819);
+            background-image: -ms-linear-gradient(top, #077535, #033819);
+            background-image: -o-linear-gradient(top, #077535, #033819);
+            background-image: linear-gradient(to bottom, #077535, #033819);
+            text-decoration: none;
+        }
+</style>
+
+<div class="inner_content">
+
+    <div class="widgets_area">
+        @*<div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    <h3 class="ModuleTitle"></h3>
+                </div>
+                <div class="span4">
+
+                </div>
+            </div>
+        </div>*@
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                <table id="rcorners1" style="margin-bottom: 60px">
+                    <tr>
+                        <td>
+                            <img src="~/Content/Images/logooih.png" />
+                        </td>
+                        <td class="txt-sec">
+                            <h3><b>UDLAP Jenkis Graduate School</b></h3>
+                            <p>Paseo de la Reforma 180, Piso 16 <br />Col Juárez, CDMX</p>
+                        </td>
+                        <td>
+                            <img src="~/Content/Images/logonewfeb12016.png" style="width: 230px" />
+                        </td>
+                    </tr>
+                </table>
+
+                @*<div style="margin-bottom:60px;width:auto !important;" id="rcorners1">
+                    <div style="float:left;width:30%;margin-top:16px">
+                        <center>  <img src="~/Content/Images/logooih.png" /></center>
+                    </div>
+                    <div class="txt-sec" style="float:right;width:40%;margin-right:309px">
+                        <h3><b>Hospital Regional de Alta Especialidad de Ixtapaluca</b></h3>
+                        <p>Carretera Federal Mexico-Puebla km. 34.5, Pueblo<br />Zoquiapan, Municipio de Ixtapaluca</p>
+                    </div>
+                    <div style="float:right;width:30%;margin-left:30px;margin-top:-150px">
+                        <center>  <img src="~/Content/Images/logonewfeb12016.png" style="width: 230px" /></center>
+                    </div>
+
+                </div>*@
+                <div style="margin-top:-54px;float:left">
+                    <h3><b> Control de Activo Fijo – Responsiva por Usuario</b></h3>
+
+                </div>
+                <div style="margin-bottom:20px;float:right">
+                    <h3><b> <a onclick="fnprint()" id="btnImprimir">Imprimir</a></b></h3>
+
+                </div>
+                <div class="light_blue set_color">
+                    
+                    <div style="margin-bottom:20px">
+                        <label>Búsqueda por "empleado" y "ID de empleado"</label>
+                        <input type="text" id="txtempleado" />&nbsp;&nbsp;<input type="button" id="btnempleado" value="Buscar" onclick="fnSearchByEmpleado()" />
+                        @*<select id="ddlEmployee">
+                                <option>--Select Employee--</option>
+                                @foreach (var item in (Dictionary<string, string>)ViewBag.EmployeeList)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </select>*@
+                    </div>
+
+                    <div id="assetTable">
+
+                    </div>
+                    <div style="margin-top:31px;width:900px;margin-left:88px">
+                        <p>RECIBÍ DE UDLAP JENKINS GRADUTATE SCHOOL, EL ACTIVO FIJO QUE SE DESCRIBE PROPIEDAD DE LA 
+MISMA QUE A PARTIR DE ESTA FECHA LO UTILIZARÉ PARA DESEMPEÑO DE MIS LABORES, COMPROMETIÉNDOME A
+SU CONSERVACIÓN Y CUIDADO, OBLIGÁNDOME A DEVOLVERLO EN EL MOMENTO QUE ME SEA
+REQUERIDO EN LAS MISMAS CONDICIONES QUE ME FUE ENTREGADO, SALVO EL DESGASTE POR
+USO NORMAL OCASIONADO POR LA NATURALEZA DE MIS FUNCIONES.</p>
+                        <p>EN CASO DE ROBO, EXTRAVÍO O DESCOMPOSTURA, ME OBLIGO A REPORTARLO POR ESCRITO A
+LA GERENCIA UDLAP JENKINS CORRESPONDIENTE, SEGÚN SEA EL TIPO DE ACTIVO,
+PARA QUE SE DESLINDE LA RESPONSABILIDAD CORRESPONDIENTE DEL DAÑO OCASIONADO,
+ASI MISMO, ME COMPROMENTO A NO HACER MAL USO DEL SOFTWARE, NI INSTALAR OTRO QUE
+NO SEA AUTORIZADO POR LA GERENCIA DE TECNOLOGÍAS DE INFORMACIÓN.</p>
+                        <p>LA FIRMA DE ESTA CARTA RESGUARDO COMPLEMENTA CUALQUIER OTRA FIRMADA CON
+ANTERIORIDAD, AGRADECEREMOS CUALQUIER OTRA INFORMACIÓN RELACIONADA.</p>
+                    </div>
+
+                    <div style="width:100%">
+                        <div id="signingdiv" style="text-align:center;margin-top:50px;float:left;width:50%">
+                            <b>Firma:</b><br />
+                            <input type="text" id="txtSignature" />
+                            <p>Nombre y firma de quien entrega</p>
+                            <b>Fecha:</b><br>
+                            <input type="text" id="txtSignature"><br>
+                            
+                        </div>
+
+                        <div id="signingdiv" style="text-align:center;margin-top:50px;float:right;width:50%">
+                            <b>Firma:</b><br />
+                            <input type="text" id="txtSignature" />
+                            <p>Nombre y firma del responsable</p>
+                            <b>Fecha:</b><br>
+                            <input type="text" id="txtSignature"><br>
+                           
+                        </div>
+                    </div>
+
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="responsible_detail_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Responsable detalle</h3>
+    </div>
+    <div class="modal-body">
+        <div id="importresultContent">
+
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                        <label>Nombre: </label>
+                        <label id="employeeName"></label>
+                    </td>
+                    <td rowspan="2" width="50%" style="text-align: left">
+                        <img style="max-height: 100px;" id="employee_img_pre" src="~/Content/Images/imgPerfil/avatar_06.png">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>Apellido Paterno: </label>
+                        <label id="employeeLastName">Singh</label>
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Apellido Materno: </label>
+                        <label id="employeeMotherLastName"></label>
+                    </td>
+                    <td>
+                        <label>ID Empleado: </label>
+                        <label id="employeeId"></label>
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Perfil: </label>
+                        <label id="employeeProfile"></label>
+                    </td>
+                    <td>
+
+                        <label>Tipo de Empleado: </label>
+                        <label id="employeeType"></label>
+
+                    </td>
+                </tr>
+                <tr style="height:50px;">
+                    <td>
+                        <label>Área: </label>
+                        <label id="employeeArea"></label>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="inner_content" id="printDiv" style="visibility:hidden">
+    <style type="text/css">
+        .dataTables_scrollBody {
+            height: 250px !important;
+        }
+
+        #rcorners1 {
+            background: #fff none repeat scroll 0 0;
+            border: 1px solid #000;
+            border-radius: 10px;
+            height: 130px;
+            padding: 20px;
+            box-shadow:0 2px 0px #000;
+        }
+        .txt-sec {
+  margin-top: 14px;
+}
+.txt-sec h3 {
+  font-size: 25px;
+  margin-bottom: 0;
+  text-align: center;
+}
+.txt-sec p {
+  text-align: center;
+  font-size:15px;
+}
+        #txtSignature {
+            border: 0;
+            border-bottom: 2px solid black;
+            width: 200px;
+        }
+    </style>
+    <link href="~/Content/CSS/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/CSS/stylesheet.css" rel="stylesheet" />
+    <div class="widgets_area">
+      
+        <br />
+        <div class="row-fluid">
+            <div class="span12">
+                
+                <table id="rcorners1" style="margin-bottom: 60px">
+                    <tr>
+                        <td>
+                            <img src="~/Content/Images/logooih.png" />
+                        </td>
+                        <td class="txt-sec">
+                            <h3><b>Hospital Regional de Alta Especialidad de Ixtapaluca</b></h3>
+                            <p>Carretera Federal Mexico-Puebla km. 34.5, Pueblo<br />Zoquiapan, Municipio de Ixtapaluca</p>
+                        </td>
+                        <td>
+                            <img src="~/Content/Images/logonewfeb12016.png" style="width: 230px" />
+                        </td>
+                    </tr>
+                </table>
+                @*<div style="margin-bottom:60px;width:auto !important;" id="rcorners1">
+                    <div style="float:left;width:30%;margin-top:16px;display:inline-block;vertical-align:top">
+                        <center>  <img src="~/Content/Images/logooih.png" /></center>
+                    </div>
+                    <div class="txt-sec" style="float:right;width:40%;margin-right:309px;display:inline-block;vertical-align:top">
+                        <h3><b>Hospital Regional de Alta Especialidad de Ixtapaluca</b></h3>
+                        <p>Carretera Federal Mexico-Puebla km. 34.5, Pueblo<br />Zoquiapan, Municipio de Ixtapaluca</p>
+                    </div>
+                    <div style="float:right;width:30%;margin-left:200px;margin-top:-145px;display:inline-block;vertical-align:top">
+                        <center>  <img src="~/Content/Images/logonewfeb12016.png" style="width: 230px" /></center>
+                    </div>
+
+                </div>*@
+                <div style="margin-top:-54px;float:left">
+                    <h3><b> Control de Activo Fijo – Responsiva por Usuario</b></h3>
+
+                </div>
+                
+                <div class="light_blue set_color">
+
+                    
+                    <div id="assetTablePrint">
+
+                    </div>
+                    <div style="margin-top:31px;width:900px;margin-left:88px">
+                        <p>
+                            RECIBÍ DE DESARROLLO Y OPERACIÓN DE INFRAESTRUCTURA HOSPITALARIA DE IXTAPALUCA
+                            S. A.P.I. DE C.V., EL ACTIVO FIJO QUE SE DESCRIBE PROPIEDAD DEL HRAEI PARA QUE A
+                            PARTIR DE ESTA FECHA LO UTILICE PARA DESEMPEÑO DE MIS LABORES, COMPROMETIÉNDOME A
+                            SU CONSERVACIÓN Y CUIDADO, OBLIGÁNDOME A DEVOLVERLO EN EL MOMENTO QUE ME SEA
+                            REQUERIDO EN LAS MISMAS CONDICIONES QUE ME FUE ENTREGADO, SALVO EL DESGASTE POR
+                            USO NORMAL OCASIONADO POR LA NATURALEZA DE MIS FUNCIONES.
+                        </p>
+                        <p>
+                            EN CASO DE ROBO, EXTRAVÍO O DESCOMPOSTURA, ME OBLIGO A REPORTARLO POR ESCRITO A
+                            LA GERENCIA DOIHI CORRESPONDIENTE, SEGÚN SEA EL TIPO DE ACTIVO,
+                            PARA QUE SE DESLINDE LA RESPONSABILIDAD CORRESPONDIENTE DEL DAÑO OCASIONADO,
+                            ASI MISMO, ME COMPROMENTO A NO HACER MAL USO DEL SOFTWARE, NI INSTALAR OTRO QUE
+                            NO SEA AUTORIZADO POR LA GERENCIA DE TECNOLOGÍA INFORMÁTICA DE DOIHI.
+                        </p>
+                        <p>
+                            LA FIRMA DE ESTA CARTA RESGUARDO COMPLEMENTA CUALQUIER OTRA FIRMADA CON
+                            ANTERIORIDAD, AGRADECEREMOS CUALQUIER OTRA INFORMACIÓN RELACIONADA.
+                        </p>
+                    </div>
+
+                    <div style="width:100%">
+                        <div id="signingdiv" style="text-align:center;margin-top:50px;float:left;width:50%">
+                            <b>Firma:</b><br />
+                            <input type="text" id="txtSignature" />
+                            <p>Nombre y firma de quien entrega</p>
+                            <b>Fecha:</b><br>
+                            <input type="text" id="txtSignature"><br>
+                        </div>
+
+                        <div id="signingdiv" style="text-align:center;margin-top:50px;float:right;width:50%">
+                            <b>Firma:</b><br />
+                            <input type="text" id="txtSignature" />
+                            <p>Nombre y firma del responsable</p>
+                            <b>Fecha:</b><br>
+                            <input type="text" id="txtSignature"><br>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    function loadAssetAssignment() {
+        selectOption = jQuery("#typeShow").val();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/VoucherSubmodule",
+            type: "POST",
+            beforeSend: _loading(),
+            success: function (data) {
+                jQuery("#assetTable").html(data);
+                jQuery("#assetTablePrint").html(data);
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+    function deleteAssignment(id) {
+        _confirm({
+            title: "Eliminar Registros",
+            message: "¿Seguro que desea eliminar los registros ?",
+            action: function () {
+                _loading();
+                jQuery.ajax({
+                    url: "/Assignments/Assignments/deleteAssignment",
+                    datatype: "json",
+                    type: "POST",
+                    data: { assignmentID: id },
+                    traditional: true,
+                    success: function (data) {
+                        if (data == null || data == "null" || data == "") {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                        else {
+                            _loading();
+                            _alert("success", "Eliminado Correctamente");
+                            loadAssetAssignment();
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    function ShowResponsibleDetail(id) {
+
+
+        _loading();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/GetEmployeeDetail",
+            datatype: "json",
+            type: "POST",
+            data: { assignmentId: id },
+            traditional: true,
+            success: function (data) {
+                _loading();
+                data = JSON.parse(data);
+                if (data == "null" || data == null || data == "") {
+
+                    alert("Ha ocurrido un error");
+                }
+                else {
+                    jQuery("#employeeName").html(data["name"]);
+                    jQuery("#employeeLastName").html(data["lastname"]);
+                    jQuery("#employeeMotherLastName").html(data["motherlastname"]);
+                    jQuery("#employeeId").html(data["employee"]);
+                    jQuery("#employeeProfile").html(data["profileId"]);
+                    jQuery("#employeeType").html(data["type"]);
+                    jQuery("#employeeArea").html(data["area"]);
+                    if (data["ImgUrl"] != "NoImage") {
+                        jQuery('#employee_img_pre').attr('src', data["ImgUrl"]);
+                    }
+
+                    jQuery("#importresultContent").find("label").css("font-size", "15px");
+                    jQuery("#responsible_detail_panel").modal("show");
+                }
+
+            }
+        });
+    }
+
+
+    jQuery(document).ready(function ($) {
+        loadAssetAssignment();
+
+    });
+
+    jQuery("#ddlEmployee").on('change', function () {
+        var prof = jQuery("#ddlEmployee").val();
+        if (prof != "0") {
+            jQuery.ajax({
+                url: "/Assignments/Assignments/VoucherSubmodule",
+                type: "POST",
+                data: { stringval: prof },
+                beforeSend: _loading(),
+                success: function (data) {
+                    
+                    _loading();
+                    //var employess = JSON.parse(data);
+                    jQuery("#assetTable").html('');
+                    jQuery("#assetTable").html(data);
+                    jQuery("#assetTablePrint").html('');
+                    jQuery("#assetTablePrint").html(data);
+                },
+                error: function (data) {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+        else {
+            var cadena = "<option value='0'>Elige un Empleados</option>";
+            jQuery("#ddlActivo").html(cadena);
+        }
+    });
+
+    function fnprint() {
+        var divToPrint = document.getElementById('printDiv');
+        var popupWin = window.open('', '_blank', 'width=300,height=400,location=no,left=200px');
+        popupWin.document.open();
+        popupWin.document.write('<!DOCTYPE html><head>\
+            </head>\
+            <body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+        popupWin.document.close();
+        //window.print();
+    }
+
+
+    function fnSearchByEmpleado() {
+        //txtempleado
+        var employee = jQuery("#txtempleado").val();
+        jQuery.ajax({
+            url: "/Assignments/Assignments/VoucherSubmodule",
+            type: "POST",
+            data: { stringval: employee },
+            beforeSend: _loading(),
+            success: function (data) {
+                debugger;
+                _loading();
+                //var employess = JSON.parse(data);
+                jQuery("#assetTable").html('');
+                jQuery("#assetTable").html(data);
+                jQuery("#assetTablePrint").html('');
+                jQuery("#assetTablePrint").html(data);
+            },
+            error: function (data) {
+                _loading();
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+    }
+
+    $('#txtempleado').keydown(function (e) {
+        if (e.keyCode == 13) {
+            var employee = jQuery("#txtempleado").val();
+            jQuery.ajax({
+                url: "/Assignments/Assignments/VoucherSubmodule",
+                type: "POST",
+                data: { stringval: employee },
+                beforeSend: _loading(),
+                success: function (data) {
+                    _loading();
+                    //var employess = JSON.parse(data);
+                    jQuery("#assetTable").html('');
+                    jQuery("#assetTable").html(data);
+                    jQuery("#assetTablePrint").html('');
+                    jQuery("#assetTablePrint").html(data);
+                },
+                error: function (data) {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+       
+    });
+   
+
+</script>

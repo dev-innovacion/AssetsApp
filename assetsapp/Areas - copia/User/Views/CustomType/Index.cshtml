@@ -1,0 +1,406 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Campos Custom";
+    var datos = Session["Permissions"].ToString();
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+    var upd = "";
+    var del = "";
+    var add = "";
+    foreach (string x in allp["custom_fields"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            upd = "u";
+        }
+        if (x.Contains("d"))
+        {
+            del = "d";
+        }
+        if (x.Contains("c"))
+        {
+            add = "c";
+        }
+    }
+    var dataclient = Session["PermissionsClient"].ToString();
+    JObject dataclientjo = JsonConvert.DeserializeObject<JObject>(dataclient);
+    var updc = "";
+    var delc = "";
+    var addc = "";
+    foreach (string x in dataclientjo["custom_fields"]["grant"])
+    {
+        if (x.Contains("u"))
+        {
+            updc = "u";
+        }
+        if (x.Contains("d"))
+        {
+            delc = "d";
+        }
+        if (x.Contains("c"))
+        {
+            addc = "c";
+        }
+    }
+  
+}
+<div class="widgets_area">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span8">
+                <h3 class="ModuleTitle">Campos Custom</h3>
+            </div>
+            <div class="span4">
+                <div class="search" style="display:none">
+                    <input type="text" data-provide="typeahead" id="globalSearch" name="globalSearch" class="typehead span8" placeholder="Búsqueda" data-source="" />
+                    <button type="submit" class="square-button green" id="globalSearchButton"><i class="icon-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="light_blue set_color">
+                <div class="well-header widgetclient titleclient">
+                    <h5>Lista de Campos</h5>
+                    <div class="btn-group">
+                        @if (add == "c" && addc=="c")
+                        {
+                            <button class="btn btn-mini dark_green fileinput-button" id="addUserButton" data-original-title="Agregar Campo Custom" rel="tooltip" data-placement="top">
+                                <i class="icon-plus icon-white"></i>
+                            </button>
+                        }
+                        @if (del == "d" && delc=="d")
+                        {
+                            <button type="button" class="btn btn-mini red delete" id="deleteButton" data-original-title="Eliminar Campos Custom" rel="tooltip" data-placement="top">
+                                <i class="icon-trash icon-white"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div id="tabcontent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="admin_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Agregar Campo Custom</h3>
+    </div>
+    @using (Ajax.BeginForm("SaveField", new AjaxOptions
+        {
+            InsertionMode = InsertionMode.Replace,
+            OnComplete = "fieldModal.ResponseText"
+        }
+        ))
+    {
+        <table width="60%" class="staticField">
+            <tr>
+                <td align="right" style="width: 150px;">
+                    <label>Tipo de campo: </label>
+                </td>
+                <td>
+                    @Html.DropDownList("type", (List<SelectListItem>)ViewBag.Types, new { @class = "staticField" })
+                </td>
+            </tr>
+        </table>
+        <div class="staticField">
+
+
+            <div style="max-height: 250px; overflow-y: auto;">
+                <table>
+                    <tbody id="extrafields"></tbody>
+                </table>
+            </div>
+
+
+        </div>
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <input value="Guardar" class="btn dark_green" type="submit" id="save_button">
+            <input value="Cancelar" class="btn grey" type="button" id="cancel_button">
+        </div>
+    }
+</div>
+
+
+
+
+
+
+<script id="tableControlScripts">
+
+    var fieldsTable;
+    var fieldModal;
+
+    fieldsTable = {
+
+        init: function () {
+            fieldsTable.bindAll();
+
+            //Loads  User customField table as defaul
+            fieldsTable.loadCustomFields();
+        },
+
+        loadCustomFields: function () {
+            var tablename = "CustomFields";
+            jQuery.ajax({
+                url: '/User/CustomType/GetTable?tablename=' + tablename,
+                type: "GET",
+                success: function (data) {
+                    jQuery("#tabcontent").empty();
+                    jQuery("#tabcontent").append(data);
+
+                    jQuery("[rel=tooltip]").tooltip();
+
+                    //Load delete script on table buttons-----------------------------------------------------------
+                    jQuery("#customFieldTable i[class='icon-trash']").on("click", function () {
+                        deleteid = jQuery(this).parents("tr").find("input[type='checkbox']").attr("name");
+
+                        _confirm({
+                            title: "Eliminar Campo",
+                            message: "la eliminación de este campo puede causar pérdida de datos en perfiles, ¿Estás seguro que deseas eliminar este campo?",
+                            action: function () {
+                                jQuery.ajax({
+                                    url: "/User/CustomType/DeleteField",
+                                    type: "POST",
+                                    data: { id: deleteid, tablename: jQuery("input[name='TableName']").val() },
+                                    success: function () {
+                                        _alert("success", "Eliminado Correctamente");
+                                        //Recarga la página
+                                        //jQuery("#tabHeader1 .active a").eq(0).trigger("click");
+                                        fieldsTable.loadCustomFields();
+                                    }
+                                });
+                            }
+                        });
+                    });
+                    //---------------------------------------------------------------------------------------------
+
+                    //Load Edit script on table buttons------------------------------------------------------------
+                    jQuery("#customFieldTable i[class='icon-edit']").on("click", function () {
+                        deleteid = jQuery(this).parents("tr").find("input[type='checkbox']").attr("name");
+                        jQuery.ajax({
+                            url: "/User/CustomType/EditField",
+                            type: "GET",
+                            data: { id: deleteid, tablename: jQuery("input[name='TableName']").val() },
+                            success: function (data) {
+
+                                //Borrar valores de inputs
+                                jQuery("#extrafields input").val("");
+                                //Borrar valores de validación
+                                jQuery("#extrafields span").empty();
+
+
+                                fieldModal.HTMLFormatInputs(data);
+                                //Lee el selectedname
+                                var selectedname = jQuery("#extrafields input[name='type']").val();
+
+                                //Deselecciona todos
+                                jQuery("#type option").attr("selected", false);
+                                jQuery("#type option[value='" + selectedname + "']").attr("selected", true);
+                                jQuery("#type").attr("disabled", true);
+
+
+                                jQuery("#admin_panel").modal("show");
+
+                            }
+                        });
+
+                    });
+                    //----------------------------------------------------------------------------------------------
+
+
+                    //Loads table style-----------------------------------------------------------------------------
+                    jQuery(".datatable").dataTable({
+                        "sPaginationType": "bootstrap",
+                        "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
+                        "iDisplayLength": 10,
+                        "sScrollY": "400px",
+                        "aoColumnDefs": [{
+                            'bSortable': false,
+                            'aTargets': [0]
+                        }],
+                        "oLanguage": {
+                            "sLengthMenu": "Mostrar _MENU_ registros",
+                            "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                            "sSearch": "Buscar"
+                        }
+                    });
+
+                    jQuery('.dataTables_length select').chosen();
+                    //----------------------------------------------------------------------------------------------
+
+
+                    //Rename customField table type column, to a more user friendly name---------------------------
+                    //Reads rows on table
+                    var rows = jQuery("#customFieldTable tbody tr");
+                    //Iterate rows to be modified
+                    for (var i = 0; i < rows.length; i++) {
+                        //Reads the "td" FieldType on each row
+                        var td = rows.eq(i).children("td").eq(3);
+                        //Reads his html
+                        var value = td.html();
+                        //Does a match with the dropdown and take out display names
+                        var displayname = jQuery("select option[value='" + value + "'").html();
+                        //Cleans "td" and puts displayname on it
+                        td.empty().append(displayname);
+
+                    }
+                    //---------------------------------------------------------------------------------------------
+                }
+            });
+        },
+
+        bindAll: function () {
+            jQuery("#addUserButton").on("click", function () {
+                //Delates the hidden input "type" because it is being read from the dropdownlist
+                jQuery("#extrafields input[id='type']").parents("tr").remove();
+                //Cleans inputs
+                jQuery("#extrafields input").val("");
+                //Delates validation messages
+                jQuery("#extrafields span").empty();
+
+                //Activates DropdownList
+                jQuery("#type").attr("disabled", false);
+
+
+                jQuery("#admin_panel").modal("show");
+            });
+
+            jQuery("#deleteButton").on('click', function () {
+                var selecteds = jQuery(".checker:checked");
+                if (selecteds.length == 0) {
+                    _alert("error", "Debe de seleccionar campos primero para eliminarlos!");
+                    return;
+                }
+
+                _confirm({
+                    title: "Eliminar Registros",
+                    message: "¿Seguro que desea eliminar los registros seleccionados?",
+                    action: function () {
+                        var selectedIdArray = [];
+                        for (i = 0; i < selecteds.length; i = i + 1) {
+                            selectedIdArray.push(jQuery(selecteds[i]).attr("name"));
+                        }
+                        jQuery.ajax({
+                            url: "/User/CustomType/deleteFields",
+                            datatype: "json",
+                            type: "POST",
+                            data: { array: selectedIdArray, tablename: jQuery("input[name='TableName']").val() },
+                            traditional: true,
+                            success: function (data) {
+                                jQuery("#tabHeader1 .active a").eq(0).trigger("click");
+
+                                _alert("success", "Eliminado Correctamente");
+                            }
+                        });
+                    }
+                });
+            });
+        }
+    };
+
+    fieldModal = {
+
+        init: function () {
+            fieldModal.bindAll();
+
+            //Loads a type and his fields on the popup
+            jQuery("#type").trigger("change");
+        },
+
+        ResponseText: function (data) {
+            //Check if the server sended some error messages and saves it on the variable text
+            var text = data.responseText;
+            if (text != "") {
+                //Formats inputs on desired format
+                fieldModal.HTMLFormatInputs(text);
+            }
+            else {
+                //Close popup
+                jQuery("#admin_panel").modal("hide");
+
+                _alert("success", "Guardado Correctamente");
+
+                //Reaload table
+                fieldsTable.loadCustomFields();
+            }
+        },
+
+        HTMLFormatInputs: function (data) {
+            if (data != null) {
+                jQuery("#extrafields").html(data);
+
+                var labels = jQuery("#extrafields .editor-label ");
+                var fields = jQuery("#extrafields .editor-field ");
+                var htmlresult = "";
+                for (var i = 0; i < jQuery(labels, "div").length; i++) {
+                    htmlresult += "<tr>";
+                    htmlresult += labels[i].outerHTML + fields[i].outerHTML;
+                    htmlresult += "</tr>"
+                }
+
+                jQuery("#extrafields").html(htmlresult);
+                jQuery("#extrafields .editor-label ").attr("align", "right").attr("style", "width:150px;")
+                jQuery("#extrafields").find("input").addClass("staticField");
+                jQuery("#extrafields").find("select").addClass("staticField");
+
+            }
+        },
+
+        bindAll: function () {
+            jQuery("#cancel_button").on("click", function () {
+                jQuery("#admin_panel").modal("hide");
+            });
+
+            //Get all the inputs needed for a customField type-------------------------------------------------------
+            jQuery("#type").on("change", function () {
+                jQuery.ajax({
+                    url: '/User/CustomType/GetForm',
+                    type: "GET",
+                    data: { type: jQuery("#type").val() },
+                    success: function (data) {
+                        fieldModal.HTMLFormatInputs(data);
+
+                        //Validate if a custom field with that name already exist---------------------------------------
+                        jQuery("form input[name='name']").on("change", function () {
+                            jQuery.ajax({
+                                url: "/User/CustomType/CheckIfCustomFieldExist",
+                                type: "GET",
+                                data: { fieldname: jQuery("form input[name='name']").val(), tablename: jQuery("input[name='TableName']").val() },
+                                success: function (data) {
+                                    //Show error Message---------------------------------------------------------------------------
+                                    if (data == "True") {
+                                        jQuery("span[data-valmsg-for='name']").empty();
+                                        jQuery("span[data-valmsg-for='name']").append("Este nombre ya existe, eliga otro").removeClass("field-validation-valid")
+                                        jQuery("span[data-valmsg-for='name']").addClass("field-validation-error")
+                                        jQuery("#save_button").attr("disabled", true);
+                                    }
+                                    else {
+                                        jQuery("span[data-valmsg-for='name']").empty();
+                                        jQuery("#save_button").attr("disabled", false);
+                                    }
+                                    //---------------------------------------------------------------------------------------------------
+                                }
+                            });
+                        });
+                        //--------------------------------------------------------------------------------------------
+                    }
+                });
+
+            });
+            //---------------------------------------------------------------------------------------------------------
+        }
+    };
+
+
+    jQuery(document).ready(function () {
+        fieldsTable.init();
+        fieldModal.init();
+    });
+</script>

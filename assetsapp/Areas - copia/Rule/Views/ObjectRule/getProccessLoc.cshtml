@@ -1,0 +1,185 @@
+﻿@{Layout = null;}
+
+
+@model Dictionary<string, string>
+@{
+    
+    ViewBag.Title = "Proccess";
+
+    bool checkon = false;
+
+    string gettypelist = "Permitidos";
+
+    try
+    {
+
+
+        gettypelist = ViewData["typelist"].ToString();
+        if (gettypelist == "")
+        {
+            gettypelist = "Permitidos";
+        }
+
+    }
+    catch (Exception)
+    {
+        gettypelist = "Permitidos";
+
+
+    }
+       
+  
+}
+<div id="radios" style="left:30px;">
+    <h3 style="padding-left:10px;">Tipo De Lista:</h3>
+
+
+    <label class="checkbox-inline btn blue">
+        @if (gettypelist == "Permitidos")
+        {
+            <input type="radio" name="typelist" value="0" checked> <text>Permitidos</text>
+        }
+        else if (gettypelist == "Denegados")
+        {
+            <input type="radio" name="typelist" value="0"> <text>Permitidos</text>
+
+        }
+    </label>
+    <label class="checkbox-inline btn blue" style="padding-left:10px;">
+        @if (gettypelist == "Permitidos")
+        {
+            <input type="radio" name="typelist" value="1">  <text>Denegados</text>
+        }
+        else
+        {
+            <input type="radio" name="typelist" value="1" checked>  <text>Denegados</text>
+
+        }
+    </label>
+</div>
+<div class="well blue">
+
+
+
+    <div class="well-header">
+        <center> <h4 style="color:white;padding-top:10px;">Lista De Objetos de Referencia</h4></center>
+    </div>
+    <div class="well-content no_padding row-fluid">
+        <div class="float_margen">
+          
+
+                <center>
+                    <div class="well light_blue" style="padding-left:2%;">
+
+                      
+
+                        
+                               @foreach (var item in Model)
+             {
+               checkon = false;
+                                  
+ 
+
+
+    <div class="float_left" style="padding: 10px 0px 0px 5px; max-height: 50px; ">
+        <label class="checkbox-inline btn blue  float_left"  style="min-width:210px;max-width:210px;max-height:50px; overflow-x:auto;padding-top:5px;color:white; border-radius:50px 50px 50px 50px;">
+
+
+
+            @foreach (var check in (Dictionary<string, string>)ViewData["checks"])
+            {
+
+                if (check.Key == item.Key)
+                {
+                    checkon = true;
+                }
+
+            }
+
+            @if (checkon == true)
+             {
+             <input type="checkbox" class="uniform float_left" style="padding-left:0px;" value="@item.Key" name="objects[]" checked>  @item.Value 
+
+             }
+            else
+            {
+             <input type="checkbox" class="uniform float_left" style="padding-left:0px;" value="@item.Key" name="objects[]"> @item.Value 
+
+            }
+
+
+        </label>
+           </div>                      
+
+
+    
+}
+                          
+
+                       
+                    </div>
+                </center>
+
+            
+        </div>
+    </div>
+    <div class="float_right">
+
+        <input type="submit" class="btn blue" id="saverules" value="Guardar" />
+    </div>
+    </div>
+
+   
+   <script>
+       var checkboxValues = new Array();
+       var idlocation = "";
+       
+
+       var array = new Array();
+       jQuery(document).ready(function ($) {
+        
+           $('#saverules').on('click', function () {
+             idlocation= $('#selectx').val();
+             var objdata = new Object();
+             var typeList = $("input[name='typelist']:checked").val();
+             objdata.idLocation = idlocation;
+               $('input[name="objects[]"]:checked').each(function () {
+                   //$(this).val() es el valor del checkbox correspondiente
+                   checkboxValues.push($(this).val());
+                  
+               });
+
+               objdata.ReferenceObjects = checkboxValues;
+               array = checkboxValues;
+
+               var jsondata = JSON.stringify(array);
+               jQuery.ajax({
+                   
+                   url: "/Rule/ObjectRule/saveLocRules",
+                   data: { id: idlocation, data: jsondata, type: typeList },
+                   beforeSend: _loading(),
+                   type: "POST",
+                   success: function (data) {
+                       $('#proccessTable').html("");
+                       $('#getType').html("");
+                       $("#selectType option[value=0]").attr("selected", true);
+                       jQuery('#selectType > option[value="0"]').attr('selected', 'selected');
+                     
+                       _alert("success", "Guardado Correctamente");
+                       array.length = 0;
+                       _loading();
+
+                   }
+               });
+           });
+       });
+   </script>
+    <!-- <center>
+         <ul class="rows">
+             foreach (var item in Model)
+             {
+                 <li> <input type="checkbox" name="proccess[]" id="item.Key" value="item.Key" /> item.Value</li>
+
+             }
+         </ul>
+     </center>-->

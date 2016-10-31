@@ -1,0 +1,25 @@
+﻿@{Layout = null;}
+
+
+@model List<List<string>>
+@{
+    ViewBag.Title = "Table Excel";
+}
+
+<h2>ImpExcel</h2>
+@foreach (var item in Model)
+{
+    
+    <table>
+      <tr>
+        @foreach (var td in item)
+        {
+            
+            <td>@td</td>
+        }
+
+      </tr> 
+
+
+    </table>
+}

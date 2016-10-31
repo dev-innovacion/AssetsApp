@@ -1,0 +1,330 @@
+﻿@using MongoDB.Bson
+@{Layout = null;}
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JArray
+@{
+
+
+    ViewBag.Title = "GenerateProccessReport";
+
+    Dictionary<string, string> cols = new Dictionary<string, string>();
+    Dictionary<string, int> graph = new Dictionary<string, int>();
+    Dictionary<int, string> headersgraph = new Dictionary<int, string>();
+    Dictionary<string, int[]> graphtime = new Dictionary<string, int[]>();
+    List<string> headsg = new List<string>();
+    int years = (int)ViewData["years"];
+    Dictionary<string, int[]> graphend = new Dictionary<string, int[]>();
+    int indexfor = 0;
+    foreach (var x in (List<string>)ViewData["headmult"])
+    {
+        headsg.Add(x);
+    }
+    foreach (var x in (Dictionary<string, int[]>)ViewData["bodygraph"])
+    {
+
+        graphend.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, string>)ViewData["cols"])
+    {
+        cols.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, int>)ViewData["graph"])
+    {
+        graph.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<int, string>)ViewData["th"])
+    {
+
+        headersgraph.Add(x.Key, x.Value);
+    }
+    foreach (var x in (Dictionary<string, int[]>)ViewData["graphtime"])
+    {
+
+        graphtime.Add(x.Key, x.Value);
+    }
+    string[] headarray = headsg.ToArray();
+    int count = 0;
+
+    int numproccess = Convert.ToInt16(ViewData["numproccess"].ToString());
+
+
+    string[] datesarray = (string[])ViewData["dates"];
+    string ts = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+}
+<div class="well widgetid" data-idwidget="@ViewData["idwidget"].ToString()">
+
+
+    <div id="@ts"></div>
+
+
+</div>
+<link href="~/Content/Scripts/library/graph/charting/css/visualize.css" rel="stylesheet" />
+<link href="~/Content/Scripts/library/graph/charting/css/visualize-dark.css" rel="stylesheet" />
+<script src="~/Content/Scripts/library/graph/charting/js/example-filtering.js"></script>
+<script src="https://www.google.com/jsapi"></script>
+<script>
+
+
+
+    jQuery(document).ready(function ($) {
+        // graph api google
+        var valuegen = '';
+        var typegraph = "";
+        var idcontent = "";
+          @(new HtmlString("typegraph='" + ViewData["typegraph"].ToString()+ "';"))
+       @(new HtmlString("idcontent='" + ts + "';"))
+      
+        function drawtable() {
+
+            $('.visualize').remove();
+            $('#' + idcontent).html("");
+            var value = typegraph;
+
+          
+            // Create and populate the data table.
+
+
+
+            var data = google.visualization.arrayToDataTable([
+                 ['Estados', '#Procesos']
+                 @foreach(var x in graph){
+
+                @(new HtmlString(",['"+x.Key+"',"))
+
+
+                @(new HtmlString(""+x.Value+"]"))
+                 }
+
+
+
+            ]);
+
+
+
+
+
+
+
+            // Create and draw the visualization.
+            var options = {
+                width: 470,
+                height: 380,
+                title: 'Procesos Por Estado',
+                vAxis: { title: 'Acumulado' },
+                isStacked: true
+            };
+
+            if (value == 'piegoo' || valuegen == 'line') {
+                valuegen = ''
+                var chart = new google.visualization.PieChart(document.getElementById(idcontent));
+                chart.draw(data, options);
+            } else
+                if (value == 'tablebar') {
+
+                    var chart = new google.visualization.SteppedAreaChart(document.getElementById(idcontent));
+                    chart.draw(data, options);
+                }
+
+            $('#' + idcontent).removeClass("loading-custom");
+        }
+
+        function drawbar() {
+
+
+            var heads = new Array();
+            heads.push('Estado');
+            debugger;
+            var rows = new Array();
+            rows.push('#Procesos');
+            $('.visualize').remove();
+            $('#' + idcontent).html("");
+            @foreach(var x in graph){
+        @(new HtmlString("heads.push('"+x.Key+"');"))
+        @(new HtmlString("rows.push("+x.Value+");"))
+        }
+            var wrapper = new google.visualization.ChartWrapper({
+                chartType: 'ColumnChart',
+                dataTable: [heads, rows],
+                /*  dataTable: [['', 'Germany', 'USA', 'Brazil', 'Canada', 'France', 'RU'],
+                              ['', 700, 300, 400, 500, 600, 800]],*/
+                options: {
+                    'title': 'Procesos Por Estado', 'width': 470,
+                    'height': 380
+                },
+                containerId: idcontent
+            });
+            wrapper.draw();
+            $('#' + idcontent).removeClass("loading-custom");
+        }
+        function drawVisualization() {
+            // Some raw data (not necessarily accurate)
+
+            var heads = new Array();
+            $('.visualize').remove();
+            $('#' + idcontent).html("");
+            @foreach(var x in headsg){
+            @(new HtmlString("heads.push('"+x+"');"))
+            }
+            var data = new google.visualization.DataTable();
+            debugger;
+            var length = heads.length;
+            for (var i = 0; i < length; i++) {
+                if (i == 0) {
+                    data.addColumn('string', heads[i]);
+                } else {
+                    data.addColumn('number', heads[i]);
+                }
+            }
+            @foreach(var x in graphend){
+                if (indexfor == 0) {
+                @(new HtmlString("data.addRows([['"+x.Key+"'"))
+                    indexfor++;
+                }
+                else
+                {
+                   @(new HtmlString(",['"+x.Key+"'"))
+
+                }
+                for (int i = 0; i < x.Value.Length; i++)
+                {
+                    @(new HtmlString("," + x.Value[i] + ""))
+                }
+                 @(new HtmlString("]"))
+            }
+            @if (indexfor > 0) {
+         @(new HtmlString("]);"))
+        }
+            /* data.addRows([
+             ['enero', 165, 938, 522, 998, 450],
+             ['feb', 135, 1120, 599, 1268, 288],
+             ['marzo', 157, 1167, 587, 807, 397],
+             ['abril', 139, 1110, 615, 968, 215],
+             ['mayo', 136, 691, 629, 1026, 366]
+             ]);*/
+
+
+
+            // Create and draw the visualization.
+            var value = typegraph;
+
+            if (value == 'gooarea') {
+                var ac = new google.visualization.AreaChart(document.getElementById(idcontent));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Procesos',
+                    isStacked: true,
+                    width: 470,
+                    height: 380,
+                    vAxis: { title: "#Procesos" },
+                    hAxis: { title: heads[0] }
+                });
+            } else if (value == 'bargroup') {
+                var ac = new google.visualization.ColumnChart(document.getElementById(idcontent));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Procesos',
+                    isStacked: true,
+                    width: 470,
+                    height: 380,
+                    vAxis: { title: "#Procesos" },
+                    hAxis: { title: heads[0] }
+                });
+
+            } else if (value == 'linegoo') {
+                var ac = new google.visualization.LineChart(document.getElementById(idcontent));
+                ac.draw(data, {
+                    title: 'Historial De Creacion De Procesos',
+                    isStacked: true,
+                    width: 470,
+                    height: 380,
+                    vAxis: { title: "#Procesos" },
+                    hAxis: { title: heads[0] }
+                });
+
+            } else if (value == 'custom') {
+
+                var motionchart = new google.visualization.MotionChart(document.getElementById(idcontent));
+                motionchart.draw(data, { 'width': 470, 'height': 380 });
+
+            } else if (value == 'barhor') {
+
+                var chart = new google.visualization.BarChart(document.getElementById(idcontent));
+                chart.draw(data, {
+                    title: 'Historial De Creacion De Usuarios',
+                    isStacked: true,
+                    width: 470,
+                    height: 380,
+                    vAxis: { title: heads[0] },
+                    hAxis: { title: "#Usuarios" }
+                });
+
+            }
+            $('#' + idcontent).removeClass("loading-custom");
+        }
+
+
+        //
+
+        enhance({
+            loadScripts: [
+                { src: 'js/excanvas.js', iecondition: 'all' },
+
+
+            ],
+            loadStyles: [
+
+            ]
+        });
+
+        $('#example')
+        .visualize({
+            rowFilter: ':not()',
+            colFilter: ':not()',
+            type: 'bar', height: '300px', width: '420px'
+        });
+        function init() {
+            var value = typegraph;
+            jQuery('#selectformat').val('none');
+
+            if (value != 0) {
+
+                $('.visualize').remove();
+                $('#' + idcontent).html("");
+                if (value == 'area' || value == 'line') {
+                    $('#example2').visualize({
+                        rowFilter: ':not()',
+                        colFilter: ':not()',
+                        type: value, height: '300px', width: '520px'
+                    });
+                } else if (value == 'goobar') {
+                    $('#' + idcontent).addClass("loading-custom");
+
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawbar, 'packages': ['corechart'] }) }, 20);
+
+                } else if (value == 'gooarea' || value == 'bargroup' || value == 'linegoo' || value == 'custom' || value == 'barhor') {
+                    $('#' + idcontent).addClass("loading-custom");
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawVisualization, 'packages': ['corechart', 'motionchart'] }) }, 20);
+
+
+                } else if (value == 'tablebar' || value == 'piegoo') {
+                    $('#' + idcontent).addClass("loading-custom");
+                    setTimeout(function () { google.load('visualization', '1', { 'callback': drawtable, 'packages': ['corechart', 'imageareachart'] }) }, 20);
+
+
+                } else {
+                    $('#example').visualize({
+                        rowFilter: ':not()',
+                        colFilter: ':not()',
+                        type: value, height: '300px', width: '420px'
+                    });
+                }
+
+                $("html, body").animate({ scrollTop: 250 }, "fast");
+            }
+        }
+       
+        init();
+    });
+
+
+</script>

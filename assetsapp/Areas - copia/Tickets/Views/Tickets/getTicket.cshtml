@@ -1,0 +1,739 @@
+﻿@using MongoDB.Bson
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@model JObject
+@{
+    string username = "";
+    string title = "";
+    string bodyticket = "";
+    string attach = "";
+    string category = "";
+    string idticket = "";
+    string status = "";
+    string readed = "";
+     string datetime = "";
+    idticket = Model["_id"].ToString();
+    username = Model["userName"].ToString();
+    title = Model["title"].ToString();
+    bodyticket = Model["bodyticket"].ToString();
+    category = Model["category"].ToString();
+    status = Model["status"].ToString();
+    readed = Model["readed"].ToString();
+    datetime=Model["CreatedDate"].ToString();
+    JArray messages = new JArray();
+    try { 
+    foreach (var item in Model["messages"])
+    {
+        messages.Add(item);
+    }
+    }
+    catch (Exception ex)
+    {
+        
+    }
+    List<string> attachlist = new List<string>();
+    foreach (string item in Model["attachments"])
+    {
+
+        attachlist.Add(item.ToString());
+    }
+    attach = Model["attachments"].ToString();
+
+    int empity = 0;
+
+    if (Request.Cookies["_id2"] != null)
+    {
+        Session["_id"] = Request.Cookies["_id2"].Value;
+    }
+
+    string iduser = Session["_id"].ToString();
+    int countattach = 0;
+    int fileat = 0;
+    foreach (string item in attachlist){
+
+        fileat++;
+    }
+}
+<div id="ViewImage" style="background-color:black;" class="modal hide fade" data-backdrop="static">
+    <div class="modal-header">
+        <h3 class="modal-header-text"><span style="color:white;font-size:medium;">@username</span></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px;color:white;"></i></button>
+    </div>
+    <div class="modal-body">
+    </div>
+
+</div>
+<div class="row-fluid">
+    <div class="span12">
+        <div class="well blue">
+            <div class="well-header widgetclient titleclient">
+                <h5 style="left:50%;">Ticket</h5>
+            </div>
+            <div class="well-content no_padding">
+                <div class="message_center span12">
+                    <div class="tab-list">
+
+                        <ul>
+                            <li class="active"><a href="/Tickets/Tickets/"><i class="icon-inbox"></i>Bandeja de Tickets</a></li>
+                        </ul>
+                    </div>
+                    <div class="message_list">
+                        <div class="tab-content">
+                            <div class="tab-pane no_padding active" id="inbox">
+
+                                <div id="mail" style="margin: 20px 20px 20px 20px; ">
+                                    <h3>Ticket : @title </h3>
+                                    <h4>Descripcion : @bodyticket </h4>
+
+
+
+
+                                    <hr size="3" style="background-color:gray;" />
+
+
+                                    
+                                    <div id="buttonsstatus" class="float_left">
+                                        @if (status == "activo")
+                                        {
+
+
+
+                                        }
+                                        else if (readed == "end")
+                                        {
+                                            <br /> <span class="" style="padding-left:0%;font-size:20px;">Ticket Finalizado</span>
+                                        }
+                                        else
+                                        {
+                                            <button id="closechat" type="button" style="font-size:15px;" class="button_green "> Confirmar Cierre </button>
+                                            <button id="openchat" type="button" style="font-size:15px;" class="btn red "> Cancelar Cierre </button>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row-fluid" style="padding-left:2%;">
+                               <br />                         
+                                <div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                                    <div style="margin:10px;text-align:center">
+                                        <h4>Enviado:</h4>
+                                        <h5 style="font-weight:bold; color: #0072c6">@datetime.Substring(0, 10)</h5>
+                                    </div>
+                                </div>
+                                <div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                                    <div style="margin:10px;text-align:center">
+                                        <h4>Creador</h4>
+                                        <h5 style="font-weight:bold; color: #0072c6">@username</h5>
+                                    </div>
+                                </div>
+                                <div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                                    <div style="margin:10px;text-align:center">
+                                        <h4>Prioridad</h4>
+                                        <h5 style="font-weight:bold; color: #0072c6">Media</h5>
+                                    </div>
+                                </div>
+                                <div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                                    <div style="margin:10px;text-align:center">
+                                        <h4>Arch. Adj.</h4>
+                                        @if (fileat == 0){
+                                         <h5 style="font-weight:bold; color: #0072c6">   No  </h5>
+                                        }
+                                        else
+                                        {
+                                             <h5 style="font-weight:bold; color: #0072c6">   Si  </h5>
+                                       
+                                        }
+                                    </div>
+                                </div>
+                                <div id="" class="span2" style="background-color: #E7E7E7; box-shadow: 4px 4px 10px #999;">
+                                    <div style="margin:10px;text-align:center">
+                                        <h4>Estado</h4>
+                                        @if (status == "activo")
+                                        {
+                                           <h5 style="font-weight:bold; color: #0072c6"> Activo  </h5>
+                                        }
+                                        else
+                                        {
+                                            <h5 style="font-weight:bold; color: #0072c6">  Cerrado  </h5>
+                                        }
+                                    </div>
+                                </div>
+
+
+                                </div>
+                            <br />
+                            @if (fileat > 0)
+                            {
+                                <div class="row-fluid">
+                                    <div class="span11 " style="padding-left:3%;padding-right:3%;">
+
+
+                                        <!-- <div class="well-header blue">
+                     <h3 style="left:50%;color:white"><strong>Titulo: </strong> @title</h3>
+
+                 </div>-->
+                                        <h4>Archivos Adjuntos: </h4>
+
+
+
+
+
+
+                                        <div id="titlecontent1" class="well-content no_padding" style="overflow-y: scroll; max-height: 300px; overflow: hidden; position: relative; margin: 0px -1px 0px 0px;">
+
+                                            <div class="row-fluid">
+                                                <!--   <div class="span8" style="">
+
+                               <div style="padding: 10px;">
+                                   <h5>  @bodyticket</h5>
+                               </div>
+                               <br />
+
+                           </div>-->
+                                                <div class="span12" style="">
+
+                                                    <div id="contentattach" class="well-content no_padding" style="overflow-y: scroll; max-height: 200px; overflow: hidden; position: relative; margin: 0px -1px 0px 0px; min-height: 60px;">
+                                                        <br />
+                                                        @foreach (string item in attachlist)
+                                                        {
+                                                            string ext = "";
+                                                            if (attach != "none")
+                                                            {
+                                                                ext = item.Split('.').Last(); //getting the extension
+                                                            }
+                                                            if (ext.ToLower() == "jpg" || ext.ToLower() == "png" || ext.ToLower() == "gif" || ext.ToLower() == "ico")
+                                                            {
+
+
+                                                                <div class="imageview float_left" style="padding-left:5%;" data-idimage="@item" id="@item">
+                                                                    <!-- <a href="/Uploads/Images/Mail/@item">-->
+                                                                    <img src="/Uploads/Images/Mail/@item" style="height:150px;width:150px;" />
+                                                                    <!--</a>-->
+                                                                </div>
+                                                                <br />
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <div id="@item" class="span float_left" style="padding-left:5%;">
+                                                                    <a href="/Uploads/Images/Mail/@item">
+                                                                        <img src="http://images.all-free-download.com/images/graphiclarge/document_blank_100462.jpg" title="@item" style="height:150px;width:150px;" />
+                                                                    </a>
+                                                                </div>
+                                                                <br />
+                                                            }
+                                                            countattach++;
+                                                        }
+                                                        @if (countattach == 0)
+                                                        {
+                                                            <div class="span" style="padding-left:40%;">
+
+                                                                <h5>No Hay Archivos Adjuntos....</h5>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                                    <div class="widgets_area" style="">
+
+                                        <div class="row-fluid">
+                                            <div id="areachat" class="span11">
+                                                <center>
+                                                    <div class="">
+                                                        <h3 style="left:50%;color:gray">Historial de Mensajes</h3>
+
+                                                    </div>
+                                                </center>
+
+                                                <div id="windowsView" class="" style="padding-left: 5%; background: #E7E7E7; padding-top: 40px; padding-right: 20px; overflow-y:scroll;max-height:400px;overflow: hidden; position: relative; margin: 0px -1px 0px 0px; ">
+                                                   
+                                                    @foreach (var item in messages)
+                                                    {
+                                                        empity++;
+                                                        try
+                                                        {
+                                                            if (iduser == item["userid"].ToString())
+                                                            {
+                                                                <div id="@item["idmessage"]" style="display: block;">
+                                                                   
+                                                                    <div class="content">
+                                                                        <div class="float_left"><img style="width: 75px; height: 73px;" src="@item["image"]"></div>
+                                                                    </div><div class="timeline-box" style="padding-right:10%">
+                                                                              <div style="margin-left:13%;margin-right:7%;background:#ffffff;" class="timeline-content">
+                                                                                  <div class=""><strong>@item["username"]:</strong></div>
+                                                                                  <div class="">@item["message"]</div>
+                                                                              </div><ul class="options">
+                                                                           <!-- <li><a href="#"></a><i class="icon-cog"></i></li>
+                                                                          <li><a href="#"><i class="icon-remove" data-idmsg="@item["idmessage"]"></i></a></li>-->
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div id="@item["idmessage"]" style="display: block;">
+                                                                    <div class="content">
+                                                                        <div class="float_right" style="padding-right:5%;"><img style="width: 75px; height: 73px;" src="@item["image"]"></div>
+                                                                    </div>
+                                                                    <div class="timeline-box" style="padding-left:3%;">
+                                                                        <div style="margin-right:17%;background:#ffffff;" class="timeline-content-rotate">
+                                                                            <div class=""><strong>@item["username"]:</strong></div>
+                                                                            <div class="">@item["message"]</div>
+                                                                        </div>
+                                                                        <ul class="options" style="margin-right:110px;background:#ffffff;">
+                                                                          <!--  <li><a href="#"></a><i class="icon-cog"></i></li>-->
+                                                                           <!-- <li><a href="#"><i class="icon-remove" data-idmsg="@item["idmessage"]"></i></a></li>-->
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+
+                                                        }
+                                                    }
+                                                    @if (empity == 0)
+                                                    {
+                                                        <div id="empityc" style="padding: 0px 0px 30px 150px;"><h3>Conversacion Sin Mensajes.....</h3></div>
+
+                                                        <div id="empitychat" style="opacity: 0.6; padding: 0px 0px 30px 250px;"> <img src="~/Content/Images/chatlogo.png" alt=""> </div>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <div id="empityc" style="padding: 0px 0px 30px 150px;"><h3></h3></div>
+
+                                                        <div id="empitychat" style="opacity: 0.6; padding: 0px 0px 30px 250px;">  </div>
+
+                                                    }
+
+                                                    <div id="loading-msg"></div>
+                                                    <br />
+                                                </div>
+                                                <div id="inputchat" class="row-fluid">
+                                                    @if (status == "activo")
+                                                    {
+                                                        
+                                                        <input type="text" id="newmsj" data-provide="typeahead" name="search" class="typehead span11 " placeholder="Escribe un Mensaje" />
+                                                        <button id="addmsg" type="button" style="font-size:14px;" class="btn blue "> Enviar </button>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+
+
+
+
+
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+        </div>
+    </div>
+</div>
+    </div>
+<script>
+
+    var chatid = 0;
+    var username = "";
+    var idticket = "";
+    area = 1;
+        @(new HtmlString("username='" + iduser + "';"))
+       @(new HtmlString("idticket='" +idticket + "';"))
+   
+        
+    jQuery(".imageview").click(function () {
+        var name = jQuery(this).data("idimage");
+
+        var img = jQuery("<img  style='width: 550px; height: 500px;'>", { class: "" }).attr('src', '/Uploads/Images/Mail/' + name);
+        var div = jQuery("<div>", { class: "" }).attr('data-id', name).append(img);
+
+
+        jQuery("#ViewImage").find(".modal-body").html("");
+        jQuery("#ViewImage").find(".modal-body").html(div);
+        jQuery("#ViewImage").modal("show");
+
+    });
+
+    function deletemsgx(id) {
+
+        if (id == null || id == "") {
+
+            id = jQuery(this).find("i").data("idmsg");
+        }
+        jQuery("#"+id).addClass("loading-msg");
+        jQuery("html, body").animate({ scrollTop: 600 }, "fast");
+
+        jQuery.ajax({
+            url: "/Tickets/Tickets/deletemsg",
+            type: "POST",
+            data: { idticket: idticket, idmsg: id },
+           
+            success: function (data) {
+                jQuery("#" + id).removeClass("loading-msg");
+                jQuery("#" + id).remove();
+                jQuery("html, body").animate({ scrollTop: 600 }, "fast");
+               
+            },
+            error: function (errorThrown) {
+                //_loading()
+                jQuery("#" + id).removeClass("loading-msg");
+               
+                jQuery("html, body").animate({ scrollTop:600 }, "fast");
+                _alert("error", "Ha ocurrido un error");
+            }
+        });
+
+    }
+    function closechat() {
+        var fd = new FormData();
+
+
+        fd.append('idticket', idticket);
+
+
+
+        jQuery.ajax({
+            url: "/Tickets/Tickets/closeTicket",
+            // data: { maildata : jsonmail},
+            contentType: false,
+            processData: false,
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: fd,
+            type: "POST",
+            beforeSend: _loading(),
+            complete: _loading(),
+            success: function (data) {
+
+                jQuery("#buttonsstatus").html("");
+
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+            }
+        });
+
+
+        // jQuery("#new_mail").modal("hide");
+
+        return null;
+    }
+    function openchat() {
+        var fd = new FormData();
+
+        fd.append('idticket', idticket);
+
+
+
+
+        jQuery.ajax({
+            url: "/Tickets/Tickets/openTicket",
+            // data: { maildata : jsonmail},
+            contentType: false,
+            processData: false,
+            // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+            data: fd,
+            type: "POST",
+            beforeSend: _loading(),
+            complete: _loading(),
+            success: function (data) {
+
+
+
+
+            },
+            error: function (errorThrown) {
+                alert("Ocurrio un error, intenta más tarde.");
+            }
+        });
+
+
+        // jQuery("#new_mail").modal("hide");
+
+        return null;
+    }
+    jQuery(document).ready(function () {
+    jQuery(".icon-remove").click(function () {
+
+        var idmsg = jQuery(this).data("idmsg");
+        deletemsgx(idmsg);
+        
+       
+    });
+        jQuery('#windowsView').perfectScrollbar({ wheelSpeed: 300 });
+        
+        jQuery('#titlecontent1').perfectScrollbar({ wheelSpeed: 300 });
+       
+        jQuery('#contentattach').perfectScrollbar({ wheelSpeed: 300 });
+        connection.client.ticketopen = function (idticketopened) {
+
+            if (idticket == idticketopened) {
+
+                var div = jQuery("<input type='text'  id='newmsj' data-provide='typeahead' name='search' class='typehead span11 pressaddnew' placeholder='Escribe un Mensaje' /><button id='addmsg' type='button' style='font-size:16px;' class='btn blue addnew' > Enviar </button>")
+              //  var button = jQuery("<button id='closechat' type='button' style='font-size:15px;' class='btn red closet1'> Cerrar Ticket </button>");
+                jQuery("#inputchat").append(div);
+                jQuery("#buttonsstatus").html("");
+               // jQuery("#buttonsstatus").append(button);
+
+
+            }
+        };
+
+        connection.client.ticketclose = function (idticketclosed) {
+
+            if (idticket == idticketclosed) {
+                jQuery("#inputchat").html("");
+
+                var button = jQuery("<button id='closechat' type='button' style='font-size:15px;' class='btn button_green open1'  onclick='closechat()'> Confirmar Cierre </button>");
+                var button2 = jQuery("<button id='openchat'  type='button' style='font-size:15px;' class='btn red open1' onclick='openchat()'> Cancelar Cierre </button>");
+
+                jQuery("#buttonsstatus").html("");
+                jQuery("#buttonsstatus").append(button);
+                jQuery("#buttonsstatus").append(button2);
+            }
+        };
+        connection.client.ticketcloseclient = function (idticketclosed) {
+
+            if (idticket == idticketclosed) {
+                jQuery("#inputchat").html("");
+
+             
+                jQuery("#buttonsstatus").html("");
+               
+            }
+        };
+        connection.client.ticket = function (userid,idt,id,name, message, image) {
+            console.log("test");
+            if (idticket == idt) {
+            chatid++;
+            jQuery("#empitychat").remove();
+            jQuery("#empityc").remove();
+
+            var content = jQuery("<div  id='" + id + "'>");
+            var div = "";
+            var div2 = "";
+        
+            if (username == userid) {
+                
+                div = jQuery("<div >", { class: "content" }).append(
+                   jQuery("<div>", { class: "float_left" }).append(
+                           //  jQuery("<img  style='width: 100px; height: 100px;' >", { class: "" }).attr('src', '//a.disquscdn.com/next/assets/img/noavatar92.d1dee965677e7cc8d58afe004a6d8282.png')
+                           jQuery("<img  style='width: 75px; height: 73px;' >", { class: "" }).attr('src', '' + image + '')
+
+                        //   jQuery("<span>", { class: "" }).html("<strong>" + message + "</strong>")
+
+                            ));
+                div2 = jQuery("<div class='timeline-box' style='padding-right:10%;' >", { class: "timeline-box" }).append(
+                   jQuery("<div style='margin-left:13%;margin-right:7%;background:#ffffff;' class='timeline-content'>").append(
+                         jQuery("<div>", { class: "" }).html("<strong>" + name + "</strong>")
+
+                          ).append(jQuery("<div>", { class: "" }).html(message)
+
+                       ))/*.append(jQuery("<ul class='options'>").append(jQuery("<li>").append(/*"<a  href='#' >").append("<i class='icon-cog'>")).append(
+                      jQuery("<li>").append(/*"<a  href='#'><i class='icon-remove' data-idmsg='" + id + "' onclick='deletemsgx(" + id + ")'></i></a>")
+                        ))*/;
+
+            } else {
+                try {
+                    var mediaElement = document.getElementById("audionot2");
+                    mediaElement.play();
+                } catch (ex) {
+
+                }
+                div = jQuery("<div >", { class: "content" }).append(
+                  jQuery("<div class='float_right' style='padding-right:5%;'>", { class: "float_right" }).append(
+                          //  jQuery("<img  style='width: 100px; height: 100px;' >", { class: "" }).attr('src', '//a.disquscdn.com/next/assets/img/noavatar92.d1dee965677e7cc8d58afe004a6d8282.png')
+                          jQuery("<img  style='width: 75px; height: 73px;' >", { class: "" }).attr('src', '' + image + '')
+
+                       //   jQuery("<span>", { class: "" }).html("<strong>" + message + "</strong>")
+
+                           ));
+                div2 = jQuery("<div class='timeline-box' style='padding-left:3%;' >", { class: "timeline-box" }).append(
+                   jQuery("<div style='margin-right:17%;background:#ffffff;' class='timeline-content-rotate'>").append(
+                         jQuery("<div>", { class: "" }).html("<strong>" + name + "</strong>")
+
+                          ).append(jQuery("<div>", { class: "" }).html(message)
+
+                       ))/*.append(jQuery("<ul class='options' style='margin-right:110px;background:#ffffff;'>").append(jQuery("<li>").append("<a  href='#' >").append("<i class='icon-cog'>")).append(
+                      jQuery("<li>").append("<a  href='#'><i class='icon-remove' data-idmsg='" + id + "' onclick='deletemsgx(" + id + ")'></i></a>")
+                        ))*/;
+
+            }
+            content.append(div).append(div2);
+            jQuery("#windowsView").append(content);
+            jQuery("#" + chatid + "").hide();
+            jQuery("#" + chatid + "").fadeIn(1000);
+            
+            
+
+            jQuery('#windowsView').animate({ scrollTop: jQuery('#windowsView')[0].scrollHeight }, 1000);
+            jQuery("#windowsView").append("<div id='loading-msg'><br/></div>");
+
+        }
+
+        };
+
+        jQuery("#closechat").click(function () {
+
+
+            closechat();
+        });
+        function closechat() {
+            var fd = new FormData();
+           
+
+            fd.append('idticket', idticket);
+           
+
+           
+                jQuery.ajax({
+                    url: "/Tickets/Tickets/closeTicket",
+                    // data: { maildata : jsonmail},
+                    contentType: false,
+                    processData: false,
+                    // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                    data: fd,
+                    type: "POST",
+                    beforeSend: _loading(),
+                    complete: _loading(),
+                    success: function (data) {
+
+                        jQuery("#buttonsstatus").html("");
+                       
+                    },
+                    error: function (errorThrown) {
+                        alert("Ocurrio un error, intenta más tarde.");
+                    }
+                });
+           
+
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        }
+        function openchat() {
+            var fd = new FormData();
+           
+            fd.append('idticket', idticket);
+
+
+
+
+            jQuery.ajax({
+                url: "/Tickets/Tickets/openTicket",
+                // data: { maildata : jsonmail},
+                contentType: false,
+                processData: false,
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+                data: fd,
+                type: "POST",
+                beforeSend: _loading(),
+                complete: _loading(),
+                success: function (data) {
+                   
+
+
+
+                },
+                error: function (errorThrown) {
+                    alert("Ocurrio un error, intenta más tarde.");
+                }
+            });
+
+
+            // jQuery("#new_mail").modal("hide");
+
+            return null;
+        }
+        jQuery("#openchat").click(function () {
+
+            openchat();
+
+        });
+        function send() {
+            
+            var messagex = jQuery("#newmsj").val();
+            jQuery("#newmsj").prop('disabled', true);
+            if (jQuery("#newmsj").val() != "") {
+
+                jQuery("#loading-msg").addClass("loading-msg");
+                jQuery.ajax({
+                    url: "/Tickets/Tickets/sendMg",
+                    type: "POST",
+                    data: {idticket: idticket, username: username, message: messagex },
+                  //  beforeSend: _loading,
+                    success: function (data) {
+                        jQuery("#newmsj").val("");
+                        jQuery("#newmsj").prop('disabled', false);
+
+                        //_loading();
+                        jQuery("#loading-msg").removeClass("loading-msg");
+                        jQuery("#loading-msg").remove();
+                       
+                    },
+                    error: function (errorThrown) {
+                        //_loading()
+                        jQuery("#newmsj").prop('disabled', false);
+
+                        jQuery("#loading-msg").removeClass("loading-msg");
+
+                        _alert("error", "Ha ocurrido un error");
+                    }
+                });
+
+                // connection.server.sendTicketPush(username, jQuery("#newmsj").val());
+
+            }
+        }
+
+        jQuery("#addmsg").click(function () {
+           
+            send();
+
+
+        });
+        jQuery("#newmsj").on('keypress', function (e) {
+            if (e.which == 13) {
+                send();
+
+            }
+        });
+
+        jQuery.connection.hub.start(
+           function () {
+               console.log("conectado");
+
+           });
+        jQuery("#areachat").on("keypress", ".pressaddnew", function (e) {
+
+            if (e.which == 13) {
+                send();
+
+            }
+
+        });
+        jQuery("#areachat").on("click", ".addnew", function () {
+
+            send();
+        });
+        jQuery('#windowsView').animate({ scrollTop: jQuery('#windowsView')[0].scrollHeight }, 1000);
+        jQuery("html, body").animate({ scrollTop: 600 }, "fast");
+
+    });
+
+</script>
+

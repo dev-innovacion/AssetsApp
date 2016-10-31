@@ -1,0 +1,11 @@
+﻿@model Rivka.Form.Field.FieldBase
+
+@Html.EditorForModel(Model)
+
+<script>
+    setTimeout(function () {
+        console.log(jQuery("#listId").val());
+        jQuery("#CustomList").val(jQuery("#listId").val());
+    }, 400);
+    
+</script>

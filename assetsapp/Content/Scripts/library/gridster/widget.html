@@ -1,0 +1,357 @@
+﻿<link href="/Content/Scripts/library/iconpicker/css/bootstrap-iconpicker.css" rel="stylesheet" />
+
+<div class="row-fluid">
+    <div class="span12" id="moduleTitle">
+        <i class="icon-tag"></i>
+        <span>Activos</span>
+    </div>
+    <div class="span6">
+        <div class="span12">
+            <div class="span5">
+                <span>Titulo </span>
+            </div>
+            <div class="span7">
+                <input type="text" name="title" />
+            </div>
+        </div>
+        <div class="no-notifications">
+
+            <div class="span12">
+                <div class="span5">
+                    <span>Visualización</span>
+                </div>
+                <div class="span7">
+                    <select name="visualization">
+                        <option value="graph">Gráfica</option>
+                        <option value="summary">Resumen</option>
+                    </select>
+                </div>
+            </div>
+            <div class="span12" id="watchLast">
+                <div class="span5">
+                    <i class="icon-time"></i>
+                    <span>Ver últimos</span>
+                </div>
+                <div class="span7">
+                    <input name="lastTime" type="number" value="5" min="1">
+                    <select name="lastType">
+                        <option value="minutes">minutos</option>
+                        <option value="hours">horas</option>
+                        <option value="days">días</option>
+                    </select>
+                </div>
+            </div>
+            <div class="span12">
+                <div class="span5">
+                    <i class="icon-refresh"></i>
+                    <span>Actualizar c/</span>
+                </div>
+                <div class="span7">
+                    <input name="updateTime" type="number" value="5" min="1">
+                    <select name="updateType">
+                        <option value="seconds">segundos</option>
+                        <option value="minutes">minutos</option>
+                        <option value="hours">horas</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <!--Preview Section-->
+    <div class="span6 no-notifications">
+        <div class="preview">
+            <div class="summary hide">
+                <i class="fa fa-home"></i>
+                <span>250</span>
+            </div>
+            <div class="graphImages">
+                <img src="/Content/Scripts/library/gridster/images/bars.png" />
+                <img src="/Content/Scripts/library/gridster/images/lines.png" />
+                <img src="/Content/Scripts/library/gridster/images/pie.png" />
+            </div>
+            <select name="graphType">
+                <option value="combochart">Barras</option>
+                <option value="linechart">Lineas</option>
+                <option value="piechart">Pastel</option>
+            </select>
+            <button name="iconPicker" id="icon" class="btn btn-default" role="iconpicker"></button>
+        </div>
+    </div>
+</div>
+<!--Filters Section-->
+<div class="row-fluid">
+    <div class="span12">
+        <div class="well dark_turq">
+            <div class="well-header">
+                <div class="title">
+                    <i class="icon-filter"></i>
+                    <span>Filtros</span>
+                </div>
+                <ul>
+                    <li class="collapse_well"><a href="#"><i class="icon-minus"></i></a></li>
+                </ul>
+            </div>
+
+            <div class="well-content no_padding" style="display: block;">
+                <table class="table opt-filter">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th colspan="2">Módulo</th>
+                            <th>Agrupar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="opt-movement">
+                            <td>
+                                <input type="checkbox" value="MovementProfiles" /></td>
+                            <td>
+                                <p><i class="icon-random"></i> Movimiento</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="movement" /></td>
+                        </tr>
+                        <tr class="opt-movement-status">
+                            <td>
+                                <input type="checkbox" value="MovementStatus" /></td>
+                            <td>
+                                <p><i class="icon-info-sign"></i> Estatus</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Aprobada">Aprobada</option>
+                                    <option value="Cancelada">Cancelada</option>
+                                    <option value="Pendiente">Pendiente</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="status" /></td>
+                        </tr>
+                        <tr class="opt-locations">
+                            <td>
+                                <input type="checkbox" value="Locations" /></td>
+                            <td>
+                                <p><i class="icon-home"></i> Ubicaciones</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="location" /></td>
+                        </tr>
+                        <tr class="opt-location-profile">
+                            <td>
+                                <input type="checkbox" value="LocationProfiles" /></td>
+                            <td>
+                                <p><i class="icon-home"></i> Perfil de Ubicación</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="profileId" /></td>
+                        </tr>
+                        <tr class="opt-reference">
+                            <td>
+                                <input type="checkbox" value="ReferenceObjects" /></td>
+                            <td>
+                                <p><i class="icon-tag"></i> Activos de Referencia</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="objectReference" /></td>
+                        </tr>
+                        <tr class="opt-users">
+                            <td>
+                                <input type="checkbox" value="Users" /></td>
+                            <td>
+                                <p>
+                                    <i class="icon-user"></i>
+                                    <span class="title">Usuarios</span>
+                                </p>
+                            </td>
+                            <td width="60%">
+                                <select multiple></select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="userid" /></td>
+                        </tr>
+                        <tr class="opt-user-profile">
+                            <td>
+                                <input type="checkbox" value="Profiles" /></td>
+                            <td>
+                                <p><i class="icon-user"></i> Perfil</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="radio" name="group" value="profileId" />
+                            </td>
+                        </tr>
+                        <!-- Notification Filters -->
+                        <tr class="opt-notifications-users">
+                            <td>
+                                <input type="checkbox" value="Users_Notification" /></td>
+                            <td>
+                                <p><i class="icon-user"></i> Usuarios</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Create">Crear</option>
+                                    <option value="Update">Modificar</option>
+                                    <option value="Delete">Eliminar</option>
+                                </select>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr class="opt-notifications-locations">
+                            <td>
+                                <input type="checkbox" value="Locations_Notification" /></td>
+                            <td>
+                                <p><i class="icon-home"></i> Ubicaciones</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Create">Crear</option>
+                                    <option value="Update">Modificar</option>
+                                    <option value="Delete">Eliminar</option>
+                                </select>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr class="opt-notifications-objects">
+                            <td>
+                                <input type="checkbox" value="Objects_Notification" /></td>
+                            <td>
+                                <p><i class="icon-tag"></i> Objetos</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Create">Crear</option>
+                                    <option value="Update">Modificar</option>
+                                    <option value="Delete">Eliminar</option>
+                                </select>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr class="opt-notifications-movements">
+                            <td>
+                                <input type="checkbox" value="Movements_Notification" /></td>
+                            <td>
+                                <p><i class="icon-random"></i> Movimientos</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Create">Crear</option>
+                                    <option value="Update">Modificar</option>
+                                    <option value="Delete">Eliminar</option>
+                                    <option value="Authorize">Autorizar</option>
+                                    <option value="Deny">Denegar</option>
+                                </select>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr class="opt-notifications-rules">
+                            <td>
+                                <input type="checkbox" value="Rules_Notification" /></td>
+                            <td>
+                                <p><i class="icon-gear"></i> Reglas</p>
+                            </td>
+                            <td width="60%">
+                                <select multiple>
+                                    <option value="Invalid">Inválidas</option>
+                                </select>
+                            </td>
+                            <td>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //jQuery(".collapse_well").collapse();
+    //jQuery('.carousel').carousel();
+
+    // Selecting the graphType
+    jQuery("select[name=graphType]").on("change", function () {
+        var graph = this.value;
+        var images = jQuery(".graphImages");
+        switch (graph) {
+            case "combochart":
+                images.css("left", "0px"); break;
+            case "linechart":
+                images.css("left", "-250px"); break;
+            case "piechart":
+                images.css("left", "-500px"); break;
+        }
+    });
+
+    //Selecting the Visualization
+    jQuery("select[name=visualization]").on("change", function () {
+        var visualization = this.value;
+        if (visualization == "graph") {
+            jQuery(".preview .graphImages").removeClass("hide");
+            jQuery(".preview .summary").addClass("hide");
+            jQuery("select[name=graphType]").removeClass("hide");
+            jQuery("select[name=icon]").addClass("hide");
+
+            jQuery("#watchLast").show();
+            jQuery("#icon").hide();
+        }
+        else if (visualization == "summary") {
+            jQuery(".preview .graphImages").addClass("hide");
+            jQuery(".preview .summary").removeClass("hide");
+            jQuery("select[name=graphType]").addClass("hide");
+            jQuery("select[name=icon]").removeClass("hide");
+
+            jQuery("#watchLast").hide();
+            jQuery("#icon").show();
+        }
+    });
+</script>
+
+<script src="/Content/Scripts/library/iconpicker/js/iconset/iconset-fontawesome-4.0.0.min.js"></script>
+<script src="/Content/Scripts/library/iconpicker/js/bootstrap-iconpicker.js"></script>
+<script>
+
+    jQuery("#icon").on("change", function (e) {
+        jQuery(".preview .summary i").attr("class", "");
+        jQuery(".preview .summary i").attr("class", "fa " + e.icon);
+    });
+
+    jQuery("#icon").iconpicker()
+        .iconpicker('setIconset', {
+            iconClass: 'fa',
+            iconClassFix: 'fa-',
+            icons: [
+                'tag',
+                'home',
+                'user',
+                'random',
+                'bar-chart',
+                'warning'
+            ]
+        })
+        .iconpicker('setSearch', false);
+</script>
