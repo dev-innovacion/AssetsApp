@@ -22,7 +22,7 @@ namespace RivkaAreas.User.Models
         /// </summary>
         public CustomerTable()
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection("Customers");
         }
 

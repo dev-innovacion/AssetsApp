@@ -498,19 +498,7 @@ namespace adminMain.Controllers
                             break;
                         case "AssetType":
                             {
-                                JArray categories = JsonConvert.DeserializeObject<JArray>(Categories.GetRows());
-                                foreach (JObject cat in categories)
-                                {
-                                    try
-                                    {
-                                        JObject value = new JObject();
-                                        value.Add("_id", cat["_id"].ToString());
-                                        value.Add("name", cat["name"].ToString());
-                                        rawSource.Add(value);
-                                    }
-                                    catch { }
-                                }
-                               /* JArray tmpRawSource = JsonConvert.DeserializeObject<JArray>( Lists.Get("name", "_HTKassetsType"));
+                                JArray tmpRawSource = JsonConvert.DeserializeObject<JArray>( Lists.Get("name", "_HTKassetsType"));
                                 foreach (JObject tmpRow in tmpRawSource)
                                 {
                                     foreach (JObject element in tmpRow["elements"]["unorder"])
@@ -523,7 +511,7 @@ namespace adminMain.Controllers
                                             rawSource.Add(value);
                                         }
                                     }
-                                }*/
+                                }
                                 break;
                             }
                     }

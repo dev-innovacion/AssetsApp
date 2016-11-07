@@ -19,7 +19,7 @@ namespace RivkaAreas.List.Models
 
         public ProfileTable(string table = "Profiles")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

@@ -16,7 +16,7 @@
     <AssemblyName>autobuildHTK-client</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -45,7 +45,12 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
+    <ExcludeGeneratedDebugSymbol>false</ExcludeGeneratedDebugSymbol>
+    <IncludeIisSettings>true</IncludeIisSettings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -1397,7 +1402,9 @@
     <Content Include="App_Data\com-agent.conf" />
     <Content Include="Content\kendo\2014.1.318\images\kendoui.ttf" />
     <Content Include="Content\kendo\2014.1.318\images\kendoui.woff" />
-    <Content Include="App_Data\database.conf" />
+    <Content Include="..\..\..\..\..\..\..\Desktop\database.conf">
+      <Link>App_Data\database.conf</Link>
+    </Content>
     <Content Include="Areas\Monitor\Views\Monitor\Index.cshtml" />
     <Content Include="Areas\Monitor\Views\Web.config" />
     <Content Include="Areas\Design\Views\Design\Index.cshtml" />
@@ -1509,17 +1516,13 @@
     <Content Include="Areas\User\Views\Login\recoverpwd.cshtml" />
     <Content Include="Areas\Reports\Views\Reports\GenerateObjectsRealplus.cshtml" />
     <Content Include="Areas\Reports\Views\Reports\GenerateObjectsRealdetail.cshtml" />
-    <Content Include="Areas\Tags\Views\Tags\Index2.cshtml" />
-    <Content Include="Areas\Tags\Views\Tags\Index3.cshtml" />
-    <Content Include="Areas\Tags\Views\Tags\getsdf.cshtml" />
-    <Content Include="Areas\Tags\Views\Tags\generateobjs2.cshtml" />
     <Content Include="Areas\Employee\Views\Web.config" />
     <Content Include="Areas\Employee\Views\_ViewStart.cshtml" />
-    <Content Include="Areas\Employee\Views\Employee\ImpExcel.cshtml" />
-    <Content Include="Areas\Employee\Views\Employee\Index.cshtml" />
     <Content Include="Areas\Employee\Views\EmployeeProfile\getEmployeeByProfile.cshtml" />
     <Content Include="Areas\Employee\Views\EmployeeProfile\Index.cshtml" />
     <Content Include="Areas\Employee\Views\EmployeeProfile\newProfile.cshtml" />
+    <Content Include="Areas\Employee\Views\Employee\ImpExcel.cshtml" />
+    <Content Include="Areas\Employee\Views\Employee\Index.cshtml" />
     <Content Include="Areas\Assignments\Views\Web.config" />
     <Content Include="Areas\Assignments\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Assignments\Views\Assignments\AssignmentAsset.cshtml" />
@@ -1534,8 +1537,10 @@
     <Content Include="Areas\Assignments\Views\Assignments\Voucher.cshtml" />
     <Content Include="Areas\Assignments\Views\Assignments\VoucherSubmodule.cshtml" />
     <None Include="Properties\PublishProfiles\clientefinal.pubxml" />
+    <None Include="Properties\PublishProfiles\DoihiX.pubxml" />
     <None Include="Properties\PublishProfiles\Empaquetado.pubxml" />
     <None Include="Properties\PublishProfiles\htk-official.pubxml" />
+    <None Include="Properties\PublishProfiles\LocalAssetsApp.pubxml" />
     <None Include="Properties\PublishProfiles\newclient-htk - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\newclient-htk - Web Deploy.pubxml" />
     <Content Include="Scripts\kendo\2014.1.318\cultures\kendo.culture.af-ZA.min.js" />
@@ -2265,7 +2270,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5634</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:80/</IISUrl>
+          <IISUrl>http://localhost:1030</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -2492,14 +2492,11 @@ namespace RivkaAreas.Reports.Controllers
             }
 
         }
-        [HttpPost, ValidateInput(false)]
         public string ExportDataSet(String result, String namefilter, String numtot, String datacols, String datesarray, string namereports, string typefilters, string graph)
         {
 
             try
             {
-
-               
 
                 string results = result.ToString();
                 JArray resultja = JsonConvert.DeserializeObject<JArray>(results);
@@ -5426,69 +5423,72 @@ namespace RivkaAreas.Reports.Controllers
                     //    if (Convert.ToInt64(item["CreatedTimeStamp"].ToString()) >= start && Convert.ToInt64(item["CreatedTimeStamp"].ToString()) <= end) {
                     try
                     {
-                        string v = "";
-                        try
+                        if (Convert.ToInt64(item["CreatedTimeStamp"].ToString()) >= start && Convert.ToInt64(item["CreatedTimeStamp"].ToString()) <= end)
                         {
-                            item["hardware_reference"] = catdict[item["hardware_reference"].ToString()];
-                        }
-                        catch
-                        {
-                            try { item["hardware_reference"] = ""; }
+                            string v = "";
+                            try
+                            {
+                                item["hardware_reference"] = catdict[item["hardware_reference"].ToString()];
+                            }
+                            catch
+                            {
+                                try { item["hardware_reference"] = ""; }
+                                catch { }
+
+                            }
+                            //    if (datacols.TryGetValue("profileId",out v)){
+                            string value = "";
+
+                            /*     if (item["smart"].ToString().ToLower() == "false")
+                             {
+
+                                 item["smart"] = "No Inteligente";
+
+                                 }
+                                 else
+                                 {
+                                     item["smart"] = "Inteligente";
+
+
+                             }*/
+
+                            int val = 0;
+                            try
+                            {
+                                int month = Convert.ToInt16(item["CreatedTimeStamp"].ToString().Substring(4, 2));
+                                int year = Convert.ToInt16(item["CreatedTimeStamp"].ToString().Substring(0, 4));
+
+                                if (month.ToString().Substring(0, 1) == "0")
+                                {
+
+                                    month = Convert.ToInt16(month.ToString().Substring(1));
+
+                                }
+                                int[] arraylinex = aux.ToArray();
+
+                                if (graph.TryGetValue(item["smart"].ToString(), out val))
+                                {
+                                    graph[item["smart"].ToString()] = graph[item["smart"].ToString()] + 1;
+                                    arraylinex = auxgraph[item["smart"].ToString()];
+                                    arraylinex = getgraph(years, arraylinex, month, year, headm);
+                                    auxgraph[item["smart"].ToString()] = arraylinex;
+                                }
+                                else
+                                {
+
+                                    graph.Add(item["smart"].ToString(), 1);
+
+                                    arraylinex = getgraph(years, arraylinex, month, year, headm);
+                                    auxgraph[item["smart"].ToString()] = arraylinex;
+                                }
+                            }
                             catch { }
 
+                            // }
+                            result.Add(item);
+                            numhw++;
+                            // }
                         }
-                        //    if (datacols.TryGetValue("profileId",out v)){
-                        string value = "";
-
-                        /*     if (item["smart"].ToString().ToLower() == "false")
-                         {
-
-                             item["smart"] = "No Inteligente";
-
-                             }
-                             else
-                             {
-                                 item["smart"] = "Inteligente";
-
-
-                         }*/
-
-                        int val = 0;
-                        try
-                        {
-                            int month = Convert.ToInt16(item["CreatedTimeStamp"].ToString().Substring(4, 2));
-                            int year = Convert.ToInt16(item["CreatedTimeStamp"].ToString().Substring(0, 4));
-
-                            if (month.ToString().Substring(0, 1) == "0")
-                            {
-
-                                month = Convert.ToInt16(month.ToString().Substring(1));
-
-                            }
-                            int[] arraylinex = aux.ToArray();
-
-                            if (graph.TryGetValue(item["smart"].ToString(), out val))
-                            {
-                                graph[item["smart"].ToString()] = graph[item["smart"].ToString()] + 1;
-                                arraylinex = auxgraph[item["smart"].ToString()];
-                                arraylinex = getgraph(years, arraylinex, month, year, headm);
-                                auxgraph[item["smart"].ToString()] = arraylinex;
-                            }
-                            else
-                            {
-
-                                graph.Add(item["smart"].ToString(), 1);
-
-                                arraylinex = getgraph(years, arraylinex, month, year, headm);
-                                auxgraph[item["smart"].ToString()] = arraylinex;
-                            }
-                        }
-                        catch { }
-
-                        // }
-                        result.Add(item);
-                        numhw++;
-                        // }
                     }
                     catch (Exception ex)
                     {

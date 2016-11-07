@@ -1,0 +1,386 @@
+/*! gridster.js - v0.5.6 - 2014-09-25
+* http://gridster.net/
+* Copyright (c) 2014 ducksboard; Licensed MIT */
+
+.gridster
+{
+    position: relative;
+}
+
+    .gridster > *
+    {
+        /*margin: 0 auto;*/
+        -webkit-transition: height .4s, width .4s;
+        -moz-transition: height .4s, width .4s;
+        -o-transition: height .4s, width .4s;
+        -ms-transition: height .4s, width .4s;
+        transition: height .4s, width .4s;
+    }
+
+    .gridster ul
+    {
+        list-style-type: none;
+    }
+
+    .gridster .gs-w
+    {
+        z-index: 2;
+        position: absolute;  
+    }
+
+.ready .gs-w:not(.preview-holder)
+{
+    -webkit-transition: opacity .3s, left .3s, top .3s;
+    -moz-transition: opacity .3s, left .3s, top .3s;
+    -o-transition: opacity .3s, left .3s, top .3s;
+    transition: opacity .3s, left .3s, top .3s;
+}
+
+.ready .gs-w:not(.preview-holder),
+.ready .resize-preview-holder
+{
+    -webkit-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+    -moz-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+    -o-transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+    transition: opacity .3s, left .3s, top .3s, width .3s, height .3s;
+}
+
+.gridster .preview-holder
+{
+    z-index: 1;
+    position: absolute;
+    background-color: #ccc;
+    border-color: #ccc;
+    opacity: 0.3;
+}
+
+.gridster .player-revert
+{
+    z-index: 10!important;
+    -webkit-transition: left .3s, top .3s!important;
+    -moz-transition: left .3s, top .3s!important;
+    -o-transition: left .3s, top .3s!important;
+    transition: left .3s, top .3s!important;
+}
+
+.gridster .dragging,
+.gridster .resizing
+{
+    z-index: 10!important;
+    -webkit-transition: all 0s !important;
+    -moz-transition: all 0s !important;
+    -o-transition: all 0s !important;
+    transition: all 0s !important;
+}
+
+
+.gs-resize-handle
+{
+    position: absolute;
+    z-index: 1;
+}
+
+.gs-resize-handle-both
+{
+    width: 20px;
+    height: 20px;
+    bottom: -8px;
+    right: -8px;
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pg08IS0tIEdlbmVyYXRvcjogQWRvYmUgRmlyZXdvcmtzIENTNiwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0+DTwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DTxzdmcgaWQ9IlVudGl0bGVkLVBhZ2UlMjAxIiB2aWV3Qm94PSIwIDAgNiA2IiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojZmZmZmZmMDAiIHZlcnNpb249IjEuMSINCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQl4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjZweCIgaGVpZ2h0PSI2cHgiDT4NCTxnIG9wYWNpdHk9IjAuMzAyIj4NCQk8cGF0aCBkPSJNIDYgNiBMIDAgNiBMIDAgNC4yIEwgNCA0LjIgTCA0LjIgNC4yIEwgNC4yIDAgTCA2IDAgTCA2IDYgTCA2IDYgWiIgZmlsbD0iIzAwMDAwMCIvPg0JPC9nPg08L3N2Zz4=');
+    background-position: top left;
+    background-repeat: no-repeat;
+    cursor: se-resize;
+    z-index: 20;
+}
+
+.gs-resize-handle-x
+{
+    top: 0;
+    bottom: 13px;
+    right: -5px;
+    width: 10px;
+    cursor: e-resize;
+}
+
+.gs-resize-handle-y
+{
+    left: 0;
+    right: 13px;
+    bottom: -5px;
+    height: 10px;
+    cursor: s-resize;
+}
+
+.gs-w:hover .gs-resize-handle,
+.resizing .gs-resize-handle
+{
+    opacity: 1;
+}
+
+.gs-resize-handle,
+.gs-w.dragging .gs-resize-handle
+{
+    opacity: 0;
+}
+
+.gs-resize-disabled .gs-resize-handle
+{
+    display: none!important;
+}
+
+[data-max-sizex="1"] .gs-resize-handle-x,
+[data-max-sizey="1"] .gs-resize-handle-y,
+[data-max-sizey="1"][data-max-sizex="1"] .gs-resize-handle
+{
+    display: none !important;
+}
+
+/* Uncomment this if you set helper : "clone" in draggable options */
+/*.gridster .player {
+  opacity:0;
+}
+*/
+
+/* Custom CSS */
+.gridster .content
+{
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #FAFAFA;
+    border: 8px solid;
+    border-color: rgba(44, 166, 210, 0.50);
+    border-radius: 5px;
+    transition: border-color 0.5s, box-shadow 0.5s;
+}
+
+.gridster .content.glow
+{
+    border-color:  rgba(44, 166, 210, 1);
+    box-shadow: 0px 0px 15px 0px rgb(44, 142, 155);
+}
+
+    .gridster .content:hover > .dragg
+    {
+        left: 0px;
+        opacity: 1;
+    }
+
+    .gridster .content:hover > .options
+    {
+        right: 0px;
+        opacity: 1;
+    }
+
+        .gridster .content:hover > .options.delete
+        {
+            right: 35px;
+            opacity: 1;
+        }
+
+.gridster .dragg, .gridster .options
+{
+    position: absolute;
+    width: 35px;
+    height: 25px;
+    padding: 5px 0;
+    font-size: 22px;
+    opacity: 0;
+    transition: 300ms all ease;
+    transition-delay: 300ms;
+    text-align: center;
+}
+
+.gridster .dragg
+{
+    left: -35px;
+}
+
+    .gridster .dragg:hover
+    {
+        cursor: -webkit-grab;
+    }
+
+    .gridster .dragg:active
+    {
+        cursor: -webkit-grabbing;
+    }
+
+    .gridster .dragg .icon-move
+    {
+        color: white;
+    }
+.gridster .options.delete
+{
+    background-color: #ac193d;
+
+}
+.gridster .options
+{
+    background-color: orange;
+    right: -35px;
+    color: white;
+}
+
+    .gridster .options:hover
+    {
+        cursor: pointer;
+    }
+
+    .gridster .options .icon-gear
+    {
+        color: white;
+    }
+
+.gridster .widget_body .title
+{
+    padding: 7px 0 7px 38px;
+    font-size: 18px;
+    min-height: 21px;
+}
+
+.gridster .widget_body, .gridster .widget_body .body
+{
+    height: 95%;
+}
+
+    .gridster .widget_body .summary
+    {
+        font-size: 50px;
+        text-align: center;
+    }
+        .gridster .widget_body .summary span
+        {
+            line-height: 100%;
+        }
+
+    .gridster .widget_body .notification_body
+    {
+        padding: 0 3px;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .gridster .widget_body .notification_row
+    {
+        padding: 4px;
+        background-color: #EEE;
+        overflow: hidden;
+    }
+        .gridster .widget_body .notification_row.odd
+        {
+            background-color: #DFDFDF;
+        }
+        .gridster .widget_body .notification_row .icon
+        {
+            float: left;
+            width: 40px; height: 35px;
+            font-size: 25px;
+            text-align: center;
+            padding-top: 10px;
+            margin-right: 5px;
+        }
+        .gridster .widget_body .notification_row .notification_content
+        {
+            width: 84%;
+            float: right;
+        }
+            .gridster .widget_body .notification_row .notification_content .title
+            {
+                padding: 0 5px;
+                font-size: 14px;
+            }
+
+/*Loading*/
+.gridster .loading , #widget_modal_config .loading
+{
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    background-image: url(/Content/Images/loading.gif);
+    background-size: 100%;
+}
+
+    .gridster .loading .error
+    {
+        background-image: none;
+    }
+
+/*Modal Config*/
+#widget_modal_config select
+{
+    width: auto;
+}
+
+#widget_modal_config .row-fluid
+{
+    margin-top: 0px !important;
+    margin-bottom: 10px !important;
+}
+
+    #widget_modal_config .row-fluid [class*="span"]
+    {
+        margin-left: 0;
+        margin-bottom: 5px;
+    }
+
+#widget_modal_config #moduleTitle
+{
+    font-size: 16px;
+}
+
+#widget_modal_config .well-header
+{
+    color: white;
+    font-size: 15px;
+}
+
+    #widget_modal_config .well-header .title
+    {
+        float: left;
+        padding: 10px;
+    }
+
+#widget_modal_config input[type=text]
+{
+    width: 100%;
+}
+
+#widget_modal_config input[type=number]
+{
+    width: 50px;
+}
+
+#widget_modal_config .preview
+{
+    border: 1px solid #CCC;
+    overflow: hidden;
+}
+
+    #widget_modal_config .preview .summary
+    {
+        height: 40px;
+        font-size: 50px;
+        padding: 25px;
+    }
+        #widget_modal_config .preview .summary span
+        {
+            margin-left: 10px;
+        }
+
+
+#widget_modal_config .graphImages
+{
+    width: 1000px;
+    position: relative;
+}
+#widget_modal_config .preview select
+{
+    float: right;
+    margin: 7px;
+}

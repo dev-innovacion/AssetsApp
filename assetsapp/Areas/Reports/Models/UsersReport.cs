@@ -25,7 +25,7 @@ namespace RivkaAreas.Reports.Models
         private MongoConection conection1;
       
         public  UsersReport(string table):base("Users") {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
            // collection.EnsureIndex(IndexKeys.Ascending("_id"),IndexOptions.SetUnique(true)); 
           

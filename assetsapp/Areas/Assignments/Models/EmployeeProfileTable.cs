@@ -20,7 +20,7 @@ namespace RivkaAreas.Assignments.Models
         public EmployeeProfileTable(string table = "EmployeeProfiles")
             : base("EmployeeProfiles")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

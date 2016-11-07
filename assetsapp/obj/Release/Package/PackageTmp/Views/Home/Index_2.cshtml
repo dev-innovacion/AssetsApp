@@ -1,0 +1,1096 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    ViewBag.Title = "Index";
+    int index = 0;
+    List<int> undef = new List<int>();
+   foreach(var x in (List<int>) ViewData["undef"]){
+       
+       undef.Add(x);
+   }
+   string topbarc = "#000000";
+   string widgetc = "#5c86ac";
+   string titlec = "#ffffff";
+
+   try { 
+  JObject colors= ViewData["colors"] as JObject;
+  topbarc = colors["topbar"].ToString();
+  widgetc = colors["widget"].ToString();
+  titlec = colors["title"].ToString();    
+   }catch(Exception ex){
+      
+  }
+
+   JArray Notifications = new JArray();
+   try { 
+    Notifications = ViewData["Notifications"] as JArray;
+   }
+   catch (Exception ex) { }
+
+   int[] arrayu = undef.ToArray();
+   int p = 0;
+}
+
+
+
+
+
+
+    <div id="conten" class="sidebar">
+        <!-- Content start -->
+
+        <div class="inner_content">
+
+           
+            @*<div class="report-widgets hidden-480 hidden-768">
+                <div class="row-fluid">
+                    <div class="span4">
+                        <div class="widget blue clearfix widgetclient titleclient">
+                            <div class="content ">
+
+                                <div class="icon">
+                                    <div class="float_left">
+                                        <i class="icon-shopping-cart" style="font-size:50px;"></i>
+                                    </div>
+                                    <div class="description" style="font-weight: bold;">
+                                        <h3>Total de Conjuntos </h3>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    2,623
+                                </div>
+                            </div>
+                            <a href="#" class="more"><i class="icon-arrow-right" style="text-decoration:none;"></i></a>
+                        </div>
+                    </div>
+                    <div class="span4">
+                        <div class="widget blue clearfix widgetclient titleclient">
+                            <div class="content">
+                                <div class="icon">
+                                    <div class="float_left">
+                                        <i class="icon-globe" style="font-size:50px;"></i>
+                                    </div>
+                                    <div class="description" style="font-weight: bold;">
+                                        <h3>Total de Activos</h3>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    117,779
+                                </div>
+                            </div>
+                            <a href="#" class="more"><i class="icon-arrow-right" style="text-decoration:none;"></i></a>
+                        </div>
+                    </div>
+                    <div class="span4">
+                        <div class="widget blue clearfix widgetclient titleclient">
+                            <div class="content">
+                                <div class="icon">
+                                    <div class="float_left">
+                                        <i class="icon-bar-chart" style="font-size:50px;"></i>
+                                    </div>
+                                    <div class="description" style="font-weight: bold;">
+                                        <h3>Bajas de Activos</h3>
+                                    </div>
+                                </div>
+                                <div class="value">
+                                    894
+                                </div>
+                            </div>
+                            <a href="#" class="more"><i class="icon-arrow-right" style="text-decoration:none;"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+            <br />
+            <div style="padding-left:12px;">
+                <div id="cssmenu" class="topbarclient titleclient" style="width:180px">
+                    <ul>
+                        <li class="has-sub widgetclient titleclient">
+                            <a class="topbarclient titleclient" href="#">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Widgets&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-plus"></i></a>
+                            <ul class="widgetclient titleclient">
+                                <li class="has-sub ">
+                                    <a class="widgetclient titleclient" href="#">Mapas</a>
+                                    <ul>
+                                          <li><a class="mapselect widgetclient titleclient" href="#">Mapa de Mexico</a>
+                                       
+
+                                    </ul>
+                                </li>
+                                <li class="has-sub">
+                                    <a class="widgetclient titleclient" href="#">Reportes</a>
+                                    <ul class="widgetclient titleclient">
+
+                                        @foreach (var x in (Dictionary<string, string>)ViewData["reports"])
+                                        {
+                                            <li class="has-sub">
+                                                <a class="widgetclient titleclient" href="#">@x.Value</a>
+                                                <ul>
+                                                    <li><a href="#" class="reportgraph widgetclient titleclient " data-id="@x.Key" data-graph="piegoo">Circular</a></li>
+                                                    <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="goobar">Barras</a></li>
+                                                    <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="tablebar">Area Escalonada</a></li>
+                                                    @if (arrayu[p] == 1)
+                                                    {
+                                                        <li><a href="#" class="reportgraph widgetclient titleclient " data-id="@x.Key" data-graph="custom">Custom</a></li>
+                                                        <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="linegoo">Lineal</a></li>
+                                                        <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="barhor">Barras(Horizontal)</a></li>
+                                                        <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="gooarea">Areas</a></li>
+                                                        <li><a href="#" class="reportgraph widgetclient titleclient" data-id="@x.Key" data-graph="bargroup">Barras Agrupadas</a></li>
+
+                                                    }
+
+                                                </ul>
+                                            </li>
+
+                                                    p++;
+                                        }
+                                    </ul>
+                                </li>
+                                <li><a href="#" class="notifselect widgetclient titleclient">Notificaciones</a></li>
+                               
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="areadashboard" class="widgets_area hidden">
+                <div class="row-fluid">
+                    <div class="span6">
+                        <div class="well blue">
+                            <div class="well-header hidden widgetclient titleclient widgetclient titleclient">
+                                <h5>Grafica de activos ultimos 12 meses</h5>
+                                <ul>
+                                    <li><a href="#"><i class="icon-rotate-right"></i></a></li>
+                                    <li class="color_pick">
+                                        <a href="#"><i class="icon-th"></i></a>
+                                        <ul>
+                                            <li><a class="blue set_color" href="#"></a></li>
+                                            <li><a class="light_blue set_color" href="#"></a></li>
+                                            <li><a class="grey set_color" href="#"></a></li>
+                                            <li><a class="pink set_color" href="#"></a></li>
+                                            <li><a class="red set_color" href="#"></a></li>
+                                            <li><a class="orange set_color" href="#"></a></li>
+                                            <li><a class="yellow set_color" href="#"></a></li>
+                                            <li><a class="green set_color" href="#"></a></li>
+                                            <li><a class="dark_green set_color" href="#"></a></li>
+                                            <li><a class="turq set_color" href="#"></a></li>
+                                            <li><a class="dark_turq set_color" href="#"></a></li>
+                                            <li><a class="purple set_color" href="#"></a></li>
+                                            <li><a class="violet set_color" href="#"></a></li>
+                                            <li><a class="dark_blue set_color" href="#"></a></li>
+                                            <li><a class="dark_red set_color" href="#"></a></li>
+                                            <li><a class="brown set_color" href="#"></a></li>
+                                            <li><a class="black set_color" href="#"></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="well-content" id="graphact">
+                                <div class="no-search">
+                                    <select class="chosen">
+                                        <option>Mostrar Todo</option>
+                                        <option>Hoy</option>
+                                        <option>Ayer</option>
+                                        <option>Semana Pasada</option>
+                                        <option>Ultimo Mes</option>
+                                        <option>Ultimo Año</option>
+                                    </select>
+                                </div>
+                                <div id="chartLine01" style="height: 250px; width: 100%;"></div>
+
+                            </div>
+                        </div>
+                        <div class="well blue">
+                            <div class="well-header hidden widgetclient titleclient">
+                                <h5>Mapa de México</h5>
+                                <ul>
+                                    <li class="color_pick">
+                                        <a href="#"><i class="icon-th"></i></a>
+                                        <ul>
+                                            <li><a class="blue set_color" href="#"></a></li>
+                                            <li><a class="light_blue set_color" href="#"></a></li>
+                                            <li><a class="grey set_color" href="#"></a></li>
+                                            <li><a class="pink set_color" href="#"></a></li>
+                                            <li><a class="red set_color" href="#"></a></li>
+                                            <li><a class="orange set_color" href="#"></a></li>
+                                            <li><a class="yellow set_color" href="#"></a></li>
+                                            <li><a class="green set_color" href="#"></a></li>
+                                            <li><a class="dark_green set_color" href="#"></a></li>
+                                            <li><a class="turq set_color" href="#"></a></li>
+                                            <li><a class="dark_turq set_color" href="#"></a></li>
+                                            <li><a class="purple set_color" href="#"></a></li>
+                                            <li><a class="violet set_color" href="#"></a></li>
+                                            <li><a class="dark_blue set_color" href="#"></a></li>
+                                            <li><a class="dark_red set_color" href="#"></a></li>
+                                            <li><a class="brown set_color" href="#"></a></li>
+                                            <li><a class="black set_color" href="#"></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="well-content" id="mapmex">
+                                <div id="vmap" style="height: 350px;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="span6 float_right">
+                        <div class="well dark_grey">
+                            <div class="well-header hidden widgetclient titleclient">
+                                <h5>Proximos Inventarios</h5>
+                                <ul>
+                                    <li class="collapse_well"><a href="#"><i class="icon-minus"></i></a></li>
+                                    <li class="color_pick">
+                                        <a href="#"><i class="icon-th"></i></a>
+                                        <ul>
+                                            <li><a class="blue set_color" href="#"></a></li>
+                                            <li><a class="light_blue set_color" href="#"></a></li>
+                                            <li><a class="grey set_color" href="#"></a></li>
+                                            <li><a class="pink set_color" href="#"></a></li>
+                                            <li><a class="red set_color" href="#"></a></li>
+                                            <li><a class="orange set_color" href="#"></a></li>
+                                            <li><a class="yellow set_color" href="#"></a></li>
+                                            <li><a class="green set_color" href="#"></a></li>
+                                            <li><a class="dark_green set_color" href="#"></a></li>
+                                            <li><a class="turq set_color" href="#"></a></li>
+                                            <li><a class="dark_turq set_color" href="#"></a></li>
+                                            <li><a class="purple set_color" href="#"></a></li>
+                                            <li><a class="violet set_color" href="#"></a></li>
+                                            <li><a class="dark_blue set_color" href="#"></a></li>
+                                            <li><a class="dark_red set_color" href="#"></a></li>
+                                            <li><a class="brown set_color" href="#"></a></li>
+                                            <li><a class="black set_color" href="#"></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="well-content no_padding row-fluid" id="notif1">
+                                <div class="span9">
+                                    <ul class="rows">
+                                        <li>
+                                            <span class="icon error"><i class="icon-bolt"></i></span>
+                                            <p>C. Sendero Hermosillo</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon info"><i class="icon-bell"></i></span>
+                                            <p>C. Hermosillo</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon success"><i class="icon-ok"></i></span>
+                                            <p>C. Centro Sur Guadalajara</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon warning"><i class="icon-bullhorn"></i></span>
+                                            <p>C. VIP Galerias Diana Acapulco</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon error"><i class="icon-bolt"></i></span>
+                                            <p>C. Zentralia Colima</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon info"><i class="icon-bell"></i></span>
+                                            <p>C. Esfera Querétaro</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon success"><i class="icon-ok"></i></span>
+                                            <p>C. Galerías Mall Sonora</p>
+                                        </li>
+                                        <li>
+                                            <span class="icon warning"><i class="icon-bullhorn"></i></span>
+                                            <p>C. Gran Patio Texcoco</p>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="span3">
+                                    <ul class="rows">
+                                        <li>
+
+                                            <p>24/04/2014</p>
+                                        </li>
+                                        <li>
+
+                                            <p>20/04/2014</p>
+                                        </li>
+                                        <li>
+
+                                            <p>12/04/2014</p>
+                                        </li>
+                                        <li>
+                                            <p>08/04/2014</p>
+                                        </li>
+                                        <li>
+                                            <p>04/04/2014</p>
+                                        </li>
+                                        <li>
+                                            <p>29/03/2014</p>
+                                        </li>
+                                        <li>
+                                            <p>20/03/2014</p>
+                                        </li>
+                                        <li>
+                                            <p>10/03/2014</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+                        <div class="well blue">
+                            <div class="well-header hidden widgetclient titleclient">
+                                <h5>Notificaciones</h5>
+                                <ul>
+                                    <li class="collapse_well"><a href="#"><i class="icon-minus"></i></a></li>
+                                    <li class="color_pick">
+                                        <a href="#"><i class="icon-th"></i></a>
+                                        <ul>
+                                            <li><a class="blue set_color" href="#"></a></li>
+                                            <li><a class="light_blue set_color" href="#"></a></li>
+                                            <li><a class="grey set_color" href="#"></a></li>
+                                            <li><a class="pink set_color" href="#"></a></li>
+                                            <li><a class="red set_color" href="#"></a></li>
+                                            <li><a class="orange set_color" href="#"></a></li>
+                                            <li><a class="yellow set_color" href="#"></a></li>
+                                            <li><a class="green set_color" href="#"></a></li>
+                                            <li><a class="dark_green set_color" href="#"></a></li>
+                                            <li><a class="turq set_color" href="#"></a></li>
+                                            <li><a class="dark_turq set_color" href="#"></a></li>
+                                            <li><a class="purple set_color" href="#"></a></li>
+                                            <li><a class="violet set_color" href="#"></a></li>
+                                            <li><a class="dark_blue set_color" href="#"></a></li>
+                                            <li><a class="dark_red set_color" href="#"></a></li>
+                                            <li><a class="brown set_color" href="#"></a></li>
+                                            <li><a class="black set_color" href="#"></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="well-content no_padding row-fluid overOn" id="notif2" style="overflow: hidden; position: relative;  padding: 0px 20px 15px 0px; ">
+                            
+                                <div class="span9">
+                                    <ul class="rows" id="listnots">
+                                 
+                                        @foreach (var item in Notifications)
+                                        {
+                                            try { 
+                                            <li><span class="icon @item["type"]"><i class="@item["icon"]"></i></span><p>@item["msg"]</p></li>
+                                            }
+                                            catch (Exception ex) { continue; }
+                                        }
+
+                                    </ul>
+                                </div>
+                                <div class="span3">
+                                    <ul class="rows" id="listdates">
+                                        @foreach (var item in Notifications)
+                                        {
+                                           try{ <li>
+                                                
+                                                <p>@item["CreatedDate"].ToString().Substring(0, 10)</p>
+                                            </li>
+                                           }
+                                           catch (Exception ex) { continue; }
+                                        }
+                                    </ul>
+                                </div>
+                            @if(Notifications.Count() == 0)
+                                {
+                                    <ul class="rows empity" >
+
+                                     <li style="padding-left: 15%;"><h3>
+                                                No Hay Notificaciones por el momento!!!
+                                            </h3>
+                                        </li>
+
+
+                                    </ul>
+
+                                }
+                            </div>
+                            </div>
+
+
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+   
+
+
+            <ul id="myDashboard"></ul>
+   
+    <div id="graph"></div>
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- <script src="js/bootstrap.js"></script>-->
+
+
+
+
+
+    <script src="~/Content/Scripts/library/maps/data/jquery.vmap.sampledata.js"></script>
+    <script src="~/Content/Scripts/calendar.js"></script>
+    <script src="~/Content/Scripts/forms.js"></script>
+    <script src="~/Content/Scripts/dashboard.js"></script>
+
+    <script>
+
+       
+
+
+        jQuery(document).ready(function ($) {
+          
+           
+            //dashboard new
+            var idw = 0;
+           
+            function addmap(name) {
+                $("#myDashboard").sDashboard("addWidget", {
+                    widgetTitle: "Mapa De Mexico",
+                    widgetId: "widget" + idw,
+                    widgetContent: $("<div id='" + idw + "map' style='height: 350px;'></div>")
+
+                });
+
+                $("#widget" + idw).css("height", "460px");
+                $("#widget" + idw).css("width", "510px");
+                $(".sDashboardWidgetContent").css("height", "400px");
+                $(".sDashboard-circle-plus-icon").removeClass();
+
+                jQuery("#" + idw + "map").vectorMap({
+                    map: name,
+                    backgroundColor: null,
+                    borderWidth: 4,
+                    borderColor: '@widgetc',
+                    color: "@topbarc",
+                    hoverOpacity: .7,
+                    selectedColor: "#2d91ef",
+                    normalizeFunction: 'polynomial',
+                    enableZoom: true,
+                    showTooltip: 1,
+                    values: sample_data,
+                    scaleColors: ["@topbarc", "@widgetc"],
+                    normalizeFunction: "polynomial",
+                    selectedRegion: "sn",
+
+                    onRegionClick: function (elemento, code, region) {
+                        var mensaje = "" + region;//+ " con el codigo:" + code;
+                        window.location = "/Locations/Location";
+                        //  alert(mensaje);
+                        //  alert("This Region has " + (Math.floor(Math.random() * 10) + 1) + " users!")
+
+                    }
+                });
+
+                idw++;
+
+               
+            }
+
+          
+            function addnotif() {
+                $("#myDashboard").sDashboard("addWidget", {
+                    widgetTitle: "Notificaciones",
+                    widgetId: "widget" + idw,
+                    widgetContent: jQuery("#notif2").clone()
+                });
+
+                $("#widget" + idw).css("height", "460px");
+                $("#widget" + idw).css("width", "510px");
+                $(".sDashboardWidgetContent").css("height", "400px");
+                $(".sDashboard-circle-plus-icon").removeClass();
+
+                idw++;
+            }
+
+            function addinvent() {
+
+                $("#myDashboard").sDashboard("addWidget", {
+                    widgetTitle: "Notificaciones",
+                    widgetId: "widget" + idw,
+                    widgetContent: jQuery("#notif2").clone()
+                });
+
+                $("#widget" + idw).css("height", "460px");
+                $("#widget" + idw).css("width", "510px");
+                $(".sDashboardWidgetContent").css("height", "400px");
+                $(".sDashboard-circle-plus-icon").removeClass();
+
+                idw++;
+            }
+            jQuery(".mapselect").on('click', function () {
+
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/GenerateMapWidget",
+                    data: { profile:"mexico", startdate: "", enddate: "", col:"", typegraph:"mapa" },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+
+                      
+                        _loading();
+
+                    }
+
+
+                });
+                addmap("mexico");
+               
+            });
+            jQuery(".mapworld").on('click', function () {
+                addmap("world_en");
+
+            });
+            jQuery(".mapsn").on('click', function () {
+                addmap("sonora");
+
+            });
+            jQuery(".notifselect").on('click', function () {
+                jQuery.ajax({
+
+                    url: "/Reports/Reports/GenerateNotWidget",
+                    data: { profile: "notificaciones", startdate: "", enddate: "", col: "", typegraph: "notificaciones" },
+                    beforeSend: _loading(),
+                    type: "POST",
+                    success: function (data) {
+
+
+                        _loading();
+
+                    }
+
+
+                });
+                addnotif();
+               
+            });
+
+            jQuery(".inventoryselect").on('change', function () {
+               
+                addinvent();
+            });
+          
+
+            //
+
+
+            $('.footable').footable();
+            $('.responsive_table_container').mCustomScrollbar({
+                set_height: 400,
+                advanced: {
+                    updateOnContentResize: true,
+                    updateOnBrowserResize: true
+
+                }
+            });
+
+
+
+            $('#vmap').vectorMap({
+                map: "mexico",
+                backgroundColor: null,
+                borderWidth: 4,
+                borderColor: '@widgetc',
+                color: "@topbarc",
+                hoverOpacity: .7,
+                selectedColor: "#2d91ef",
+                normalizeFunction: 'polynomial',
+                enableZoom: true,
+                showTooltip: 1,
+                values: sample_data,
+                scaleColors: ["@topbarc", "@widgetc"],
+                normalizeFunction: "polynomial",
+                selectedRegion: "sn",
+
+                onRegionClick: function (elemento, code, region) {
+                    var mensaje = "" + region;//+ " con el codigo:" + code;
+                    window.location = "/Locations/Location";
+                    //  alert(mensaje);
+                    //  alert("This Region has " + (Math.floor(Math.random() * 10) + 1) + " users!")
+
+                }
+            });
+
+            $('.responsive_table_container_2').mCustomScrollbar({
+                set_height: 520,
+                advanced: {
+                    updateOnContentResize: true,
+                    updateOnBrowserResize: true
+                }
+            });
+
+            $('.inner_sidebar').easytabs({
+                animationSpeed: 300,
+                collapsible: false,
+                updateHash: false
+            });
+
+
+
+         
+            $('.reportgraph').on('click', function () {
+
+                var value = $(this).data("id");
+                var typegraph = $(this).data("graph");
+               
+                if (value != 0) {
+                    jQuery.ajax({
+
+                        url: "/Reports/Reports/GetReport",
+                        data: { id: value },
+                        type: "POST",
+                        success: function (data) {
+
+                          
+
+                            if (data != "" && data != null) {
+                                var data = JSON.parse(data);
+                                var jsondatafilter = data["profiles"];
+                                var startdate = data["startdate"];
+                                var enddate = data["enddate"];
+                                var jsondata = data["cols"];
+                                var jsonmovs = data["movements"];
+                                var jsonobjs = data["objects"];
+                                var jsonlocs = data["locations"];
+                                var jsonusers = data["users"];
+                                var categoryreport = data["CategoryReport"];
+                                var urlajax = "";
+                                switch(categoryreport) {
+                                    case "Usuarios":
+                                        urlajax="GenerateUserWidget";
+                                        break;
+                                    case "Objetos_Reales":
+                                        urlajax = "GenerateObjectsRealWidget";
+                                        break;
+                                    case "Perfiles":
+                                        urlajax = "GenerateProfileWidget";
+
+                                        break;
+                                    case "Procesos":
+                                        urlajax = "GenerateProcessesWidget";
+
+                                        break;
+                                    case "Objetos_Ref":
+                                        urlajax = "GenerateObjectsRefWidget";
+
+                                        break;
+                                    case "Movimientos":
+                                        urlajax = "GenerateMovementWidget";
+
+                                        break;
+                                    case "Ubicaciones":
+                                        urlajax = "GenerateLocationsWidget";
+
+                                        break;
+                                    case "Inventarios":
+                                        urlajax = "GenerateInventoryWidget";
+
+                                        break;
+                                    case "Hardwares":
+                                        urlajax = "GenerateHwWidget";
+
+                                        break;
+                                    case "Movements":
+                                        urlajax = "GenerateCustomWidget";
+
+                                        break;
+                                    default:
+                                        urlajax = "GenerateUserWidget";
+
+                                }
+
+                                if (urlajax == "GenerateCustomWidget") {
+                                    jQuery.ajax({
+
+                                        url: "/Reports/Reports/" + urlajax,
+                                        data: { startdate: startdate, enddate: enddate, movements:jsonmovs,objects:jsonobjs,locations:jsonlocs,users:jsonusers, typegraph: typegraph },
+
+                                        type: "POST",
+                                        success: function (data) {
+
+                                            $("#graph").append("<div id='widget" + idw + "'></div>");
+                                            $("#widget" + idw).html(data);
+                                            $("#myDashboard").sDashboard("addWidget", {
+                                                widgetTitle: "Grafica " + categoryreport,
+                                                widgetId: "widget" + idw,
+                                                widgetContent: jQuery("#widget" + idw)
+                                            });
+
+                                            $("#widget" + idw).css("height", "460px");
+                                            $("#widget" + idw).css("width", "510px");
+                                            $(".sDashboardWidgetContent").css("height", "400px");
+                                            $(".sDashboard-circle-plus-icon").removeClass();
+
+                                            $('#selectreport').val("0");
+                                            idw++;
+                                            $("html, body").animate({ scrollTop: 250 }, "fast");
+
+
+                                        }
+
+
+                                    });
+                                
+                                }else{
+                                    jQuery.ajax({
+
+                                        url: "/Reports/Reports/" + urlajax,
+                                        data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata, typegraph: typegraph },
+
+                                        type: "POST",
+                                        success: function (data) {
+
+                                            $("#graph").append("<div id='widget" + idw + "'></div>");
+                                            $("#widget" + idw).html(data);
+                                            $("#myDashboard").sDashboard("addWidget", {
+                                                widgetTitle: "Grafica " + categoryreport,
+                                                widgetId: "widget" + idw,
+                                                widgetContent: jQuery("#widget" + idw)
+                                            });
+
+                                            $("#widget" + idw).css("height", "460px");
+                                            $("#widget" + idw).css("width", "510px");
+                                            $(".sDashboardWidgetContent").css("height", "400px");
+                                            $(".sDashboard-circle-plus-icon").removeClass();
+
+                                            $('#selectreport').val("0");
+                                            idw++;
+                                            $("html, body").animate({ scrollTop: 250 }, "fast");
+
+
+                                        }
+
+
+                                    });
+                                }
+
+                            } else {
+                                alert("Error Al Generar el Reporte!!!");
+                            }
+
+
+                        }
+
+
+                    });
+                }
+            });
+
+            function loadbasic() {
+
+                var dashboardJSON = [{
+
+                    widgetTitle: "Grafica de activos ultimos 12 meses",
+                    widgetId: "id1",
+                    widgetContent: jQuery("#graphact")
+                }, {
+
+                    widgetTitle: "Mapa De Mexico",
+                    widgetId: "id2",
+                    widgetContent: jQuery("<div id='id2map' style='height: 350px;'></div>")
+                }, {
+
+                    widgetTitle: "Notificaciones",
+                    widgetId: "id4",
+                    widgetContent: jQuery("#notif2").clone()
+                }, ];
+
+
+
+                jQuery("#myDashboard").sDashboard({
+                    dashboardData: dashboardJSON
+                });
+
+
+                $("#id1").css("height", "460px");
+                $("#id2").css("height", "460px");
+                 $("#id4").css("height", "460px");
+
+                $("#id1").css("width", "510px");
+                $("#id2").css("width", "510px");
+                 $("#id4").css("width", "510px");
+
+
+                $(".sDashboardWidgetContent").css("height", "400px");
+                //table row clicked event example
+                $(".sDashboard-circle-plus-icon").removeClass();
+                $("#myDashboard").bind("sdashboardrowclicked", function (e, data) {
+                    $.gritter.add({
+                        position: 'bottom-left',
+                        title: 'Table row clicked',
+                        time: 1000,
+                        text: 'A table row within a table widget has been clicked, please check the console for additional event data'
+                    });
+
+                    if (console) {
+                        console.log("table row clicked, for widget: " + data.selectedWidgetId);
+                    }
+                });
+
+                //plot selected event example
+                $("#myDashboard").bind("sdashboardplotselected", function (e, data) {
+                    $.gritter.add({
+                        position: 'bottom-left',
+                        title: 'Plot selected',
+                        time: 1000,
+                        text: 'A plot has been selected within a chart widget, please check the console for additional event data'
+                    });
+                    if (console) {
+                        console.log("chart range selected, for widget: " + data.selectedWidgetId);
+                    }
+                });
+                //plot click event example
+                $("#myDashboard").bind("sdashboardplotclicked", function (e, data) {
+                    $.gritter.add({
+                        position: 'bottom-left',
+                        title: 'Plot Clicked',
+                        time: 1000,
+                        text: 'A plot has been clicked within a chart widget, please check the console for additional event data'
+                    });
+                    if (console) {
+                        console.log("chart clicked, for widget: " + data.selectedWidgetId);
+                    }
+                });
+
+                //widget order changes event example
+                $("#myDashboard").bind("sdashboardorderchanged", function (e, data) {
+                    $.gritter.add({
+                        position: 'bottom-left',
+                        title: 'Order Changed',
+                        time: 4000,
+                        text: 'The widgets order has been changed,check the console for the sorted widget definitions array'
+                    });
+                    if (console) {
+                        console.log("Sorted Array");
+                        console.log("+++++++++++++++++++++++++");
+                        console.log(data.sortedDefinitions);
+                        console.log("+++++++++++++++++++++++++");
+                    }
+
+                });
+
+                $("#myDashboard").bind("sdashboardwidgetmaximized", function (e, data) {
+                    var widgetDefinition = data.widgetDefinition;
+                });
+
+
+                $('#id2map').vectorMap({
+                    map: "mexico",
+                    backgroundColor: null,
+                    borderWidth: 4,
+                    borderColor: '@widgetc',
+                    color: "@topbarc",
+                    hoverOpacity: .7,
+                    selectedColor: "#2d91ef",
+                    normalizeFunction: 'polynomial',
+                    enableZoom: true,
+                    showTooltip: 1,
+                    values: sample_data,
+                    scaleColors: ["@topbarc", "@widgetc"],
+                    normalizeFunction: "polynomial",
+                    selectedRegion: "sn",
+
+                    onRegionClick: function (elemento, code, region) {
+                        var mensaje = "" + region;//+ " con el codigo:" + code;
+                        window.location = "/Locations/Location";
+                        //  alert(mensaje);
+                        //  alert("This Region has " + (Math.floor(Math.random() * 10) + 1) + " users!")
+
+                    }
+                });
+
+            }
+            var x = 0;
+           function loadwidgets() {
+               x = 0;
+                var widgets = new Array();
+                var categoryreport = new Array();
+                
+              
+               @foreach(var items in (List<string[]>) ViewData["widgets"]){
+                   
+                   @(new HtmlString("var objectw = {};"))
+                     
+                     @(new HtmlString("objectw.id='"+items[0]+"';"))
+                     @(new HtmlString("objectw.profile='" + items[1] + "';"))
+                     @(new HtmlString("objectw.startdate='"+items[2]+"';"))
+                     @(new HtmlString("objectw.enddate='"+items[3]+"';"))
+                     @(new HtmlString("objectw.fields='"+items[4]+"';"))
+                     @(new HtmlString("objectw.graph='"+items[5]+"';"))
+                     @(new HtmlString("objectw.url='"+items[6]+"';"))
+                     @(new HtmlString("objectw.category='"+items[7]+"';"))
+                     @(new HtmlString("objectw.movements='"+items[8]+"';"))
+                     @(new HtmlString("objectw.objects='"+items[9]+"';"))
+                     @(new HtmlString("objectw.locations='"+items[10]+"';"))
+                     @(new HtmlString("objectw.users='"+items[11]+"';"))
+            
+            
+                          @(new HtmlString("widgets.push(objectw);"))
+                    }
+              // _loading();
+               for (var i = 0; i < widgets.length; i++) {
+                   categoryreport[i] = widgets[i].category;
+               }
+                for (var i = 0; i < widgets.length; i++) {
+                    
+                    var url = widgets[i].url;
+                    var jsondatafilter = widgets[i].profile;
+                    var startdate = widgets[i].startdate;
+                    var enddate = widgets[i].enddate;
+                    var jsondata = widgets[i].fields;
+                    var typegraph = widgets[i].graph;
+                    var idwidget = widgets[i].id;
+                    var jsondatamovs = widgets[i].movements;
+                    var jsondataobjs = widgets[i].objects;
+                    var jsondatalocs = widgets[i].locations;
+                    var jsondatausers = widgets[i].users;
+                    $("#myDashboard").addClass("loading-custom");
+
+                    if (url == "GenerateCustomWidget")
+                    {
+
+
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/" + url,
+                            data: {  startdate: startdate, enddate: enddate, movements:jsondatamovs,objects:jsondataobjs,locations:jsondatalocs,users:jsondatausers, typegraph: typegraph, id: idwidget },
+
+                            type: "POST",
+                            success: function (data) {
+                                $("#graph").append("<div id='widget" + idw + "'></div>");
+                                $("#widget" + idw).html(data);
+                                $("#myDashboard").sDashboard("addWidget", {
+                                    widgetTitle: "Grafica " + categoryreport[(categoryreport.length - 1) - x],
+                                    widgetId: "widget" + idw,
+                                    widgetContent: jQuery("#widget" + idw)
+                                });
+
+                                $("#widget" + idw).css("height", "460px");
+                                $("#widget" + idw).css("width", "510px");
+                                $(".sDashboardWidgetContent").css("height", "400px");
+                                $(".sDashboard-circle-plus-icon").removeClass();
+
+                                x++;
+
+
+                                $("#myDashboard").removeClass("loading-custom");
+
+
+                                $('#selectreport').val("0");
+                                idw++;
+
+
+                            }
+
+
+
+                        });
+
+
+                    } else {
+                        jQuery.ajax({
+
+                            url: "/Reports/Reports/" + url,
+                            data: { profile: jsondatafilter, startdate: startdate, enddate: enddate, col: jsondata, typegraph: typegraph, id: idwidget },
+
+                            type: "POST",
+                            success: function (data) {
+                                $("#graph").append("<div id='widget" + idw + "'></div>");
+                                $("#widget" + idw).html(data);
+                                $("#myDashboard").sDashboard("addWidget", {
+                                    widgetTitle: "Grafica " + categoryreport[(categoryreport.length - 1) - x],
+                                    widgetId: "widget" + idw,
+                                    widgetContent: jQuery("#widget" + idw)
+                                });
+
+                                $("#widget" + idw).css("height", "460px");
+                                $("#widget" + idw).css("width", "510px");
+                                $(".sDashboardWidgetContent").css("height", "400px");
+                                $(".sDashboard-circle-plus-icon").removeClass();
+
+                                x++;
+
+
+                                $("#myDashboard").removeClass("loading-custom");
+
+
+                                $('#selectreport').val("0");
+                                idw++;
+
+
+                            }
+
+
+
+                        });
+                    }
+
+                }
+
+               
+                
+               
+                $("html, body").animate({ scrollTop: 250 }, "fast");
+                //_loading();
+           }
+           
+            
+            loadbasic();
+            loadwidgets();
+           
+            jQuery(".sDashboardWidgetContent").css("overflow", "hidden")
+            jQuery(".sDashboardWidgetContent").css("position", "relative")
+
+            jQuery('.sDashboardWidgetContent').perfectScrollbar({ wheelSpeed: 100 });
+
+            connection.client.newNotification = function (messageJson) {
+               
+                
+                var data = JSON.parse(messageJson);
+
+                var msg = data["msg"];
+                var date = data["date"];
+                var type = data["type"];
+                var icon = data["icon"];
+                var mediaElement = document.getElementById("audionot");
+                mediaElement.play();
+
+                var div = jQuery("<li>").append(
+                        jQuery("<span class='icon " + type + "'>").append(
+                            jQuery("<i class='" + icon + "'>"))).append(
+                               jQuery("<p>").html(msg));
+                var div2 = jQuery("<li>").append(
+                      jQuery("<p>").html(date));
+
+                jQuery("#id4").find("#listnots").prepend(div);
+                jQuery("#id4").find("#listdates").prepend(div2);
+                jQuery("#id4").find("#notif2 li").first().hide();
+                jQuery("#id4").find("#notif2 li").first().fadeIn(1000);
+                jQuery(".empity").html("");
+
+
+            };
+
+        });
+
+
+
+    </script>
+
+
+
+
+
+

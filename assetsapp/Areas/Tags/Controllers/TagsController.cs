@@ -62,47 +62,6 @@ namespace RivkaAreas.Tags.Controllers
               _locationTable = new MongoModel("Locations");
               _objectTable = new ObjectTable();
           }
-          public ActionResult Index2()
-          {
-              Dictionary<string, string> locations = new Dictionary<string, string>();
-              string getconjunt = locationsProfilesdb.Get("name", "Conjunto");
-              string idprofile = "";
-              JObject conjuntja = new JObject();
-              try
-              {
-                  conjuntja = JsonConvert.DeserializeObject<JArray>(getconjunt).First() as JObject;
-                  idprofile = conjuntja["_id"].ToString();
-              }
-              catch
-              {
-
-              }
-              try
-              {
-                  JArray getlocatins = JsonConvert.DeserializeObject<JArray>(locationsdb.Get("profileId", idprofile));
-                  locations = getlocatins.ToDictionary(x => (string)x["_id"], x => (string)x["name"]);
-              }
-              catch
-              {
-
-              }
-              string iduser = "";
-              try
-              {
-                  iduser = Session["_id"].ToString();
-              }
-              catch (Exception ex)
-              {
-                  if (Request.Cookies["_id2"] != null)
-                  {
-                      Session["_id"] = Request.Cookies["_id2"].Value;
-                      iduser = Session["_id"].ToString();
-                  }
-              }
-              ViewData["iduser"] = iduser;
-              ViewData["locations"] = locations;
-              return View();
-          }
         public ActionResult Index()
         {
             Dictionary<string, string> locations = new Dictionary<string, string>();
@@ -231,7 +190,7 @@ namespace RivkaAreas.Tags.Controllers
                     JObject profiles3 = JsonConvert.DeserializeObject<JArray>(locationsProfilesdb.Get("name", "Sub-Ubicaciones")).First() as JObject;
                     profsububi.Add(profiles3["_id"].ToString(), profiles3["name"].ToString());
                 }
-                catch { }
+                catch (Exception ex) { Error.Log(ex, " - - "); }
               try
               {
                   Epcs = (from row in rows.Cast<dynamic>() select (string)row.af_epc_completo).ToList();
@@ -275,11 +234,11 @@ namespace RivkaAreas.Tags.Controllers
                                 myobj.conjuntoname = conj["name"].ToString();
                             }
                         }
-                        catch { }
-                    
-                    
-                    
-                     resultepcs.Add(myobj);
+                        catch (Exception ex) { Error.Log(ex, " - - "); }
+
+
+
+                        resultepcs.Add(myobj);
 
                  }
                   if (Conjuntos != null) {
@@ -298,8 +257,8 @@ namespace RivkaAreas.Tags.Controllers
                                           break;
                                       }
                                   }
-                                  catch { }
-                              }
+                                  catch (Exception ex) { Error.Log(ex, " - - "); }
+                                }
                           }
                           catch
                           {
@@ -309,24 +268,23 @@ namespace RivkaAreas.Tags.Controllers
                   }
               
               }
-              catch { }
-              try
+              catch (Exception ex) { Error.Log(ex, " - - "); }
+                try
               {
-                  Idslist = (from row in rows.Cast<dynamic>() select (string)row.id_unico).ToList();
+                  Idslist = (from row in rows.Cast<dynamic>() select (string)row.id_registro).ToList();
                   JArray objects = JsonConvert.DeserializeObject<JArray>(objectrealdb.ValidIds(Idslist));
                   //rows.Cast<dynamic>().Where(c => Idslist.Contains(c.id_registro)).ToList().ForEach(cc => cc.analisis = "Activo con Id de Registro ya Existente");
-                  dynamic resultids1 = (from objectsx in objects select new { id = (string)objectsx["_id"], id_unico = (string)objectsx["id_registro"], name = (string)objectsx["name"], serie = (string)objectsx["serie"], marca = (string)objectsx["marca"], modelo = (string)objectsx["modelo"], location = (string)objectsx["location"], location_name = (string)objectsx["location_name"], conjunto = (string)objectsx["conjunto"], number = "", conjuntoname = "", profile = (string)objectsx["profileId"] }).ToList();
+                  dynamic resultids1 = (from objectsx in objects select new { id = (string)objectsx["_id"], name = (string)objectsx["name"], serie = (string)objectsx["serie"], marca = (string)objectsx["marca"], modelo = (string)objectsx["modelo"], location = (string)objectsx["location"], location_name = (string)objectsx["location_name"], conjunto = (string)objectsx["conjunto"], number = "", conjuntoname = "", profile = (string)objectsx["profileId"] }).ToList();
                 
                  foreach (dynamic obj in resultids1)
                  {
                      dynamic myobj = new ExpandoObject();
                      myobj.id = obj.id;
-                     myobj.id_unico = obj.id_unico;
                      myobj.name = obj.name;
                      myobj.serie = obj.serie;
                      myobj.marca = obj.marca;
                      myobj.modelo = obj.modelo;
-                       /* string prof = "";
+                        string prof = "";
                         try
                         {
                             prof = profubi[obj.profile];
@@ -337,36 +295,12 @@ namespace RivkaAreas.Tags.Controllers
                                 obj.number = conj["number"].ToString();
                             }
                         }
-                        catch { }*/
-                     myobj.location = obj.location;
+                        catch (Exception ex) { Error.Log(ex, " - - "); }
+                        myobj.location = obj.location;
                      myobj.location_name = obj.location_name;
                      myobj.conjunto = obj.conjunto;
                      myobj.number = obj.number;
                      myobj.conjuntoname = obj.conjuntoname;
-                     string prof = "";
-                     string conjuntx = obj.conjunto;
-                     try
-                     {
-                         prof = obj.profile;
-                         if (prof == profsububi.ElementAt(0).Key)
-                         {
-                             JObject conj = JsonConvert.DeserializeObject<JObject>(locationsdb.GetRow(conjuntx));
-                             myobj.conjunto = conj["parent"].ToString();
-                             conjuntx = conj["parent"].ToString();
-
-                             myobj.number = conj["number"].ToString();
-                             myobj.conjuntoname = conj["name"].ToString();
-                             prof = conj["profileId"].ToString();
-                         }
-                         if (prof == profubi.ElementAt(0).Key)
-                         {
-                             JObject conj = JsonConvert.DeserializeObject<JObject>(locationsdb.GetRow(conjuntx));
-                             // myobj.conjunto = conj["parent"].ToString();
-                             myobj.number = conj["number"].ToString();
-                             myobj.conjuntoname = conj["name"].ToString();
-                         }
-                     }
-                     catch { }
                      resultids.Add(myobj);
 
                  }
@@ -378,7 +312,6 @@ namespace RivkaAreas.Tags.Controllers
                           {
                               foreach (dynamic item2 in Conjuntos)
                               {
-                                  string id_unico = item.id_unico;
                                   try
                                   {
                                       if (item.conjunto == item2.id)
@@ -388,8 +321,8 @@ namespace RivkaAreas.Tags.Controllers
                                           break;
                                       }
                                   }
-                                  catch { }
-                              }
+                                  catch (Exception ex) { Error.Log(ex, " - - "); }
+                                }
                           }
                           catch
                           {
@@ -408,7 +341,7 @@ namespace RivkaAreas.Tags.Controllers
                       string observacion = "";
                       if (resultepcs!=null)
                       {
-                          string epccurrent = row.af_epc_completo;
+
                           foreach (dynamic item in resultepcs)
                           {   
                              
@@ -416,7 +349,7 @@ namespace RivkaAreas.Tags.Controllers
                               {
                                   if (item.epc == row.af_epc_completo)
                                   {
-                                      if (row.id_unico == "0")
+                                      if (row.id_registro == "0")
                                       {
                                           observacion = "A pesar de que no se cuenta con ID REGISTRO,el EPC existe en IOS, ";
                                           row.check = "";
@@ -429,12 +362,12 @@ namespace RivkaAreas.Tags.Controllers
                                       }
                                       if (item.number == row.af_unidad_explotacion)
                                       {
-                                          observacion += " la oficina es la misma en IOS(" + item.conjuntoname + "),";
+                                          observacion += " el conjunto es el mismo en IOS(" + item.conjuntoname + "),";
                                           row.check = "checked";
                                       }
                                       else
                                       {
-                                          observacion += " la oficina es diferente en IOS(" + item.conjuntoname + "),";
+                                          observacion += " el conjunto es diferente en IOS(" + item.conjuntoname + "),";
                                           row.check = "";
                                       }
                                     /*  if (item.location == row.ub_id_ubicacion)
@@ -475,7 +408,7 @@ namespace RivkaAreas.Tags.Controllers
                                       catch { }
                                       observacion += " por lo tanto se actualizara la información";
                                       row.analisis = observacion;
-                                      row.color = "border: solid 5px red !important;";
+                                      row.color = "border: solid 5px red;";
                                       break;
 
                                   }
@@ -486,151 +419,31 @@ namespace RivkaAreas.Tags.Controllers
                       }
                         if (resultids!=null)
                           {
-                              bool exist = false;
-                              if (row.id_unico == "0")
-                              {
-                                  try
-                                  {
-                                      string thisepc = row.af_epc_completo;
-                                      if (thisepc.Length > 0)
-                                      {
-                                          JObject objex = JsonConvert.DeserializeObject<JArray>(objectrealdb.Get("EPC", thisepc)).First() as JObject;
-                                          if (objex["id_registro"].ToString().Length > 0)
-                                          {
-                                              row.id_unico = objex["id_registro"].ToString();
-                                              string thisnumber = "";
-                                              string thisname = "";
-                                              string actname = "";
-                                              string actmarca = "";
-                                              string actmodelo = "";
-
-                                              string actserie = "";
-                                              try
-                                              {
-                                                  actname = objex["name"].ToString();
-                                              }
-                                              catch { }
-                                              try
-                                              {
-                                                  actmarca = objex["marca"].ToString();
-                                              }
-                                              catch { }
-                                              try
-                                              {
-                                                  actmodelo = objex["modelo"].ToString();
-                                              }
-                                              catch { }
-                                              try
-                                              {
-                                                  actserie = objex["serie"].ToString();
-                                              }
-                                              catch { }
-                                              try
-                                              {
-                                                  JObject locs = JsonConvert.DeserializeObject<JObject>(locationsdb.GetRow(objex["location"].ToString()));
-                                                  JObject conj = JsonConvert.DeserializeObject<JObject>(locationsdb.GetRow(locs["parent"].ToString()));
-                                                  try
-                                                  {
-                                                      string profi = profubi[conj["profileId"].ToString()];
-                                                      if (profi.Contains("Ubicacion"))
-                                                      {
-                                                          JObject conj2 = JsonConvert.DeserializeObject<JObject>(locationsdb.GetRow(conj["parent"].ToString()));
-                                                          conj["number"] = conj2["number"].ToString();
-                                                          conj["name"] = conj2["name"].ToString();
-                                                      }
-                                                  }
-                                                  catch { }
-                                                  thisnumber = conj["number"].ToString();
-                                                  thisname = conj["name"].ToString();
-                                              }
-                                              catch
-                                              {
-
-                                              }
-                                              observacion = "El ID UNICO existe en IOS,";
-                                              row.color = "border: solid 5px red !important;";
-                                              if (thisnumber == row.af_unidad_explotacion)
-                                              {
-                                                  observacion += " la oficina es la misma en IOS(" + thisname + "),";
-
-                                                  row.check = "checked";
-                                                  row.color = "border: solid 5px rgb(42, 180, 11) !important;";
-                                              }
-                                              else
-                                              {
-                                                  observacion += " sin embargo el conjunto es diferente en IOS(" + thisname + "),";
-                                                  row.check = "";
-
-                                              }
-                                              /*  if (item.location == row.ub_id_ubicacion)
-                                                {
-                                                    observacion += " y la ubicacion es igual en CAFIWEB(" + item.location_name + "),";
-
-                                                }
-                                                else
-                                                {
-                                                    observacion += "y la ubicacion es diferente en CAFIWEB(" + item.location_name + "),";
-
-                                                }*/
-                                              try
-                                              {
-
-                                                  if (row.af_desc_articulo != actname)
-                                                  {
-                                                      row.af_desc_articulo = label + actname + labelend;
-
-                                                  }
-                                                  if (row.af_marca != actmarca)
-                                                  {
-                                                      row.af_marca = label + actmarca + labelend;
-
-                                                  }
-                                                  if (row.af_modelo != actmodelo)
-                                                  {
-                                                      row.af_modelo = label + actmodelo + labelend;
-
-                                                  }
-                                                  if (row.af_num_serie != actserie)
-                                                  {
-                                                      row.af_num_serie = label + actserie + labelend;
-
-                                                  }
-
-                                              }
-                                              catch { }
-                                              observacion += " por lo tanto se actualizara la información";
-                                              row.analisis = observacion;
-                                              exist = true;
-                                          }
-                                      }
-                                  }
-                                  catch { }
-                              }
+                             
                               foreach (dynamic item in resultids)
                                   
                                    try {
-
-                                       if (item.id_unico == row.id_unico)
+                                        
+                                      if (item.id == row.id_registro)
                                       {
-
-                                          if (row.id_unico == "0")
+                                          
+                                          if (row.id_registro == "0")
                                           {
-
-                                              if (exist == false)
-                                                  continue;
+                                             
+                                              continue;
                                           }
                                           observacion = "El ID UNICO existe en IOS,";
                                           row.color = "border: solid 5px red;";
                                           if (item.number == row.af_unidad_explotacion)
                                           {
-                                              observacion += " la oficina es la misma en IOS(" + item.conjuntoname + "),";
+                                              observacion += " el conjunto es el mismo en IOS(" + item.conjuntoname + "),";
 
                                               row.check = "checked";
                                               row.color = "border: solid 5px rgb(42, 180, 11);";
                                           }
                                           else
                                           {
-                                              observacion += " sin embargo la oficina es diferente en IOS(" + item.conjuntoname + "),";
+                                              observacion += " sin embargo el conjunto es diferente en IOS(" + item.conjuntoname + "),";
                                               row.check = "";
                                              
                                           }
@@ -681,7 +494,7 @@ namespace RivkaAreas.Tags.Controllers
                           if(observacion=="")
                           {
                               row.analisis = "Se creará un nuevo activo en IOS";
-                              row.color = "border: solid 5px rgb(42, 180, 11) !important;";
+                              row.color = "border: solid 5px rgb(42, 180, 11);";
                               row.check = "checked";
                           }
                   }
@@ -695,7 +508,7 @@ namespace RivkaAreas.Tags.Controllers
             }
             catch (Exception ex)
             {
-                return null;
+                return new HttpStatusCodeResult(404, ex.Message);
             }
 
         }
@@ -907,7 +720,7 @@ namespace RivkaAreas.Tags.Controllers
                 catch { }
                 try
                 {
-                    Idslist = (from row in rows.Cast<dynamic>() select (string)row.id_unico).ToList();
+                    Idslist = (from row in rows.Cast<dynamic>() select (string)row.id_registro).ToList();
                     JArray objects = JsonConvert.DeserializeObject<JArray>(objectrealdb.ValidIds(Idslist));
                     Idslist.Clear();
                     Idslist = (from obj in objects select (string)obj["_id"]).ToList();
@@ -939,18 +752,11 @@ namespace RivkaAreas.Tags.Controllers
                                 string locations = row.ub_id_ubicacion;
                                 string sublocations = row.ub_id_sububicacion;
                                 string epcx = row.af_epc_completo;
-                                string id_unico = row.id_unico;
                                 string referenceobj = row.af_id_articulo;
                                 string numserie = row.af_num_serie;
-                                string marca = row.af_marca;
-                                string modelo = row.af_modelo;
-                                string quantity = row.af_cantidad;
                                 string conjunto = row.af_unidad_explotacion;
                                 string namelocation = row.af_ubicacion;
                                 string namesublocation = row.af_sububicacion;
-                                string fecha = row.af_fecha_etiquetado;
-                                string usuario = row.af_usuario_etiquetado;
-                                string objid = "";
                                 JObject objectJo = new JObject();
                                 if (locations.Length < 23)
                                 {
@@ -1115,22 +921,13 @@ namespace RivkaAreas.Tags.Controllers
                                 objectJo.Add("EPC", epcx);
                                 objectJo.Add("serie", numserie);
                                 objectJo.Add("assetType", assettype);
-                               // objectJo.Add("label", "normal");
-                                objectJo.Add("object_id", objid);
-                             
                                 objectJo.Add("label", "normal");
-                                objectJo.Add("quantity", quantity);
-                                objectJo.Add("id_registro", _objectTable.GetIdUnico());
-                                objectJo.Add("marca", marca);
-                                objectJo.Add("modelo", modelo);
-                                objectJo.Add("date", fecha);
-                                objectJo.Add("user_label", usuario);
                                 string item = JsonConvert.SerializeObject(objectJo);
                                 string idr="";
-                                string idregis = row.id_unico;
-                                if ((Epcs.Contains(row.af_epc_completo) && row.af_epc_completo != "") && (!Idslist.Contains(row.id_unico)))
+                                string idregis=row.id_registro;
+                                if ((Epcs.Contains(row.af_epc_completo) && row.af_epc_completo != "") && (!Idslist.Contains(row.id_registro)))
                                 {
-                                   /* try
+                                    try
                                     {
                                         objectJo.Add("system_status", true);
                                         item = JsonConvert.SerializeObject(objectJo);
@@ -1141,261 +938,37 @@ namespace RivkaAreas.Tags.Controllers
                                         if(epcx!="")
                                           Epcs.Add(epcx);
                                         if(idregis.Count()>2)
-                                            Idslist.Add(row.id_unico);
-                                    }
-                                    catch { }*/
-                                    try
-                                    {
-                                        JToken tk;
-                                        if(!objectJo.TryGetValue("system_status",out tk)){
-                                           objectJo.Add("system_status", true);
-                                        }
-                                        String objsresult = objReals.Get("EPC", row.af_epc_completo);
-                                        JObject objedit = JsonConvert.DeserializeObject<JArray>(objsresult).First() as JObject;
-                                        if (objedit.TryGetValue("id_registro", out tk))
-                                        {
-                                            if (objedit["id_registro"].ToString() != "" || objedit["id_registro"].ToString() != "0")
-                                            {
-
-                                                objectJo["id_registro"] = objedit["id_registro"].ToString();
-                                            }
-                                           
-                                        }
-                                        else
-                                        {
-                                           
-                                        }
-                                        if (objedit.TryGetValue("name", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("name", out tk))
-                                                objedit["name"] = objectJo["name"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("name", out tk))
-                                                objedit.Add("name", objectJo["name"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("id_registro", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("id_registro", out tk))
-                                                objedit["id_registro"] = objectJo["id_registro"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("id_registro", out tk))
-                                                objedit.Add("id_registro", objectJo["id_registro"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("marca", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("marca", out tk))
-                                                objedit["marca"] = objectJo["marca"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("marca", out tk))
-                                                objedit.Add("marca", objectJo["marca"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("modelo", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("modelo", out tk))
-                                                objedit["modelo"] = objectJo["modelo"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("modelo", out tk))
-                                                objedit.Add("modelo", objectJo["modelo"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("serie", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("serie", out tk))
-                                                objedit["serie"] = objectJo["serie"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("serie", out tk))
-                                                objedit.Add("serie", objectJo["serie"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("location", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("location", out tk))
-                                                objedit["location"] = objectJo["location"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("location", out tk))
-                                                objedit.Add("location", objectJo["location"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("EPC", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("EPC", out tk))
-                                                objedit["EPC"] = objectJo["EPC"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("EPC", out tk))
-                                                objedit.Add("EPC", objectJo["EPC"].ToString());
-                                        }
-                                        item = JsonConvert.SerializeObject(objedit);
-                                        idr = objReals.SaveRow(item, objedit["_id"].ToString());
-                                        if (idr.Length > 0)
-                                        {
-                                            // idindex = idindex + 1;
-                                        }
-                                        row.id_unico = objectJo["id_registro"].ToString();
-
-                                        editEpcs.Add(row);
-                                        if (epcx != "")
-                                            Epcs.Add(epcx);
-                                        if (objectJo["id_registro"].ToString() != "" && objectJo["id_registro"].ToString() != "0")
-                                            Idslist.Add(objectJo["id_registro"].ToString());
+                                         Idslist.Add(row.id_registro);
                                     }
                                     catch { }
                                 }
-                                else if (Idslist.Contains(row.id_unico) && row.id_unico != "")
+                                else if (Idslist.Contains(row.id_registro) && row.id_registro!="")
                                 {
-                                   /* try
+                                    try
                                     {
                                         objectJo.Add("system_status", true);
                                         item = JsonConvert.SerializeObject(objectJo);
-                                        JObject objedit = JsonConvert.DeserializeObject<JObject>(objReals.GetRow(row.id_unico));
+                                        JObject objedit = JsonConvert.DeserializeObject<JObject>(objReals.GetRow(row.id_registro));
                                         idr = objReals.SaveRow(item, objedit["_id"].ToString());
                                         editIds.Add(row);
                                         if (epcx != "")
                                             Epcs.Add(epcx);
                                         if (idregis.Count() > 2)
-                                            Idslist.Add(row.id_unico);
-                                    }
-                                    catch { }*/
-                                    try
-                                    {
-                                        JToken tk;
-                                        objectJo.Add("system_status", true);
-                                        String resultid = objReals.Get("id_registro", row.id_unico);
-                                        JObject objedit = JsonConvert.DeserializeObject<JArray>(resultid).First() as JObject;
-                                        if (objedit.TryGetValue("id_registro", out tk))
-                                        {
-                                            if (objedit["id_registro"].ToString() != "" || objedit["idregistro"].ToString() != "0")
-                                            {
-                                                objectJo["id_registro"] = objedit["id_registro"].ToString();
-                                            }
-                                          
-                                        }
-                                       
-                                        if (objedit.TryGetValue("name", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("name", out tk))
-                                                objedit["name"] = objectJo["name"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("name", out tk))
-                                                objedit.Add("name", objectJo["name"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("id_registro", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("id_registro", out tk))
-                                                objedit["id_registro"] = objectJo["id_registro"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("id_registro", out tk))
-                                                objedit.Add("id_registro", objectJo["id_registro"].ToString());
-                                          
-                                        }
-                                        if (objedit.TryGetValue("marca", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("marca", out tk))
-                                                objedit["marca"] = objectJo["marca"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("marca", out tk))
-                                                objedit.Add("marca", objectJo["marca"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("modelo", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("modelo", out tk))
-                                                objedit["modelo"] = objectJo["modelo"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("modelo", out tk))
-                                                objedit.Add("modelo", objectJo["modelo"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("serie", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("serie", out tk))
-                                                objedit["serie"] = objectJo["serie"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("serie", out tk))
-                                                objedit.Add("serie", objectJo["serie"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("location", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("location", out tk))
-                                                objedit["location"] = objectJo["location"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("location", out tk))
-                                                objedit.Add("location", objectJo["location"].ToString());
-                                        }
-                                        if (objedit.TryGetValue("EPC", out tk))
-                                        {
-                                            if (objectJo.TryGetValue("EPC", out tk))
-                                                objedit["EPC"] = objectJo["EPC"].ToString();
-                                        }
-                                        else
-                                        {
-                                            if (objectJo.TryGetValue("EPC", out tk))
-                                                objedit.Add("EPC", objectJo["EPC"].ToString());
-                                        }
-                                        item = JsonConvert.SerializeObject(objedit);
-                                        idr = objReals.SaveRow(item, objedit["_id"].ToString());
-                                        if (idr.Length > 0)
-                                        {
-                                            //  idindex = idindex + 1;
-                                        }
-                                        row.id_unico = objectJo["id_registro"].ToString();
-                                        editIds.Add(row);
-                                        if (epcx != "")
-                                            Epcs.Add(epcx);
-                                        if (objectJo["id_registro"].ToString() != "" && objectJo["id_registro"].ToString() != "0")
-                                            Idslist.Add(objectJo["id_registro"].ToString());
+                                            Idslist.Add(row.id_registro);
                                     }
                                     catch { }
                                 }
                                 else
                                 {
-                                  /*  try
+                                    try
                                     {
                                         idr = objReals.SaveRow(item);
                                         newObjs.Add(row);
                                         if (epcx != "")
                                             Epcs.Add(epcx);
                                         if (idregis.Count() > 2)
-                                            Idslist.Add(row.id_unico);
+                                            Idslist.Add(row.id_registro);
                                  
-                                    }
-                                    catch { }*/
-                                    try
-                                    {
-                                        idr = objReals.SaveRow(item);
-                                        
-                                        row.id_unico = objectJo["id_registro"].ToString();
-                                        newObjs.Add(row);
-                                        if (epcx != "")
-                                            Epcs.Add(epcx);
-
-                                        try
-                                        {
-                                            if (objectJo["id_registro"].ToString() != "" && objectJo["id_registro"].ToString() != "0")
-                                                Idslist.Add(objectJo["id_registro"].ToString());
-                                        }
-                                        catch { }
-
                                     }
                                     catch { }
                                 }
@@ -1403,12 +976,12 @@ namespace RivkaAreas.Tags.Controllers
                                 bool ok = true;
                                 try
                                 {
-                                /*    ok = RulesChecker.isValidToLocation(referenceobj, locations);
+                                    ok = RulesChecker.isValidToLocation(referenceobj, locations);
                                     if (ok == false)
                                     {
                                         Notificationsclass.saveNotification("Rules", "Invalid", "Objetos se han movido a Ubicacion no valida");
                                         // return "problem";
-                                    }*/
+                                    }
                                 }
                                 catch { }
                                 
@@ -1451,8 +1024,6 @@ namespace RivkaAreas.Tags.Controllers
         }
         public string generateObjs(string url,string selects)
         {
-            
-
             try
             {
                 List<string> listselects = new List<string>();
@@ -1714,8 +1285,8 @@ namespace RivkaAreas.Tags.Controllers
                 return "error";
             }
             
-        }
-
+        }     
+        //MODIFY OBJECTS FROM SDF   
         public string modifyObjs(string url) {
             try
             {
@@ -1943,23 +1514,9 @@ namespace RivkaAreas.Tags.Controllers
                 return "error";
             }
         }
-       /* public int setids(){
-
-            JArray objects = JsonConvert.DeserializeObject<JArray>(objReals.GetRows());
-            int i=1;
-            foreach(JObject j in objects){
-                try{
-
-                    objReals.UpdateRow("id_registro", i.ToString(), j["_id"].ToString());
-                    i++;
-                }catch{ }
-            }
-            return i;
-        }*/
-        public  List<ExpandoObject> getRows(string url)
+        //Read SDF
+        public List<ExpandoObject> getRows(string url)
         {
-
-
             List<ExpandoObject> myobjlist = new List<ExpandoObject>();
             try
             {
@@ -2087,6 +1644,7 @@ namespace RivkaAreas.Tags.Controllers
                 return myobjlist;
             }
         }
+        //Asset modeling
         public ExpandoObject CatalogoModel()
         {
             dynamic model = new ExpandoObject();
@@ -2110,7 +1668,6 @@ namespace RivkaAreas.Tags.Controllers
             model.af_sububicacion = "";
             model.ub_id_sububicacion = "";
             model.id_usuario="";
-            model.id_unico = "";
             model.analisis = "";
             model.color = "";
             model.check = "";
@@ -2550,7 +2107,7 @@ namespace RivkaAreas.Tags.Controllers
 	                            AF_UNIDAD_EXPLOTACION NVARCHAR(15) NULL,
 	                            AF_NOMBRE_CONJUNTO NVARCHAR(50) NULL,
 	                            AF_DEPARTAMENTO NVARCHAR(50) NULL,
-	                            AF_UBICACION NVARCHAR(50) NULL,
+	                            AF_UBICACION NVARCHAR(100) NULL,
 	                            AF_ID_ARTICULO NVARCHAR(24) NULL,
 	                            AF_DESC_ARTICULO NVARCHAR(100) NULL,
 	                            AF_MARCA NVARCHAR(30) NULL,
@@ -2566,12 +2123,14 @@ namespace RivkaAreas.Tags.Controllers
                                 AF_SUBUBICACION NVARCHAR(50) NULL,
                                 UB_ID_SUBUBICACION NVARCHAR(25) NULL,
                                 ID_USUARIO NVARCHAR(25) NULL,
-                                ID_UNICO NVARCHAR(25) NULL)";
+                                AF_ULTIMO_MANT NVARCHAR(25) NULL,
+                                AF_PROX_MANT NVARCHAR(25) NULL,
+                                AF_COM_MANT NVARCHAR(250) NULL)";
 
                     string pathexe = "\\bin\\sdf\\ConsoleApplication1.exe";
                     string exe = Server.MapPath(pathexe);
-                    string fields = "'_id','objectReference','objectReference_name','EPC','serie','location','location_name','marca','modelo','Creator','number','conjuntoName','department','label','date','quantity','sublocationname','sublocation','id_registro'";
-                    string values = "'0','5','6','10','9','16','4','7','8','19','1','2','3','11','12','14','17','18','20'";
+                    string fields = "'_id','objectReference','objectReference_name','EPC','serie','location','location_name','marca','modelo','Creator','number','conjuntoName','department','label','date','quantity','sublocationname','sublocation','lastmaintenance','nextmaintenance','comments'";
+                    string values = "'0','5','6','10','9','16','4','7','8','19','1','2','3','11','12','14','17','18','20','21','22'";
                    
 
                     String idLocation =idlocation;
@@ -2695,7 +2254,20 @@ namespace RivkaAreas.Tags.Controllers
                             {
                                 row.Add("quantity", "");
                             }
-                            objectsall.Add(row);
+                        //'lastmaintenance','nextmaintenance','comments'";
+                            if (!row.TryGetValue("lastmaintenance", out jtoken))
+                            {
+                                row.Add("lastmaintenance", "");
+                            }
+                            if (!row.TryGetValue("nextmaintenance", out jtoken))
+                            {
+                                row.Add("nextmaintenance", "");
+                            }
+                            if (!row.TryGetValue("comments", out jtoken))
+                            {
+                                row.Add("comments", "");
+                            }
+                        objectsall.Add(row);
                         }
                         catch
                         {
@@ -2770,14 +2342,13 @@ namespace RivkaAreas.Tags.Controllers
                     String path = rootPath + relativepath;
                     string path1 = path.Replace("\\", "\\\\");
 
-
                     string query = @"CREATE TABLE [htk_Inventarios] (
 	                    ID_SESION_INVENTARIO NVARCHAR(30),
 	                    EPC_ACTIVO NVARCHAR(30) NOT NULL,
 	                    FECHA_REGISTRO DATETIME NULL,
 	                    USUARIO_REGISTRO NVARCHAR(50) NULL,
 	                    ENCONTRADO NVARCHAR(1) NULL,
-	                    AF_CONJUNTO NVARCHAR(100) NULL,
+	                    AF_CONJUNTO NVARCHAR(50) NULL,
 	                    AF_UBICACION NVARCHAR(100) NULL,
 	                    AF_DESC_ARTICULO NVARCHAR(100) NULL,
 	                    AF_MARCA NVARCHAR(30) NULL,
@@ -2785,10 +2356,7 @@ namespace RivkaAreas.Tags.Controllers
 	                    AF_NUM_SERIE NVARCHAR(30) NULL,
 	                    AF_CANTIDAD FLOAT NULL,
 	                    AF_ID_ARTICULO NVARCHAR(24) NULL,
-                        UB_ID_UBICACION NVARCHAR(24) NULL,
-                        UB_ID_SUBUBICACION NVARCHAR(30) NULL,
-	                    AF_SUBUBICACION NVARCHAR(100) NULL,
-                        ID_UNICO NVARCHAR(25) NULL)";
+	                    UB_ID_UBICACION NVARCHAR(24) NULL)";
 
                     string query2 = @"CREATE TABLE [htk_Inv_NP] 
                         (ID_SESION_INVENTARIO NVARCHAR(30) NULL,
@@ -2796,8 +2364,7 @@ namespace RivkaAreas.Tags.Controllers
 	                     FECHA_REGISTRO DATETIME NULL,
 	                     USUARIO_REGISTRO NVARCHAR(50) NULL,
 	                     AF_CONJUNTO NVARCHAR(50) NULL,
-	                     AF_UBICACION NVARCHAR(50) NULL,
-                         AF_SUBUBICACION NVARCHAR(80) NULL,
+	                     AF_UBICACION NVARCHAR(100) NULL,
 	                     AF_DESC_ARTICULO NVARCHAR(100) NULL,
 	                     AF_MARCA NVARCHAR(30) NULL,
 	                     AF_MODELO NVARCHAR(30) NULL,
@@ -2817,8 +2384,6 @@ namespace RivkaAreas.Tags.Controllers
 	                    NOMBRE_DEPARTAMENTO NVARCHAR(50) NULL,
 	                    ID_UBICACION NTEXT NULL,
 	                    NOMBRE_UBICACION NTEXT NULL,
-                        ID_SUBUBICACION NTEXT NULL,
-	                    NOMBRE_SUBUBICACION NTEXT NULL,
 	                    HH_INVOLUCRADOS NVARCHAR(255) NULL,
 	                    FECHA_INICIO DATETIME NULL,
 	                    FECHA_FINALIZACION DATETIME NULL,

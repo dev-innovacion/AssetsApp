@@ -99,7 +99,7 @@ namespace RivkaAreas.Assignments.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             BsonArray result = conection.getDataBase().Eval(SubFunction).AsBsonArray;
             List<BsonDocument> documents = new List<BsonDocument>();
             foreach (BsonDocument document in result)
@@ -125,7 +125,7 @@ namespace RivkaAreas.Assignments.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             String result = conection.getDataBase().Eval(SubFunction).AsString;
 
             return result;
@@ -139,7 +139,7 @@ namespace RivkaAreas.Assignments.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             String result = conection.getDataBase().Eval(SubFunction).AsString;
 
             return result;
@@ -153,7 +153,7 @@ namespace RivkaAreas.Assignments.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             BsonArray result = conection.getDataBase().Eval(SubFunction).AsBsonArray;
             List<BsonDocument> documents = new List<BsonDocument>();
             foreach (BsonDocument document in result)
@@ -504,7 +504,7 @@ namespace RivkaAreas.Assignments.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             double result = conection.getDataBase().Eval(SubFunction).AsDouble;
 
             return result.ToString();

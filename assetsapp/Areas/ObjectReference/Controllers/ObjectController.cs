@@ -233,8 +233,8 @@ namespace RivkaAreas.ObjectReference.Controllers
             bool access = false;
             bool accessClient = false;
             //  access = getpermissions("users", "r");
-            access = validatepermissions.getpermissions("objectsreference", "d", dataPermissions);
-            accessClient = validatepermissions.getpermissions("objectsreference", "d", dataPermissionsClient);
+            access = validatepermissions.getpermissions("objects", "d", dataPermissions);
+            accessClient = validatepermissions.getpermissions("objects", "d", dataPermissionsClient);
 
             if (access == true && accessClient == true)
             {

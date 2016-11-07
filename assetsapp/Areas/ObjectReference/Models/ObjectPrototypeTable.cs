@@ -22,7 +22,7 @@ namespace RivkaAreas.ObjectReference.Models
         /// </summary>
         public ObjectPrototypeTable()
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection("ObjectPrototype");
         }
 

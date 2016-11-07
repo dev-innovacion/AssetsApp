@@ -2,8 +2,8 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
-    <NameOfLastUsedPublishProfile>assetapphtk</NameOfLastUsedPublishProfile>
-    <UseIISExpress>false</UseIISExpress>
+    <NameOfLastUsedPublishProfile>LocalAssetsApp</NameOfLastUsedPublishProfile>
+    <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />

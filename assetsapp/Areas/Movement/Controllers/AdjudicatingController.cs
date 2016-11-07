@@ -41,26 +41,10 @@ namespace RivkaAreas.Movement.Controllers
         public ActionResult Index()
         {
             { //creating asssetsTypeOptions
-               // String assetsTypeString = listsModel.Get("name", "_HTKassetsType");
-               // JObject assetsType = JsonConvert.DeserializeObject<JArray>(assetsTypeString).First() as JObject;
-               
-                MongoModel Categories = new MongoModel("Categories");
-                String assetsTypeOptions = "<option disabled>---------------------------</option>";
-
-                try
-                {
-                    JArray catja = JsonConvert.DeserializeObject<JArray>(Categories.GetRows());
-                    foreach (JObject cat in catja)
-                    {
-                        try
-                        {
-                            assetsTypeOptions += "<option value='" + cat["_id"].ToString() + "' >" + cat["name"].ToString() + "</option>";
-                        }
-                        catch { }
-                    }
-                }
-                catch { }
-               /* foreach (JObject item in (JArray)assetsType["elements"]["order"])
+                String assetsTypeString = listsModel.Get("name", "_HTKassetsType");
+                JObject assetsType = JsonConvert.DeserializeObject<JArray>(assetsTypeString).First() as JObject;
+                String assetsTypeOptions = "";
+                foreach (JObject item in (JArray)assetsType["elements"]["order"])
                 {
                     foreach (KeyValuePair<String, JToken> element in item)
                     {
@@ -76,7 +60,7 @@ namespace RivkaAreas.Movement.Controllers
                     {
                         assetsTypeOptions += "<option value='" + element.Key + "'>" + element.Value + "</option>";
                     }
-                }*/
+                }
                 ViewData["assetsTypeOptions"] = new HtmlString(assetsTypeOptions);
             }
 

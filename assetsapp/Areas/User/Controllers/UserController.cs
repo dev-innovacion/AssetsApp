@@ -234,6 +234,7 @@ namespace RivkaAreas.User.Controllers
                 }
 
                 loadDepartments();
+                loadAreas();
 
                 return View();
             }
@@ -1947,6 +1948,37 @@ namespace RivkaAreas.User.Controllers
                 ViewData["departList"] = null;
             }
         }
+        public void loadAreas()
+        {
+            try
+            {
+                String AreasOptions = "";
+                String rowArray = listTable.Get("name", "Area");
+                JArray rowString = JsonConvert.DeserializeObject<JArray>(rowArray);
+                JArray listas = new JArray();
+                foreach (JObject obj in rowString)
+                {
+                    listas = JsonConvert.DeserializeObject<JArray>(obj["elements"]["unorder"].ToString());
+                }
+                AreasOptions += "<option value='null' selected>Seleccione...</option>";
+                foreach (JObject puesto in listas)
+                {
+                    foreach (KeyValuePair<string, JToken> token in puesto)
+                    {
+                        AreasOptions += "<option value='" + token.Key + "'"; //setting the id as the value
+                        AreasOptions += ">" + token.Value + "</option>"; //setting the text as the name
+                    }
+
+                }
+
+                ViewData["areaList"] = new HtmlString(AreasOptions);
+            }
+            catch (Exception e)
+            {
+                ViewData["areaList"] = null;
+            }
+        }
+
         public string searchDepartment(string namedepartment)
         {
             String iddep = "";

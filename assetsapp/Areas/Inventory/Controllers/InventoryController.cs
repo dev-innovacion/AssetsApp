@@ -9,6 +9,8 @@ using Newtonsoft.Json.Linq;
 
 using RivkaAreas.Inventory.Models;
 using Rivka.Db.MongoDb;
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 namespace RivkaAreas.Inventory.Controllers
 {
@@ -23,11 +25,12 @@ namespace RivkaAreas.Inventory.Controllers
         protected HardwareTable _hardwareTable;
         protected MongoModel _locationProfiles = new MongoModel("LocationProfiles");
         protected RivkaAreas.LogBook.Controllers.LogBookController _logTable;
-
+        protected LocationTable locationTable;
         public InventoryController() {
             this._inventoryTable = new InventoryTable();
             this._userTable = new UserTable();
             this._locationTable = new LocationTable();
+            this.locationTable = new LocationTable();
             this._profileTable = new ProfileTable();
             this._hardwareTable = new HardwareTable();
             this._logTable = new LogBook.Controllers.LogBookController();
@@ -35,17 +38,30 @@ namespace RivkaAreas.Inventory.Controllers
 
         public ActionResult Index()
         {
-            string rowArray = _locationTable.GetRows();
-            JArray locat = JsonConvert.DeserializeObject<JArray>(rowArray);
+            MongoCursor rowArray = locationTable.GetCursors();
             Dictionary<string, string> data = new Dictionary<string, string>();
-
-            foreach (JObject items in locat)
+            foreach (BsonDocument item in rowArray)
             {
-                data.Add(items["_id"].ToString(), items["name"].ToString());
+                item.GetElement("_id").Value.ToString();
+                if (!data.ContainsKey(item.GetElement("_id").Value.ToString()))
+                    data.Add(item.GetElement("_id").Value.ToString(), item.GetElement("name").Value.ToString());
             }
-
             ViewData["locations"] = data;
             return View();
+
+
+
+            //string rowArray = _locationTable.GetRows();
+            //JArray locat = JsonConvert.DeserializeObject<JArray>(rowArray);
+            //Dictionary<string, string> data = new Dictionary<string, string>();
+
+            //foreach (JObject items in locat)
+            //{
+            //    data.Add(items["_id"].ToString(), items["name"].ToString());
+            //}
+
+            //ViewData["locations"] = data;
+            //return View();
         }
         /// <summary>
         ///     Get the inventory table belonging to the current user

@@ -5776,9 +5776,9 @@
                 else if (this.type == "movement" || this.type == "delete") {
                     urlResource = "GetAllSubObjects";
                     if (locFilter == "null") {
-                        sendData = { locationId: conjuntoFilter, assetType: assetTypeFilter }
+                        sendData = { locationId: conjuntoFilter }
                     } else {
-                        sendData = { locationId: locFilter, assetType: assetTypeFilter }
+                        sendData = { locationId: locFilter }
                     }
                     
                     if (this.type == "delete" && $("select[name=deleteType]").val() == "planeada") {
@@ -8203,7 +8203,6 @@
 
                 //Event to send the order to save
                 jQuery("#save_button").bind("click.validate", function () {
-                    debugger;
                     var objects = OrderTable.getObjects();
                     var selectedItems = Movements.useViewer.getSelectedItems();
                     if (Movements.type == "movement" && Movements.temp == false && (jQuery("#selectConjuntoDestiny").val() == null || jQuery("#selectConjuntoDestiny").val() == "null")) {

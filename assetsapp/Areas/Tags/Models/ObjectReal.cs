@@ -205,16 +205,15 @@ namespace RivkaAreas.Tags.Models
         {
             //Query needed to get the result
             BsonArray idsarray = new BsonArray();
-            foreach (string id in Ids)
+            foreach (string epc in Ids)
             {
                 try
                 {
-                    if(id!="")
-                     idsarray.Add(id);
+                    idsarray.Add(new BsonObjectId(epc));
                 }
                 catch { }
             }
-            var query = Query.And(Query.In("id_registro", idsarray));
+            var query = Query.And(Query.In("_id", idsarray));
 
             JoinCollections Join = new JoinCollections();
             Join.Select("ObjectReal")

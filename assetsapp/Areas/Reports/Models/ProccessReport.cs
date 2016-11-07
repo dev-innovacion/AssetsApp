@@ -20,7 +20,7 @@ namespace RivkaAreas.Reports.Models
         private MongoConection conection;
         public ProccessReport(string table): base("Processes")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

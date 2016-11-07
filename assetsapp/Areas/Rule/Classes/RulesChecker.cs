@@ -64,15 +64,8 @@ namespace RivkaAreas.Rule
             // TODO :: Validar si locationId es null
             //
             String locationString = locationModel.GetRow(locationId);
-            JObject location = new JObject();
-            try
-            {
-                 location = JsonConvert.DeserializeObject<JObject>(locationString);
-            }
-            catch
-            {
-                return true;
-            }
+            JObject location = JsonConvert.DeserializeObject<JObject>(locationString);
+
             //check 
             String rulestring = locationruleModel.Get("IdLocation", location["_id"].ToString());
             if (rulestring == null) return true;

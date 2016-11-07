@@ -340,8 +340,7 @@ namespace RivkaAreas.Locations.Controllers
                         catch (Exception ex) { }
                     }
 
-                    if (type == "" || type == "SubLocations")
-                    {
+                    if (type == "") {
                         if (obj["parent"].ToString() == "none") {
                             objects1.Add(obj);
                         }

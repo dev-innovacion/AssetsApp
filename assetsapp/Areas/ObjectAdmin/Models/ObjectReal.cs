@@ -151,25 +151,29 @@ namespace RivkaAreas.ObjectAdmin.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             BsonArray result = conection.getDataBase().Eval(SubFunction).AsBsonArray;
             List<BsonDocument> documents = new List<BsonDocument>();
             foreach (BsonDocument document in result)
             {
                 document.Set("_id", document.GetElement("_id").Value.ToString());
-                try
-                {
-                    document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                }
-                catch (Exception ex) { }
+                if(document.Contains("CreatedTimeStamp"))
+                    document.Set("CreatedTimeStamp", document["CreatedTimeStamp"].ToString());
+                //try
+                //{
+                //    document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
+                //}
+                //catch (Exception ex) { }
                 string type = "true";
                 if (filter)
                 {
-                    try
-                    {
-                        type = document.GetElement("system_status").Value.ToString().ToLower();
-                    }
-                    catch { }
+                    if(document.Contains("system_status"))
+                        type = document["system_status"].ToString().ToLower();
+                        //try
+                        //{
+                        //    type = document.GetElement("system_status").Value.ToString().ToLower();
+                        //}
+                        //catch { }
                 }
                 if (filter && type == "false")
                 {
@@ -193,7 +197,7 @@ namespace RivkaAreas.ObjectAdmin.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             String result = conection.getDataBase().Eval(SubFunction).AsString;
 
             return result;
@@ -207,7 +211,7 @@ namespace RivkaAreas.ObjectAdmin.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             String result = conection.getDataBase().Eval(SubFunction).AsString;
 
             return result;
@@ -221,7 +225,7 @@ namespace RivkaAreas.ObjectAdmin.Models
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             BsonArray result = conection.getDataBase().Eval(SubFunction).AsBsonArray;
             List<BsonDocument> documents = new List<BsonDocument>();
             foreach (BsonDocument document in result)
@@ -336,7 +340,7 @@ namespace RivkaAreas.ObjectAdmin.Models
             else
             {
                 Join.Select("ObjectReal")
-                .Join("ReferenceObjects", "objectReference", "_id", "marca=>marca,modelo=>modelo,object_id=>object_id,profileFields=>profileFileds,parentCategory=>parentCategory,assetType=>assetType,ext=>ext")
+                .Join("ReferenceObjects", "objectReference", "_id", "marca,modelo,object_id,profileFields,parentCategory,assetType")
                 .Join("Users", "Creator", "_id", "name=>Creator")
                 .Join("Locations", "location", "_id", "name=>location");
             }

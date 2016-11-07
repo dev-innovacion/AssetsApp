@@ -131,17 +131,19 @@ namespace Rivka.Db.MongoDb
                 BsonJavaScript JoinFunction = new BsonJavaScript(queryFunction);
 
                 //Calling the stores Mongo Function
-                MongoConection conection = (MongoConection)Conection.getConection();
+                MongoConection conection = (MongoConection)Conection.getConection("37017");
                 BsonArray result = conection.getDataBase().Eval(JoinFunction).AsBsonArray;
                 List<BsonDocument> documents = new List<BsonDocument>();
                 foreach (BsonDocument document in result)
                 {
                     document.Set("_id", document.GetElement("_id").Value.ToString());
-                    try
-                    {
-                        document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                    }
-                    catch (Exception ex) { }
+                    if(document.Contains("CreatedTimeStamp"))
+                        document.Set("CreatedTimeStamp", document["CreatedTimeStamp"].ToString());
+                    //try
+                    //{
+                    //    document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
+                    //}
+                    //catch (Exception ex) { }
 
                     documents.Add(document);
                 }
@@ -188,77 +190,32 @@ namespace Rivka.Db.MongoDb
                     try
                     {
 
-                      
                         document.Set("_id", document.GetElement("_id").Value.ToString());
 
-                        try
-                        {
-                            document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                        }
-                        catch (Exception ex) { }
-                        try
-                        {
-                            document.Set("status", document.GetElement("status").Value.ToString());
-                           
-                        }
-                        catch (Exception ex) { }
+                        //try
+                        //{
+                            if (document.Contains("CreatedTimeStamp"))
+                            {
+                            //document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
+                            document.Set("CreatedTimeStamp", document["CreatedTimeStamp"].ToString());
+                            }
+                        //}
+                        //catch (Exception ex) { }
+                        //try
+                        //{
+                            if (document.Contains("status"))
+                            {
+                            //document.Set("status", document.GetElement("status").Value.ToString());
+                            document.Set("status", document["status"].ToString());
+                            }
+                        //}
+                        //catch (Exception ex) { }
 
 
                         documents.Add(document);
                     }
                     catch { }
                 }
-                return documents.ToJson();
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-        }
-        public String GetbyList(string key, List<string> datas)
-        {
-            //Query needed to get the result
-            BsonArray datasarray = new BsonArray();
-            foreach (string data in datas)
-            {
-                try
-                {
-                    if (key == "_id")
-                    {
-                        datasarray.Add(new BsonObjectId(data));
-                    }
-                    else
-                    {
-                        datasarray.Add(data);
-                    }
-                }
-                catch { }
-            }
-          
-
-          
-               string orderfield = "name";
-            
-            try
-            {
-                var query = Query.And(Query.In(key, datasarray));
-                var cursor = collection.FindAs(typeof(BsonDocument), query).SetSortOrder(SortBy.Ascending(orderfield));
-                List<BsonDocument> documents = new List<BsonDocument>();
-                foreach (BsonDocument document in cursor)
-                {
-                    // if (isValidDocument(document))
-                    document.Set("_id", document.GetElement("_id").Value.ToString());
-                    try
-                    {
-                        document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                    documents.Add(document);
-                }
-
                 return documents.ToJson();
             }
             catch (Exception e)
@@ -360,36 +317,7 @@ namespace Rivka.Db.MongoDb
                 return null;
             }
         }
-        public String validSession(string ID_SESION, string DESCRIPCION, string NOMBRE_CONJUNTO, string FECHA_INICIO, string FECHA_FINALIZACION)
-        {
 
-            try
-            {
-                var query = Query.And(Query.EQ("ID_SESION", ID_SESION), Query.EQ("DESCRIPCION", DESCRIPCION), Query.EQ("NOMBRE_CONJUNTO", NOMBRE_CONJUNTO), Query.EQ("FECHA_INICIO", FECHA_INICIO), Query.EQ("FECHA_FINALIZACION", FECHA_FINALIZACION));
-                var cursor = collection.FindAs(typeof(BsonDocument), query);
-                List<BsonDocument> documents = new List<BsonDocument>();
-                foreach (BsonDocument document in cursor)
-                {
-                    // if (isValidDocument(document))
-                    document.Set("_id", document.GetElement("_id").Value.ToString());
-                    try
-                    {
-                        document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                    documents.Add(document);
-                }
-
-                return documents.ToJson();
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-        }
         /// <summary>
         ///     Allows to get all the documents in the collection with status false
         /// </summary>
@@ -453,17 +381,22 @@ namespace Rivka.Db.MongoDb
                 BsonDocument result = resultObject.ToBsonDocument();
                 result.Set("_id", result.GetElement("_id").Value.ToString());
 
-                try
-                {
-                    result.Set("CreatedTimeStamp",result.GetElement("CreatedTimeStamp").Value.ToString());
-                }
-                catch (Exception ex) { }
+
+                if (result.Contains("CreatedTimeStamp"))
+                    result.Set("CreatedTimeStamp", result["CreatedTimeStamp"].ToString());
+                //try
+                //{
+                //    result.Set("CreatedTimeStamp",result.GetElement("CreatedTimeStamp").Value.ToString());
+                //}
+                //catch (Exception ex) { }
                 if (collection.Name != "Demand") {
-                    try
-                {
-                        result.Set("status", result.GetElement("status").Value.ToString());
-                }
-                    catch (Exception ex) { }
+                    if (result.Contains("status"))
+                        result.Set("status", result["status"].ToString());
+                    //    try
+                    //{
+                    //        result.Set("status", result.GetElement("status").Value.ToString());
+                    //}
+                    //    catch (Exception ex) { }
                 }
                 
 
@@ -521,7 +454,8 @@ namespace Rivka.Db.MongoDb
             BsonJavaScript SubFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
+            conection.getCollection("ObjectReal");
             double result = conection.getDataBase().Eval(SubFunction).AsDouble;
 
             return result.ToString();
@@ -617,14 +551,16 @@ namespace Rivka.Db.MongoDb
                 {
                     // if (isValidDocument(document))
                     document.Set("_id", document.GetElement("_id").Value.ToString());
-                    try
-                    {
-                        document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                    }
-                    catch (Exception ex)
-                    {
+                    if (document.Contains("CreatedTimeStamp"))
+                        document.Set("CreatedTimeStamp", document["CreatedTimeStamp"].ToString());
+                    //try
+                    //{
+                    //    document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
+                    //}
+                    //catch (Exception ex)
+                    //{
 
-                    }
+                    //}
                     documents.Add(document);
                 }
 
@@ -666,14 +602,16 @@ namespace Rivka.Db.MongoDb
                 {
                     // if (isValidDocument(document))
                     document.Set("_id", document.GetElement("_id").Value.ToString());
-                    try
-                    {
-                        document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
-                    }
-                    catch (Exception ex)
-                    {
+                    if (document.Contains("CreatedTimeStamp"))
+                        document.Set("CreatedTimeStamp", document["CreatedTimeStamp"].ToString());
+                    //try
+                    //{
+                    //    document.Set("CreatedTimeStamp", document.GetElement("CreatedTimeStamp").Value.ToString());
+                    //}
+                    //catch (Exception ex)
+                    //{
 
-                    }
+                    //}
                     documents.Add(document);
                 }
 

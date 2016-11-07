@@ -118,7 +118,7 @@ namespace RivkaAreas.Locations.Models
             BsonJavaScript JoinFunction = new BsonJavaScript(queryFunction);
 
             //Calling the stores Mongo Function
-            MongoConection conection = (MongoConection)Conection.getConection();
+            MongoConection conection = (MongoConection)Conection.getConection("37017");
             objs = conection.getDataBase().Eval(JoinFunction).AsBsonArray;
 
             result = objs.Count;

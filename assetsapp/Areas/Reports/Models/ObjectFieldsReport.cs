@@ -32,9 +32,9 @@ namespace RivkaAreas.Reports.Models
         public ObjectFieldsReport(string table)
             : base("ObjectFields")
         {
-            conection = (MongoConection)Conection.getConection();
-            conection1 = (MongoConection)Conection.getConection();
-            conection2 = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
+            conection1 = (MongoConection)Conection.getConection("37017");
+            conection2 = (MongoConection)Conection.getConection("37017");
 
             collection = conection.getCollection(table);
            // collection.EnsureIndex(IndexKeys.Ascending("_id"), IndexOptions.SetUnique(true));

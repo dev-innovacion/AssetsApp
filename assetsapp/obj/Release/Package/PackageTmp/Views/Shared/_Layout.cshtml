@@ -1,0 +1,606 @@
+﻿<!DOCTYPE html>
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+
+@{
+    string thisAction = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("action").ToLower();
+    string thisController = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("controller").ToLower();
+    string thisArea = null;
+    string iduserthis = "";
+    
+    try
+    {
+        thisArea = ViewContext.RouteData.DataTokens["area"].ToString().ToLower();
+    }
+    catch (Exception e) { }
+
+    try
+    {
+        string loggin = Session["LoggedUser"].ToString();
+    }
+    catch (Exception ex)
+    {
+        if (Request.Cookies["_loggeduser"] != null)
+        {
+            Session["LoggedUser"] = Request.Cookies["_loggeduser"].Value;
+        }
+    }
+    try
+    {
+        iduserthis = Session["_id"].ToString();
+    }
+    catch (Exception ex)
+    {
+        if (Request.Cookies["_id2"] != null)
+        {
+            Session["_id"] = Request.Cookies["_id2"].Value;
+            iduserthis = Session["_id"].ToString();
+        }
+    }
+   
+     
+
+      try
+      {
+          string permission = Session["Permissions"].ToString();
+      }
+      catch (Exception ex)
+      {
+          if (Request.Cookies["permissions"] != null)
+          {
+              Session["Permissions"] = Request.Cookies["permissions"].Value;
+
+          }
+
+      }
+
+      try
+      {
+          string permissionclient = Session["PermissionsClient"].ToString();
+      }
+      catch (Exception ex)
+      {
+          if (Request.Cookies["permissionsclient"] != null)
+          {
+              Session["PermissionsClient"] = Request.Cookies["permissionsclient"].Value;
+
+          }
+
+      }
+
+      if (System.Web.Security.FormsAuthentication.IsEnabled && (Session["LoggedUser"] == null || Session["Permissions"] == null || Session["PermissionsClient"] == null))
+    {
+        System.Web.Security.FormsAuthentication.SignOut();
+
+        this.Response.Redirect("#");
+    }
+
+   
+ 
+  
+}
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - HTK Asset App</title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <meta name="google-translate-customization" content="e90df25cd06dfb52-d3354e9db8ecbb70-g81a119f996b3b062-f" />
+    <!-- Le styles -->
+
+    <link href="~/Content/CSS/bootstrap.css" rel="stylesheet" />
+    @*<link href="~/Content/CSS/flat-ui.css" rel="stylesheet" />*@
+    <link href="~/Content/CSS/bootstrap-responsive.css" rel="stylesheet" />
+    <link href="~/Content/CSS/stylesheet.css" rel="stylesheet" />
+    <link href="~/Content/CSS/library/jquery.fileupload-ui.css" rel="stylesheet" />
+    <link href="~/Content/CSS/library/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/Content/icon/font-awesome-4/font-awesome.css" rel="stylesheet" />
+    <link href="~/Content/icon/font-awesome.css" rel="stylesheet" />
+    @*<link href="~/Content/CSS/bootstrap-tree.css" rel="stylesheet" />*@
+    <link href="~/RivkaBase/Scripts/RivkaTree/RivkaTree.css" rel="stylesheet" />
+    <link href="~/Content/CSS/jquery.colourPicker.css" rel="stylesheet" />
+    <link href="~/RivkaBase/Scripts/RivkaViewer2/RivkaViewer.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/select2/select2.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/fixedTable/demo/css/myTheme.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/fixedTable/demo/css/960.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/fixedTable/demo/css/myTheme.css" rel="stylesheet" />
+
+    <link href="~/Content/Scripts/library/fixedTable/defaultTheme.css" rel="stylesheet" />
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- Le fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="~/Content/Images/apple-touch-icon-144-precomposed.html">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="~/Content/Images/apple-touch-icon-72-precomposed.html">
+    <link rel="apple-touch-icon-precomposed" href="~/Content/Images/apple-touch-icon-57-precomposed.html">
+    <link rel="shortcut icon" href="~/Uploads/Images/Design/Favicon/favicon.png">
+    <script src="~/Content/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Content/Scripts/jquery-ui-1.10.3.js"></script>
+    <script src="~/Content/Scripts/bootstrap_3x.js"></script>
+
+
+    @*<script src="~/Content/Scripts/bootstrap-tree.js"></script>
+    <link href="~/Content/Scripts/ui-tree.js" rel="stylesheet" />*@
+    <link href="~/Content/Scripts/jquery.colourPicker.js" rel="stylesheet" />
+    <link href="~/Content/Scripts/jquery.colourPicker.js" rel="stylesheet" />
+
+
+    <link href="~/Content/Scripts/library/jspdf/examples/css/editor.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/jspdf/examples/css/main.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/jspdf/examples/css/smoothness/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/Scroll/perfect-scrollbar.css" rel="stylesheet" />
+
+    <link href="~/Content/Scripts/library/sDashboard/sDashboard.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/sDashboard/css/jquery.minitwitter.css" rel="stylesheet" />
+
+    <link href="~/Content/Scripts/library/sDashboard/css/gitter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/Content/CSS/Design/default.css" rel="stylesheet" />
+    <link href="~/Content/CSS/Design/slidercustom.css" rel="stylesheet" />
+    <link href="~/Content/CSS/Design/logomenudefault.css" rel="stylesheet" />
+
+    <!--news elements headers statics-->
+    <link href="~/Content/CSS/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/Content/Scripts/library/scroller/dataTables.scroller.css" rel="stylesheet" />
+    
+    <!--end news-->
+     <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/touchpunch/jquery.ui.touch-punch.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/gitter/jquery.gritter.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/datatables/jquery.dataTables.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/flotr2/flotr2.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/jquery-sDashboard.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/themeswitcher/jquery.themeswitcher.min.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/sDashboard/libs/miniTwitter/jquery.minitwitter.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/Scroll/jquery.mousewheel.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/Scroll/perfect-scrollbar.js"></script>
+
+
+
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.addimage.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.cell.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.standard_fonts_metrics.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.split_text_to_size.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.from_html.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/jspdf.plugin.javascript.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/libs/Blob.js/Blob.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/libs/FileSaver.js/FileSaver.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/libs/Deflate/adler32cs.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/libs/Deflate/deflate.js"></script>
+
+    <script type="text/javascript" src="~/Content/Scripts/library/jspdf/libs/Deflate/deflate.js"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/zoom/jquery.elevatezoom.js"></script>
+
+    <script src="~/Content/Scripts/canvg.js"></script>
+    <script src="~/Content/Scripts/StackBlur.js"></script>
+    <script src="~/Content/Scripts/rgbcolor.js"></script>
+    <script src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="~/Content/Scripts/library/fixedTable/jquery.fixedheadertable.js"></script>
+
+
+    <script type="text/javascript">
+        var area = 0;
+        function alertblue(message) {
+          
+            var mediaElement = document.getElementById("audionot");
+            mediaElement.play();
+            var name = "";
+            var msg = message;
+            var image = "/Content/Images/not.gif";
+            var content = "<img src='" + image + "' class='avatar' style='padding-bottom:10px;height:50px;width:50px;'><h5 style='font-weight:bold' >" + name + "</h5><a href='#' style='color:white'>" + msg + "</a>";
+            generate1('bottomRight', content);
+        }
+        function generate1(layout, text) {
+            var n = noty({
+                text: text,
+                type: 'information',
+                dismissQueue: true,
+                layout: layout,
+                theme: 'defaultTheme'
+            });
+            console.log('html: ' + n.options.id);
+        }
+        
+    </script>
+    @RenderSection("heads", required: false)
+   
+  
+</head>
+<body>
+
+    <audio id="audionot" preload="auto" src="/Content/Images/pop.mp3"></audio>
+    <audio id="audionot2" preload="auto" src="/Content/Images/audio.mp3"></audio>
+
+    <!-- Inicio Header  -->
+    
+    <header class="blue topbarclient">
+        <!--<a href="#" class="logo_image logomenu"><span class="hidden-480">ASSET APP</span></a>-->
+        <span class="logo_image logomenu hidden-480"></span>
+        <ul class="header_actions pull-left hidden-480 hidden-768 headeright">
+            <li rel="tooltip" data-placement="bottom" title="Ocultar Menu"><a href="#" class="hide_navigation"><i class="icon-chevron-left"></i></a></li>
+            <li rel="tooltip" data-placement="right" title="Change navigation color scheme" class="color_pick navigation_color_pick"></li>
+        </ul>
+        <span class="logoclient" style="display:none">ASSET APP</span>
+        <span style="font-size: 16px; color: #fff; line-height: 44px;">ASSET APP</span>
+        <ul class="header_actions">
+            <li class="select_dashboard"></li>
+            <li rel="tooltip" data-placement="bottom" title="Mensajes" class="messages">
+                <a class="iconic" href="#"><i class="icon-envelope-alt"></i><span id="inboxnew" style="background-color: red; padding: 1px 5px;"></span></a>
+                <ul id="ulMails" class="dropdown-menu pull-right messages_dropdown" style="max-width: 450px;width: 400px !important;">
+                    <li>
+                        <a href="#">
+
+                            <div class="details">
+                                <div class="name">Cargando...</div>
+                            </div>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            @Html.Partial("_LoginPartial")
+            <li class="responsive_menu"><a class="iconic" href="#"><i class="icon-reorder"></i></a></li>
+        </ul>
+    </header>
+    <!-- Fin Header -->
+    @Html.Partial("_NewMenu")
+    <!-- Inicio del Contenedor -->
+    <div id="content">
+        @*<div class="top_bar">
+                    <ul class="breadcrumb">
+                        <li><a href="/Home/Index"><i class="icon-home"></i></a><span class="divider">/</span></li>
+                        <li><div ><p style="font-size:medium;padding-top:2px;padding-left:30px;"></p></div></li>
+                        <li><div class="" id="google_translate_element"></div></li>
+
+                        Html.MvcSiteMap().SiteMapPath()
+                    </ul>
+                </div>*@
+        <div class="inner_content">
+            @RenderBody()
+        </div>
+
+    </div>
+    <!-- Fin Contenedor -->
+    <div class="modal_fade"></div>
+    <div class="modal_loading" id="loader">
+        <span></span>
+    </div>
+
+    <div id="confirmmodal" class="modal  hide fade" data-backdrop="static">
+        <div class="modal-header">
+            <h3 class="modal-header-text"></h3>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+            <input value="Sí" class="btn red" type="submit" id="yes_button">
+            <input value="No" class="btn grey" type="button" id="non_button">
+        </div>
+    </div>
+
+    <div id="alertmodal" class="alert alert-success alertshow" style="display: none">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+
+        <strong></strong>
+    </div>
+
+
+</body>
+</html>
+@RenderSection("scripts", required: false)
+<!-- Le javascript-->
+
+
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCL6XtCGot7S7cfxnO6tRfeZx9kLQQRMtA&amp;sensor=false"></script>
+
+
+<script src="~/Content/Scripts/flatpoint_core.js"></script>
+@*<script src="~/Content/Scripts/forms_advanced.js"></script>*@
+<script src="~/Content/Scripts/library/jquery.collapsible.min.js"></script>
+<script src="~/Content/Scripts/library/jquery.mCustomScrollbar.min.js"></script>
+<script src="~/Content/Scripts/library/jquery.mousewheel.min.js"></script>
+<script src="~/Content/Scripts/library/jquery.uniform.min.js"></script>
+<script src="~/Content/Scripts/library/jquery.sparkline.min.js"></script>
+<script src="~/Content/Scripts/library/chosen.jquery.min.js"></script>
+<script src="~/Content/Scripts/library/jquery.easytabs.js"></script>
+<script src="~/Content/Scripts/library/jquery.autosize-min.js"></script>
+<script src="~/Content/Scripts/library/charCount.js"></script>
+<script src="~/Content/Scripts/library/jquery.minicolors.js"></script>
+<script src="~/Content/Scripts/library/jquery.tagsinput.js"></script>
+<script src="~/Content/Scripts/library/fullcalendar.min.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-datepicker.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-timepicker.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-fileupload.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-datetimepicker.js"></script>
+<script src="~/Content/Scripts/library/jquery.inputmask.bundle.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-modal.js"></script>
+<script src="~/Content/Scripts/library/bootstrap-modalmanager.js"></script>
+<script src="~/Content/Scripts/library/flot/excanvas.min.js"></script>
+<script src="~/Content/Scripts/library/flot/jquery.flot.js"></script>
+<script src="~/Content/Scripts/library/flot/jquery.flot.orderBars.js"></script>
+<script src="~/Content/Scripts/library/flot/jquery.flot.pie.js"></script>
+<script src="~/Content/Scripts/library/flot/jquery.flot.resize.js"></script>
+<script src="~/Content/Scripts/library/flot/jquery.flot.selection.js"></script>
+<script src="~/Content/Scripts/library/select2/select2.js"></script>
+<script src="~/Content/Scripts/library/select2/select2_locale_es.js"></script>
+@*<script src="~/Content/Scripts/library/maps/jquery.vmap.js"></script>
+<script src="~/Content/Scripts/library/maps/maps/jquery.vmap.world.js"></script>
+<script src="~/Content/Scripts/library/maps/maps/jquery.vmap.mexico.js"></script>
+<script src="~/Content/Scripts/library/maps/maps/jquery-vmap-sonora.js"></script>
+<script src="~/Content/Scripts/library/maps/data/jquery.vmap.sampledata.js"></script>*@
+<script src="~/Content/Scripts/library/footable/footable.js"></script>
+<script src="~/Content/Scripts/library/footable/data-generator.js"></script>
+@*<script src="~/Content/Scripts/library/editor/bootstrap-wysihtml5.js"></script>
+<script src="~/Content/Scripts/library/editor/wysihtml5-0.3.0.js"></script>*@
+<script src="~/Content/Scripts/library/jquery.dataTables.js"></script>
+<script src="~/Content/Scripts/sonic.js"></script>
+<script src="~/Content/Scripts/loadSonic.js"></script>
+<script src="~/Content/Scripts/global_functions.js"></script>
+<script src="~/Content/Scripts/datatables.js"></script>
+<script src="~/Content/Scripts/jquery.dataTables.columnFilter.js"></script>
+<script src="~/Content/Scripts/jquery.dataTables.rowGrouping.js"></script>
+<script src="~/Content/Scripts/dataTables.plugins.js"></script>
+<script src="~/Content/Scripts/jquery.signalR-2.0.3.js"></script>
+<script src="~/Content/Scripts/jquery.maskMoney.min.js"></script>
+<script src="~/Content/Scripts/library/graph/_shared/EnhanceJS/enhance.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/tableExport.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/jquery.base64.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/html2canvas.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/jspdf/libs/sprintf.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/jspdf/jspdf.js"></script>
+<script src="~/Content/Scripts/library/exportexcel/jspdf/libs/base64.js"></script>
+<script src="~/Content/Scripts/library/graph/charting/js/excanvas.js"></script>
+<script src="~/Content/Scripts/library/graph/charting/js/visualize.jQuery.js"></script>
+<script src="~/RivkaBase/Scripts/RivkaTree/jquery.nestable.js"></script>
+<script src="~/Content/Scripts/library/scroller/dataTables.scroller.js"></script>
+
+<!--Reference the autogenerated SignalR hub script. -->
+<!--1 <script src="http://localhost:21011/signalr/hubs/" type="text/javascript"></script>-->
+<script src="~/signalr/hubs"></script>
+<!--<script src="~/signalr/hubs"></script>-->
+<script src="@Url.Content("~/Content/Scripts/jquery.unobtrusive-ajax.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Content/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+    function bindzoom(position) {
+        position = typeof position !== 'undefined' ? position : 1;
+        jQuery('.zoom').elevateZoom({
+            //zoomType: "inner",
+            zoomWindowPosition: position,
+            cursor: "crosshair",
+            scrollZoom: true,
+            zoomWindowFadeIn: 500,
+            zoomWindowFadeOut: 750
+        });
+    }
+    jQuery.support.cors = true;
+    var connection = jQuery.connection.messenger;
+    //2 jQuery.connection.hub.url = "http://localhost:21011/signalr";
+    var user = "";
+    var iduserthis = "";
+
+    @(new HtmlString("user='" + Session["LoggedUser"].ToString() + "';"))
+    @(new HtmlString("iduserthis='" + iduserthis + "';"))
+
+
+    function generate(layout, text) {
+        var n = noty({
+            text: text,
+            type: 'information',
+            dismissQueue: true,
+            layout: layout,
+            theme: 'defaultTheme'
+        });
+        console.log('html: ' + n.options.id);
+    }
+    jQuery(document).ready(function ($) {
+        // pass in your custom templates on init
+
+       // $('.textarea').wysihtml5();
+        $('.uniform').uniform();
+        $('.chosen').chosen();
+
+        $("#non_button").click(function () {
+            jQuery("#confirmmodal").modal("hide");
+            try {
+                sett.onCancelAction();
+            } catch (e) { }
+        });
+
+        $("#yes_button").on('click', function () {
+            jQuery("#confirmmodal").modal("hide");
+           // sett.action();
+        });
+
+        connection.client.enviar = function (message) {
+            //console.log("test");
+
+            refresh();
+        };
+
+
+        connection.client.ticketnot = function (userid, idt, name, message, image, idto) {
+       
+         if (iduserthis == idto && area == 0) {
+             var mediaElement = document.getElementById("audionot2");
+             mediaElement.play();
+           //  _alert("success", "Nuevo Mensaje de : " + name);
+                var content = "<img src='" + image + "' class='avatar' style='padding-top:8px;height:50px;width:50px;'><h5 style='font-weight:bold' >" + name + "</h5><a href='/Tickets/Tickets/getTicket?idTicket=" + idt + "' style='color:white'>" + message + "</a>";
+                generate('bottomRight', content);
+         }
+     };
+
+        connection.client.notificationobj = function (messageJson) {      
+        
+         var data = JSON.parse(messageJson);
+         var isuser = data["to"];
+
+         if (iduserthis == isuser) {
+             var mediaElement = document.getElementById("audionot");
+             mediaElement.play();
+             var image = data["image"];
+             var subject = data["subject"];
+             var body = data["body"];
+             var idm = data["idmail"];
+             var content = "<img src='" + image + "' class='avatar' style='padding-bottom:10px;height:50px;width:50px;'><h5 style='font-weight:bold' >" + name + "</h5><a href='/Message/Message/getMail?idMail=" + idm + "' style='color:white'>" + body + "</a>";
+             generate('bottomRight', content);
+         }
+     };
+
+    
+
+        /*  $("#sent_mail").click(function () {
+            
+             
+              connection.server.sendMailPush("send");
+             
+            });*/
+
+        $.connection.hub.start(
+             function () {
+                 /*3   $('.logocustomer_image').click(function () {
+                        connection.server.sendMailPush("Mensaje de:"+user);
+                    });*/
+
+             });
+
+
+        refresh();
+
+        // setInterval(refresh, 20000);
+
+        function refresh() {
+            refreshCenterMails();
+            jQuery.ajax({
+                url: "/Message/Message/refreshMail",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+
+                type: "POST",
+                // beforeSend: _loading(),
+                // complete: _loading(),
+                success: function (data) {
+                    jQuery("#inboxnew").html("");
+                    jQuery("#inboxnew").html(data);
+                    jQuery("#notificationsmails").html("");
+                    jQuery("#noticlass").removeClass("notification");
+                    jQuery("#arrow-notif").removeClass("arrow-notif");
+                    jQuery("#notificationsmails").html(data);
+                    jQuery("#noticlass").addClass("notification");
+                    jQuery("#arrow-notif").addClass("arrow-notif");
+
+
+
+                },
+                error: function (errorThrown) {
+
+                },
+
+            });
+
+        }
+
+
+
+
+        function refreshCenterMails() {
+
+            jQuery.ajax({
+                url: "/Message/Message/newMails",
+                // data: { maildata : jsonmail},
+
+                // data: { to: list_mail, subject: subject, message: bodymail, attachment: "none"},
+
+                type: "POST",
+                beforeSend: _loading(),
+                complete: _loading(),
+
+                success: function (data) {
+
+                    jQuery("#ulMails").html("");
+                    jQuery("#ulMails").html(data);
+
+
+                    // alert("IN");
+
+                },
+                error: function (errorThrown) {
+
+                }
+            });
+
+        }
+
+        jQuery("body").on('click', function () {
+
+            jQuery(".goog-te-banner-frame").remove();
+            $("body").removeAttr("style");
+
+        });
+
+
+
+        function generateAll() {
+            /*   generate('top');
+               generate('topCenter');
+               generate('topLeft');
+               generate('topRight');
+               generate('center');
+               generate('centerLeft');
+               generate('centerRight');
+               generate('bottom');
+               generate('bottomCenter');
+               generate('bottomLeft');*/
+            generate('bottomRight');
+        }
+
+    });
+</script>
+@*<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>*@
+
+
+<script type="text/javascript">
+
+    /* function googleTranslateElementInit() {
+       
+         new google.translate.TranslateElement({ pageLanguage: 'es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, multilanguagePage: true }, 'google_translate_element');
+         
+         jQuery(".goog-te-gadget-icon").remove();
+         // jQuery(".skiptranslate").html("");
+       
+         jQuery(".goog-te-banner-frame").remove();
+         jQuery("body").removeAttr("style");
+         
+      
+     }*/
+    /* function translateText(response) {
+         console.log(response);
+         document.getElementById("translation").innerHTML += "<br>" + response.data.translations[0].translatedText;
+     }
+     function translate() {
+         var newScript = document.createElement('script');
+         newScript.type = 'text/javascript';
+         var sourceText = escape(document.getElementById("sourceText").innerHTML);
+         sourceText = "hello world";
+         // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
+         // Restrict your key to designated domains or use a proxy to hide your key
+         // to avoid misuage by other party.
+         var source = 'https://www.googleapis.com/language/translate/v2?key=AIzaSyAQXINtckGsZKM7bqt35aXno8EkDiVpBV4&source=en&target=de&callback=translateText&q=' + sourceText;
+         newScript.src = source;
+ 
+         // When we add this script to the head, the request is sent off.
+         document.getElementsByTagName('head')[0].appendChild(newScript);
+     }*/
+
+</script>

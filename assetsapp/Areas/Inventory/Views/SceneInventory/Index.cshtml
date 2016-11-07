@@ -31,12 +31,6 @@
 
 }
 
-<style type="text/css">
-    .dataTables_scrollBody {
-        height: 250px !important;
-    }
-</style>
-
 <div class="inner_content">
     <div class="widgets_area">
         <div class="row-fluid">
@@ -60,7 +54,7 @@
                         <h5>Lista de Inventarios Programados</h5>
                     </div>
                     <div style="margin-left: 35%; position: absolute; margin-top: 1%; z-index: 1;">
-                        de:
+                        de: 
                         <select id="typeShow">
                             <option value="today">Hoy</option>
                             <option value="assgined">Pendientes</option>
@@ -90,42 +84,26 @@
                         <table class="line">
                             <tbody>
                                 <tr>
-                                    <td>
-                                        <input id="activeInventoryBox" type="checkbox" checked="checked" value="true" />
-                                        Catalogo_Activos_Etiq.sdf
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
                                     <td width="170">
-                                        <input id="conjuntoBox" type="checkbox" checked="checked" value="true" />
-                                        Conjuntos.sdf
-                                    </td>
-
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input id="inventoryBox" type="checkbox" checked="checked" value="true" />
-                                        Inventarios.sdf
-                                    </td>
+                                        <input id="locationBox" type="checkbox" checked="checked" value="true" />
+                                        Ubicación</td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <input id="referenceBox" type="checkbox" checked="checked" value="true" />
-                                        Referencia.sdf
+                                        Activos de Referencia</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <input id="inventoryBox" type="checkbox" checked="checked" value="true" />
+                                        Inventario (Blanco)
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="170">
-                                        <input id="locationBox" type="checkbox" checked="checked" value="true" />
-                                        Ubicaciones.sdf
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="170">
-                                        <input id="usersBox" type="checkbox" checked="checked" value="true" />
-                                        Usuarios.sdf
-                                    </td>
+                                    <td>
+                                        <input id="activeInventoryBox" type="checkbox" checked="checked" value="true" />
+                                        Activos para Inventarios</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -141,7 +119,7 @@
                                                 <td></td>
                                                 <td>
                                                     <label class="checkbox-inline">
-                                                        <input type="radio" name="groupRadio" id="rarOption" value="true" checked="checked" />
+                                                        <input type="radio" name="groupRadio" id="rarOption" value="true" checked="checked"/>
                                                         .rar
                                                     </label>
                                                 </td>
@@ -215,16 +193,15 @@
             </div>
             <div class="modal-body">
                 <div id="filesdf">
-                    <table class="line">
-                        <tbody>
-                            <tr>
-                                <td width="170">
-                                    Información
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="line">
+                    <tbody>
+                        <tr>
+                            <td width="170">Información
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                    </div>
             </div>
             <div class="modal-footer">
                 <input value="Aceptar" class="btn blue" type="submit" id="acept_buttonReportSQL">
@@ -266,7 +243,7 @@
 
     function reset() {
         jQuery("#zipOption").attr('checked', false);
-        jQuery("#locationBox,#referenceBox,#inventoryBox,#activeInventoryBox,#usersBox,#conjuntoBox,#rarOption").prop('checked', true);
+        jQuery("#locationBox,#referenceBox,#inventoryBox,#activeInventoryBox,#rarOption").prop('checked', true);
     }
 
     jQuery(document).ready(function ($) {
@@ -299,8 +276,6 @@
         $("#acept_buttonSQL").click(function () {
             infoData = "{";
             infoData += '"location":"' + jQuery("#locationBox").is(':checked').toString() + '",';
-            infoData += '"conjunto":"' + jQuery("#conjuntoBox").is(':checked').toString() + '",';
-            infoData += '"user":"' + jQuery("#usersBox").is(':checked').toString() + '",';
             infoData += '"activeReference":"' + jQuery("#referenceBox").is(':checked').toString() + '",';
             infoData += '"inventory":"' + jQuery("#inventoryBox").is(':checked').toString() + '",';
             infoData += '"activeInventory":"' + jQuery("#activeInventoryBox").is(':checked').toString() + '",';
@@ -318,7 +293,7 @@
                         _alert("error", "Selecciona datos!");
                         return false;
                     }
-                    try {
+                    try{
                         data = JSON.parse(data);
                         jQuery("#modal_SQL").modal('hide');
                         _loading();
@@ -340,68 +315,68 @@
     });
 
     function setReportSQL(idInvnetory) {
-
+       
         inventoryId = idInvnetory;
-        //  jQuery("#filesdf").html("");
+      //  jQuery("#filesdf").html("");
 
-        //   jQuery("#modal_reportSQL").modal('show');
+     //   jQuery("#modal_reportSQL").modal('show');
         window.location.href = "/Inventory/SceneInventory/setSdf?idInventory=" + inventoryId;
 
-        /*  jQuery.ajax({
-              url: "/Inventory/SceneInventory/getInventoryRow",
-              data: { idInventory: inventoryId },
-              type: 'POST',
-              beforeSend: _loading(),
-              success: function (data) {
-                  data = JSON.parse(data);
+      /*  jQuery.ajax({
+            url: "/Inventory/SceneInventory/getInventoryRow",
+            data: { idInventory: inventoryId },
+            type: 'POST',
+            beforeSend: _loading(),
+            success: function (data) {
+                data = JSON.parse(data);
 
-                  if (data["status"].toString() == "Completado") {
-                      jQuery("#buttonStatus").html(
-                          '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
-                          '¡Completado! <i class="icon-ok icon-white"></i>' +
-                      '</button>');
-                  } else {
-                      jQuery("#buttonStatus").html(
-                           '<button class="btn btn-mini red fileinput-button" id="complete_buttonSQL" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
-                           '¡Pendiente! <i class="icon-save icon-white"></i>' +
-                       '</button>');
-                      activeCompletAction();
-                  }
+                if (data["status"].toString() == "Completado") {
+                    jQuery("#buttonStatus").html(
+                        '<button class="btn btn-mini dark_green fileinput-button" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                        '¡Completado! <i class="icon-ok icon-white"></i>' +
+                    '</button>');
+                } else {
+                    jQuery("#buttonStatus").html(
+                         '<button class="btn btn-mini red fileinput-button" id="complete_buttonSQL" data-original-title="Inventario Completado" rel="tooltip" data-placement="top">' +
+                         '¡Pendiente! <i class="icon-save icon-white"></i>' +
+                     '</button>');
+                    activeCompletAction();
+                }
 
-                    /* jQuery.ajax({
-                      url: "/Inventory/SceneInventory/setSdf",
-                      data: { idInventory: inventoryId },
-                      type: 'POST',
+                  /* jQuery.ajax({
+                    url: "/Inventory/SceneInventory/setSdf",
+                    data: { idInventory: inventoryId },
+                    type: 'POST',
+                   
+                    success: function (data) {
 
-                      success: function (data) {
+                        jQuery("#filesdf").html("");
+                        jQuery("#filesdf").html(data);
+                      
+                        _loading();
+                       
+                          jQuery("#modal_reportSQL").css('top', '1%');
+                        jQuery("#modal_reportSQL").css('margin-top', '0%');
 
-                          jQuery("#filesdf").html("");
-                          jQuery("#filesdf").html(data);
+                    },
+                    error: function () {
+                        _loading();
+                        jQuery("#filesdf").html("");
+                        jQuery("#filesdf").html("Archivo(s) no Encontrados..");
+                        _alert("error", "Ha ocurrido un error");
+                          jQuery("#modal_reportSQL").css('top', '1%');
+                        jQuery("#modal_reportSQL").css('margin-top', '0%');
 
-                          _loading();
-
-                            jQuery("#modal_reportSQL").css('top', '1%');
-                          jQuery("#modal_reportSQL").css('margin-top', '0%');
-
-                      },
-                      error: function () {
-                          _loading();
-                          jQuery("#filesdf").html("");
-                          jQuery("#filesdf").html("Archivo(s) no Encontrados..");
-                          _alert("error", "Ha ocurrido un error");
-                            jQuery("#modal_reportSQL").css('top', '1%');
-                          jQuery("#modal_reportSQL").css('margin-top', '0%');
-
-                      }
-                  });
-
-              },
-              error: function () {
-                  _loading();
-                  jQuery("#filesdf").html("");
-                  _alert("error", "Ha ocurrido un error");
-              }
-          });*/
+                    }
+                });
+               
+            },
+            error: function () {
+                _loading();
+                jQuery("#filesdf").html("");
+                _alert("error", "Ha ocurrido un error");
+            }
+        });*/
 
     }
 
@@ -434,3 +409,5 @@
         });
     }
 </script>
+
+

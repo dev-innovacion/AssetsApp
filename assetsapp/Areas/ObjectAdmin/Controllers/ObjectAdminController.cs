@@ -181,7 +181,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         newobject.Add("location", location);
                         newobject.Add("EPC", "Porasignar"+idunico);
                         newobject.Add("serie", serie);
-                        newobject.Add("id_registro", idunico);
+                        newobject.Add("object_id", idunico);
                         if (objrefdata.TryGetValue("assetType", out tk))
                         {
                             newobject.Add("assetType", objrefdata["assetType"].ToString());
@@ -198,9 +198,9 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         newobject.Add("price", price);
                         string id = _objectTable.SaveRow(JsonConvert.SerializeObject(newobject));
                     }
-                    catch
+                    catch (Exception ex)
                     {
-
+                        string e = ex.ToString();
                     }
                 }
                 return "success";
@@ -279,7 +279,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
             //    return Redirect("~/Home");
             //}
             ////TODO: advanced search using Agregation.
-            JArray objja = new JArray();
+           JArray objja = new JArray();
             try
             {
                 objja = JsonConvert.DeserializeObject<JArray>(_objectReferenceTable.GetRows());
@@ -409,7 +409,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         data2.Add(items["_id"].ToString(), items["name"].ToString());
                 }
 
-               rowArray = locationTable.GetRows();
+                rowArray = locationTable.GetRows();
                 JArray locat = JsonConvert.DeserializeObject<JArray>(rowArray);
                 Dictionary<string, string> data3 = new Dictionary<string, string>();
                 JArray profileloc = new JArray();
@@ -708,7 +708,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     try { row["proveedor"] = row1["proveedor"].ToString(); }catch { }
                     try { row["department"] = row1["department"].ToString(); }catch { }
                     try { row["perfil"] = row1["perfil"].ToString(); }catch { }
-                    try { row["object_idact"] = row["id_registro"].ToString(); }catch { }
+                    try { row["object_idact"] = row["object_id"].ToString(); }catch { }
                     try { row["object_id"] = row1["object_id"].ToString(); }
                     catch { }
                     row["profileFields"] = row1["profileFields"];
@@ -1083,9 +1083,10 @@ namespace RivkaAreas.ObjectAdmin.Controllers
         {
             JObject result = new JObject();
             if (id == "") id = "null";
-             String categoriesString="";
-            if (id=="null" && userid != null) {
-                 String userstring = userTable.GetRow(userid); 
+            String categoriesString = "";
+            if (id == "null" && userid != null)
+            {
+                String userstring = userTable.GetRow(userid); 
                 JObject userobj = JsonConvert.DeserializeObject<JObject>(userstring);
                 JObject profilobj = new JObject();
                 try
@@ -1970,7 +1971,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                 document.Add("object_id_ref", "");
                             try
                             {
-
+                                
                                 document["object_id_ref"] = objo["object_id"].ToString();
                             }
                             catch { }
@@ -2015,26 +2016,9 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                             document.Add("nameCategory", listCategories[document["parentCategory"].ToString()]);
                     }
                     catch { }
-                    JToken tk1;
-                    if (!document.TryGetValue("status",out tk1))
-                    {
-                        document.Add("status", "Esta en tu oficina");
-
-                    }
-                    document["currentmove"] = "";
-                    int sumtipo = 0;
                     document["nameCreator"] = document["nameCreator"].ToString() + " " + document["lastnameCreator"].ToString();
-                    if (document["system_status"].ToString().ToLower() == "false" )
-                    {
-                        sumtipo = 1;
-                        document["status"] = "Dado de baja";
-                    }
-                    else
-                    {
-                        sumtipo = 2;
-                        document["status"] = "Está en tu oficina";
-                    }
-                   /* try
+
+                    try
                     {
                         //    document["currentmove"] = _objectTable.GetdemandFolio(document["_id"].ToString());
                         document["currentmove"] = "";
@@ -2048,8 +2032,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                     {
                                         if (obj["id"].ToString() == document["_id"].ToString())
                                         {
-                                            //document["currentmove"] = item["folio"].ToString() + " " + item["namemov"].ToString();
-                                            document["status"] = "Esta en tu oficina";
+                                            document["currentmove"] = item["folio"].ToString() + " " + item["namemov"].ToString();
                                             break;
                                         }
                                     }
@@ -2069,7 +2052,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     {
                         document["currentmove"] = "";
                     }
-                    */
+
                     try
                     {
                         //  document["allmoves"] = _objectTable.GetAlldemandsFolio(document["_id"].ToString());
@@ -2085,10 +2068,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                     {
                                         if (obj["id"].ToString() == document["_id"].ToString())
                                         {
-                                            sumtipo = 3;
-                                            document["status"] = "En Movimiento";
-                                            document["currentmove"] = item["folio"].ToString() + " " + item["namemov"].ToString();
-                                           
                                             folioslist.Add(item["folio"].ToString() + " " + item["namemov"].ToString());
                                             break;
                                         }
@@ -2117,62 +2096,35 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     {
                         document["allmoves"] = "";
                     }
-                    if (sumtipo == 1)
-                    {
-                        numBaja++;
-                    }
-                    else if (sumtipo == 2)
-                    {
-                        numActivos++;
-                    }
-                    else if(sumtipo==3)
-                    {
-                        numMov++;
-                    }
-                  /*  try
-                    {
-                        document["currentmove"] = _objectTable.GetdemandFolio(document["_id"].ToString());
-                        try
-                        {
-                            document["allmoves"] = _objectTable.GetAlldemandsFolio(document["_id"].ToString());
-                        }
-                        catch (Exception ex)
-                        {
-                            document["allmoves"] = _objectTable.GetAlldemandsFolio(document["_id"].ToString());
-                        }
-                        try
-                        {
-                            if (document["currentmove"].ToString() != " " && document["currentmove"].ToString() != "")
-                            {
-                                document["status"] = "En movimiento";
 
+                    try
+                    {
+                        if (document["currentmove"].ToString() != " " && document["currentmove"].ToString() != "")
+                        {
+                            document["status"] = "En movimiento";
+                            numMov++;
+                        }
+                        else
+                        {
+                            if (document["system_status"].ToString() == "false" || document["system_status"].ToString() == "False")
+                            {
+                                document["status"] = "Dado de baja";
+                                numBaja++;
                             }
                             else
                             {
-                                if (document["system_status"].ToString() == "false" || document["system_status"].ToString() == "False")
-                                {
-                                    document["status"] = "Dado de baja";
-                                }
-                                else
-                                {
-                                    document["status"] = "Está en tu oficina";
-                                }
-
+                                document["status"] = "Está en tu oficina";
+                                numActivos++;
                             }
 
                         }
-                        catch
-                        {
-                            document["status"] = "Está en tu oficina";
-                        }
-                     
 
                     }
                     catch
                     {
                         document["status"] = "Está en tu oficina";
                         numActivos++;
-                    }*/
+                    }
                     try
                     {
                         if (document["label"].ToString() == "normal")
@@ -2330,7 +2282,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         }
                         else
                         {
-                            document["status"] = "Está en tu oficina";
+                            document["status"] = "Está en tu conjunto";
                         }
 
                     }
@@ -2338,7 +2290,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                 }
                 catch
                 {
-                    document["status"] = "Está en tu oficina";
+                    document["status"] = "Está en tu conjunto";
                 }
                 if (document["label"].ToString() == "normal")
                     document["etiquetado"] = "Normal";
@@ -3151,8 +3103,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                 JToken jk;
                 if (!newObject.TryGetValue("fechafactura", out jk))
                     newObject.Add("fechafactura", "");
-                if (!newObject.TryGetValue("perfil", out jk))
-                    newObject.Add("perfil", "");
                 if (!newObject.TryGetValue("observation", out jk))
                     newObject.Add("observation", "");
                 if (!newObject.TryGetValue("userlabel", out jk))
@@ -3183,10 +3133,10 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                 newObject["department"] = datos["departamento"].ToString();
                // newObject["marca"] = datos["marca"].ToString();
                // newObject["modelo"] = datos["modelo"].ToString();
-                newObject["perfil"] = datos["perfil"].ToString();
+               // newObject["perfil"] = datos["perfil"].ToString();
                 //newObject["object_id"] = (datos["object_id"].ToString().Length > 0) ? datos["object_id"].ToString() : newObject["object_id"].ToString();
                 newObject["folio"] = datos["folio"].ToString();
-                newObject["proveedor"] = datos["proveedor"].ToString();
+               // newObject["proveedor"] = datos["proveedor"].ToString();
                 newObject["num_pedido"] = datos["pedido"].ToString();
                 newObject["num_solicitud"] = datos["solicitud"].ToString();
                 newObject["num_reception"] = datos["recepcion"].ToString();
@@ -3194,7 +3144,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                 newObject["serie"] = datos["serie"].ToString();
                 newObject["factura"] = datos["factura"].ToString();
                 newObject["RH"] = datos["RH"].ToString();
-                 
+                
                 newObject["fechafactura"] = datos["fechafactura"].ToString();
                 newObject["observation"] = datos["observation"].ToString();
                 newObject["userlabel"] = datos["userlabel"].ToString();

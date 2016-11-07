@@ -1,0 +1,105 @@
+﻿@using MongoDB.Driver
+@using MongoDB.Bson
+@model JArray
+@using Newtonsoft.Json.Linq;
+
+@{
+    int count = 0;}
+
+
+
+<div class="inner_content" id="divemployee">
+    <div class="widgets_area">
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="span8">
+                    @if (ViewBag.employeeDetail != "")
+                    {
+                        <img src="@ViewBag.imagePath" onerror="if (this.src != '/Content/Images/imgPerfil/avatar_06.png') this.src = '/Content/Images/imgPerfil/avatar_06.png';" style="height:30px;width:30px;">    <h3 class="ModuleTitle">@ViewBag.employeeDetail</h3>
+                    }
+                    else
+                    {
+
+                        <h3 class="ModuleTitle"> Datos no encontrados</h3>
+                    }
+
+
+                </div>
+                <div class="span4 search">
+                    <div class="btn-group pull-right top-btn">
+
+
+                        <a href="/Assignments/Assignments" class="grey btn">Regresar</a>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="light_blue set_color">
+                        <div class="well-header widgetclient titleclient">
+                            <h5>Lista de Activos</h5>
+                        </div>
+                        <div class="well-content no-search" id="assignmentassetTable">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        var AssignmentId = '@ViewBag.assignmentId';
+        $(document).ready(function ($) {
+            loadAssignedAssetList();
+        });
+        function UnAssignAsset(AssetId) {
+            _confirm({
+                title: "Eliminar Registros",
+                message: "¿Seguro que desea eliminar los registros ?",
+                action: function () {
+
+                    jQuery.ajax({
+                        url: "/Assignments/Assignments/UnAssignAsset",
+                        type: "POST",
+                        data: { assignmentId: AssignmentId, assetId: AssetId, PartialViewName: 'AssignmentAssetlist' },
+                        beforeSend: _loading(),
+                        success: function (data) {
+                            _loading();
+                            _alert("success", "Eliminado Correctamente");
+                            jQuery("#assignmentassetTable").html(data);
+
+                        },
+                        error: function () {
+                            _loading();
+                            _alert("error", "Ha ocurrido un error");
+                        }
+                    });
+                }
+            });
+
+        }
+
+        function loadAssignedAssetList() {
+            jQuery.ajax({
+                url: "/Assignments/Assignments/AssignmentAssetlist",
+                type: "POST",
+                data: { assignmentId: AssignmentId },
+                beforeSend: _loading(),
+                success: function (data) {
+                    jQuery("#assignmentassetTable").html(data);
+                    _loading();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ha ocurrido un error");
+                }
+            });
+        }
+    </script>
+

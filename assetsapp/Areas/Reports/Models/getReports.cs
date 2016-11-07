@@ -29,7 +29,7 @@ namespace RivkaAreas.Reports.Models
         public getReports(string table)
             : base("Reports")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
             //collection.EnsureIndex(IndexKeys.Ascending("_id"), IndexOptions.SetUnique(true));
 

@@ -1486,7 +1486,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         if (moveobj["typeMovement"].ToString() == "delete") {
                             if ((newdemand["adjudicating"].ToString() == "" || newdemand["adjudicating"].ToString() == "[]") && datos["deleteType"].ToString() == "planeada") //datos["destinyOptions"].ToString() == "robo"
                             {
-                               // missingResons.Add("dictaminador");
+                                missingResons.Add("dictaminador");
                             }
 
                             JArray autorizationsArray = JsonConvert.DeserializeObject<JArray>(authos);
@@ -1794,13 +1794,12 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                             }
 
                         }
-                        string aux = "";
+
                         if (typemove == "movement")
                         {
                             string var1 = "1";
                             bool ok2 = false;
-                            string pro1;
-                            string pro2;
+                            string pro1, pro2;
                             foreach (JObject obj in newdemand["objects"])
                             {
                                 ok = RulesChecker.isValidToLocation(obj["id"].ToString(), obj["locationDestiny"].ToString());
@@ -1812,19 +1811,15 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                 JObject lobj = JsonConvert.DeserializeObject<JObject>(larray);
                                 try { pro1 = lobj["processId"].ToString(); }
                                 catch { pro1 = ""; }
-                                try
+
+                                larray = _locationTable.GetRow(obj["locationDestiny"].ToString());
+                                lobj = JsonConvert.DeserializeObject<JObject>(larray);
+                                try { pro2 = lobj["processId"].ToString(); }
+                                catch { pro2 = ""; }
+
+                                if (pro1 != "" && pro2 != "")
                                 {
-                                    
-                                    larray = _locationTable.GetRow(obj["locationDestiny"].ToString());
-                                    lobj = JsonConvert.DeserializeObject<JObject>(larray);
-                                    try { pro2 = lobj["processId"].ToString(); }
-                                    catch { pro2 = ""; }
-                                    aux = pro2;
-                                }
-                                catch { }
-                                if (pro1 != "" && aux != "")
-                                {
-                                    ok2 = RulesChecker.isValidProcessFlow(pro1, aux);
+                                    ok2 = RulesChecker.isValidProcessFlow(pro1, pro2);
 
                                     if (ok2 == false)
                                         classNotifications.saveNotification("Rules", "Invalid", "Flujo de procesos es invalido en Solicitud de "+namemov+", #folio: " + newdemand["folio"]);
@@ -1846,25 +1841,20 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                         {
                             DeleteObjects(JsonConvert.DeserializeObject<JArray>(newdemand["objects"].ToString()), moveobj["processes"].ToString());
                         }
-                        try
-                        {
-                            if (newdemand["contador"].ToString() != "")
+                        if (newdemand["contador"].ToString() != "") {
+                            foreach (var dd in newdemand["contador"])
                             {
-                                foreach (var dd in newdemand["contador"])
+                                try
                                 {
-                                    try
-                                    {
-                                        recipients.Add(dd["id_user"].ToString());
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        continue;
-                                    }
-
+                                    recipients.Add(dd["id_user"].ToString());
                                 }
+                                catch (Exception ex)
+                                {
+                                    continue;
+                                }
+
                             }
                         }
-                        catch { }
                         recipients.Add(creatorDemand);
                         string to = JsonConvert.SerializeObject(recipients);
                         string attach = JsonConvert.SerializeObject(attachments);
@@ -1963,14 +1953,8 @@ namespace RivkaAreas.ObjectAdmin.Controllers
             Dictionary<string, string> perfiles = new Dictionary<string, string>();
             Dictionary<string, string> perfiles2 = new Dictionary<string, string>();
             perfiles = profiles.ToDictionary(x => (string)x["_id"].ToString(), x => (string)x["name"].ToString());
-            //perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
-            foreach (JObject row in profiles) {
-                try {
-                    perfiles2.Add(row["name"].ToString(), row["_id"].ToString());
-                
-                }
-                catch { }
-            }
+            perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
+
             foreach (JObject cad1 in location)
             {
                 ele = getRoute3(cad1["location"].ToString());
@@ -2199,15 +2183,8 @@ namespace RivkaAreas.ObjectAdmin.Controllers
             Dictionary<string, string> perfiles = new Dictionary<string, string>();
             Dictionary<string, string> perfiles2 = new Dictionary<string, string>();
             perfiles = profiles.ToDictionary(x => (string)x["_id"].ToString(), x => (string)x["name"].ToString());
-           // perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
-            foreach (JObject row in profiles)
-            {
-                try
-                {
-                    perfiles2.Add(row["name"].ToString(), row["_id"].ToString());
-                }
-                catch { }
-            }
+            perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
+
             foreach (JObject cad1 in location)
             {
                 ele = getRoute3(cad1["location"].ToString());
@@ -2392,15 +2369,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
             Dictionary<string, string> perfiles= new Dictionary<string, string>();
             Dictionary<string, string> perfiles2 = new Dictionary<string, string>();
             perfiles = profiles.ToDictionary(x => (string)x["_id"].ToString(), x => (string)x["name"].ToString());
-           // perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
-            foreach (JObject row in profiles)
-            {
-                try
-                {
-                    perfiles2.Add(row["name"].ToString(), row["_id"].ToString());
-                }
-                catch { }
-            }
+            perfiles2 = profiles.ToDictionary(x => (string)x["name"].ToString(), x => (string)x["_id"].ToString());
             foreach (JObject cad1 in location)
             {
                 ele = getRoute3(cad1["location"].ToString());
@@ -3775,27 +3744,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
             return null;
         }
 
-        public bool updateStatusObjects(string iddemand){
-
-            try
-            {
-                JObject demand = JsonConvert.DeserializeObject<JObject>(_demandTable.GetRow(iddemand));
-                foreach (JObject objectx in demand["objects"])
-                {
-                    JToken tk;
-                    if (!objectx.TryGetValue("status",out tk))
-                        objectx.Add("status", "Está en tu Oficina");
-                    else
-                        objectx["status"] = "Está en tu Oficina";
-
-                    _objectTable.SaveRow(JsonConvert.SerializeObject(objectx),objectx["_id"].ToString());
-
-                }
-            }
-            catch { }
-
-            return true;
-        }
         public String UpdateStatusDemand(String selectedID, int estatus)
         {
             bool edit = false;
@@ -4008,23 +3956,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                             }
                                             catch { }
                                         }
-                                        if (item.TryGetValue("image", out tk))
-                                        {
-                                            try
-                                            {
-
-                                                item["image"] = "/Uploads/Images/ObjectReferences/Thumb_" + item["objectReference"].ToString() + "" + values["ext"].ToString();
-                                            }
-                                            catch { }
-                                        }
-                                        else
-                                        {
-                                            try
-                                            {
-                                                item.Add("image", "/Uploads/Images/ObjectReferences/Thumb_" + item["objectReference"].ToString() + "" + values["ext"].ToString());
-                                            }
-                                            catch { }
-                                        }
 
                                     }
                                 }
@@ -4200,14 +4131,12 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                             {
                                 objectRow = _objectTable.GetRow(ob["id"].ToString());
                                 objs = JsonConvert.DeserializeObject<JObject>(objectRow);
-                                try { ob["EPC"] = objs["EPC"].ToString(); }
-                                catch{ }
-                                try { ob["modelo"] = objs["modelo"].ToString(); }catch{ }
-                                try { ob["marca"] = objs["marca"].ToString(); }catch{ }
-                                try { ob["serie"] = objs["serie"].ToString(); }catch{ }
-                                try { ob["object_id"] = objs["object_id"].ToString(); }catch{ }
-                                try { ob["name"] = objs["name"].ToString(); }
-                                catch{ }
+                                ob["EPC"] = objs["EPC"].ToString();
+                                ob["modelo"] = objs["modelo"].ToString();
+                                ob["marca"] = objs["marca"].ToString();
+                                ob["serie"] = objs["serie"].ToString();
+                                ob["object_id"] = objs["object_id"].ToString();
+                                ob["name"] = objs["name"].ToString();
                             }
                             
 
@@ -4219,29 +4148,21 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                             JObject objs1 = JsonConvert.DeserializeObject<JObject>(rowString);
 
                             ob["nameCategory"] = objs1["name"].ToString();
-                            JToken tk1;
-                            if(!ob.TryGetValue("image",out tk1)){
-                                ob.Add("image","");
-                            }
+
                             if (objs["ext"].ToString() != "")
                                 ob["image"] = "/Uploads/Images/ObjectReferences/" + ob["objectReference"].ToString() + "." + objs["ext"].ToString();
                             else
                                 ob["image"] = "";
-                            try
-                            {
-                                rowString = _locationTable.GetRow(ob["location"].ToString());
-                                objs1 = JsonConvert.DeserializeObject<JObject>(rowString);
-                                ob["locationName"] = objs1["name"].ToString();
-                            }
-                            catch { }
-                            try
-                            {
-                                rowString = _locationTable.GetRow(objs1["parent"].ToString());
-                                idconjunto = objs1["parent"].ToString();
-                                JObject objs2 = JsonConvert.DeserializeObject<JObject>(rowString);
-                                ob["conjuntoName"] = objs2["name"].ToString();
-                            }
-                            catch { }
+
+                            rowString = _locationTable.GetRow(ob["location"].ToString());
+                            objs1 = JsonConvert.DeserializeObject<JObject>(rowString);
+                            ob["locationName"] = objs1["name"].ToString();
+
+                            rowString = _locationTable.GetRow(objs1["parent"].ToString());
+                            idconjunto = objs1["parent"].ToString();
+                            JObject objs2 = JsonConvert.DeserializeObject<JObject>(rowString);
+                            ob["conjuntoName"] = objs2["name"].ToString();
+
                             
 
                             if (typeMovement == "movement" && temp==false )
@@ -5141,7 +5062,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
         public String getDemandApprovedGood(String iddemand, string userid, string assetTypeObjects = "[]", string valuebookObjects = "[]", string locationsObjects = "[]", string deniedObjects = "[]")
         {
             String demandArray = _demandTable.GetRow(iddemand);
-           
             JObject demand = JsonConvert.DeserializeObject<JObject>(demandArray);
             JArray autos = JsonConvert.DeserializeObject<JArray>(demand["approval"].ToString());
             String UserRow = _userTable.GetRow(userid);
@@ -5592,25 +5512,21 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     {
                         recipients.Add(useridx);
                     }
-                    try
+                    if (demand["contador"].ToString() != "")
                     {
-                        if (demand["contador"].ToString() != "")
+                        foreach (var dd in demand["contador"])
                         {
-                            foreach (var dd in demand["contador"])
+                            try
                             {
-                                try
-                                {
-                                    recipients.Add(dd["id_user"].ToString());
-                                }
-                                catch (Exception ex)
-                                {
-                                    continue;
-                                }
-
+                                recipients.Add(dd["id_user"].ToString());
                             }
+                            catch (Exception ex)
+                            {
+                                continue;
+                            }
+
                         }
                     }
-                    catch { }
                     if (typemove == "movement") { recipients.Add(GetLogistica()); }
                     to = JsonConvert.SerializeObject(recipients);
                     attach = JsonConvert.SerializeObject(attachments);
@@ -6550,27 +6466,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
 
             }
         }
-        /// <summary>
-        /// Returns true if objrefid is category of categoryid
-        /// </summary>
-        /// <param name="objrefid"></param>
-        ///  /// <param name="categoryid"></param>
-        /// <returns></returns>
-        public bool validAssetsType(string objrefid, Dictionary<string,string> categoryid,string assetstype)
-        {
 
-            try
-            {    string result="";
-            if (categoryid.TryGetValue(objrefid, out result))
-            {
-                if(result==assetstype)
-                return true;
-            }
-            }
-            catch { }
-            return false;
-
-        }
         /// <summary>
         /// Returns all objects from a location
         /// </summary>
@@ -6643,58 +6539,15 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     {
 
                     }
-                    Dictionary<string, string> categorydict = new Dictionary<string, string>();
-                    Dictionary<string, JObject> categorydictfull = new Dictionary<string, JObject>();
-                    try
-                    {
-                        List<string> idsobjref = (from objs in objectList.Children() select (string)objs["objectReference"]).ToList();
-                        JArray objectrefs = JsonConvert.DeserializeObject<JArray>(_objectReferenceTable.GetbyList("_id", idsobjref));
-                        categorydict=objectrefs.ToDictionary(x=>(string)x["_id"],x=>(string)x["parentCategory"]);
-                        categorydictfull = objectrefs.ToDictionary(x => (string)x["_id"], x => (JObject)x);
-                        
-                    }
-                    catch { }
                     //Choose just the matching assetTypes
-                    if (assetType != null && assetType !="")
+                    if (assetType != null)
                     {
                         foreach (JObject document in objectList) //for each profile we create an option element with id as value and the name as the text
                         {
                             if (!exists.Contains(document["_id"].ToString()))
                             {
-                               // if (document["assetType"].ToString() == assetType)
-                                if (validAssetsType(document["objectReference"].ToString(),categorydict,assetType))
+                                if (document["assetType"].ToString() == assetType)
                                 {
-                                    JToken tk;
-                                    JObject objrefjo=new JObject();
-                                    if (!document.TryGetValue("marca", out tk))
-                                        document.Add("marca", "");
-                                    if (!document.TryGetValue("modelo", out tk))
-                                        document.Add("modelo", "");
-                                    if (!document.TryGetValue("object_id", out tk))
-                                        document.Add("object_id", "");
-                                    if (categorydictfull.TryGetValue(document["objectReference"].ToString(), out objrefjo))
-                                    {
-                                        if (document["marca"].ToString() == "")
-                                        {
-                                            try { document["marca"] = objrefjo["marca"]; }
-                                            catch { }
-                                        }
-                                        if (document["modelo"].ToString() == "")
-                                        {
-                                            try { document["modelo"] = objrefjo["modelo"]; }
-                                            catch { }
-                                        }
-                                        if (document["object_id"].ToString() == "")
-                                        {
-
-                                            try { document["object_id"] = objrefjo["object_id"]; }
-                                            catch { }
-
-                                        }
-                                    }
-                                    
-
-
                                     if (document["ext"].ToString() != "")
                                     {
                                         document.Add("image", "/Uploads/Images/ObjectReferences/" + document["objectReference"] + "." + document["ext"]);
@@ -7166,7 +7019,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                 + "','marca':'" + marca
                                 + "','modelo':'" + modelo
                                 + "','quantity':'" + quantity
-                                + "','id_registro':'" + idunico
+                                + "','object_id':'" + idunico
                                 + "','num_solicitud':'" + solicitud
                                 + "','num_pedido':'" + pedido
                                 + "','num_reception':'" + recepcion
@@ -7207,7 +7060,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                                   + "','marca':'" + marca
                                   + "','modelo':'" + modelo
                                    + "','quantity':'" + quantity
-                                  + "','id_registro':'" + idunico
+                                  + "','object_id':'" + idunico
                                   + "','num_solicitud':'" + solicitud
                                   + "','num_pedido':'" + pedido
                                   + "','num_reception':'" + recepcion
@@ -8384,25 +8237,15 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                 }
                 objs = JsonConvert.DeserializeObject<JArray>(demandobj["objects"].ToString());
                 String documento = "";
-                String conjunto = "";
-                String sububicacion = "";
                 if (objs.Count > 0)
                 {
                     JObject locat = JsonConvert.DeserializeObject<JObject>(_locationTable.GetRow(objs[0]["location"].ToString()));
                     JObject conju = JsonConvert.DeserializeObject<JObject>(_locationTable.GetRow(locat["parent"].ToString()));
                     ubicacion = conju["name"].ToString();
-                    sububicacion = locat["name"].ToString();
-                    try
-                    {
-                        JObject parent = JsonConvert.DeserializeObject<JObject>(_locationTable.GetRow(conju["parent"].ToString()));
-                        conjunto = parent["name"].ToString();
-                    }
-                    catch { }
-
                 }
                 documento = documento + "<table>"
-                + "<tr><td><table border='1'><tr><td><span style='text-align:center;'>DCT OBS</span></td></tr></table></td><td><span style='text-align:center;'>SISTEMA ASSETSAPP</span> <br/> <span style='text-align:center;'>Dictámen de obsolescencia</span> </td><td><img width='100px' heigth='100px' src='" + Server.MapPath("~") + "/Content/Images/clientes/logoCinepolis.png' alt='logo'></td></tr>"
-                + "<tr><td></td><td></td><td><span style='font-weight:bold;'>Folio :</span> " + demandobj["folio"].ToString() + "<br/><span style='font-weight:bold;'>Fecha :</span> " + demandobj["CreatedDate"].ToString() + "<br/><span style='font-weight:bold;'>Ubicacion :</span> "+ conjunto+"/"+ ubicacion + "/"+sububicacion+" <br/></td></tr>"
+                + "<tr><td><table border='1'><tr><td><span style='text-align:center;'>DCT OBS</span></td></tr></table></td><td><span style='text-align:center;'>SISTEMA CAFI</span> <br/> <span style='text-align:center;'>Dictámen de obsolescencia</span> </td><td><img src='" + Server.MapPath("~") + "/Content/Images/clientes/logoCinepolis.png' alt='logo'></td></tr>"
+                + "<tr><td></td><td></td><td><span style='font-weight:bold;'>Folio :</span> " + demandobj["folio"].ToString() + "<br/><span style='font-weight:bold;'>Fecha :</span> " + demandobj["CreatedDate"].ToString() + "<br/><span style='font-weight:bold;'>Conjunto :</span> " + ubicacion + "<br/></td></tr>"
                 + "<tr><td colspan=3>A QUIEN CORRESPONDA <br/> Por este medio ratifico que el(los) artículo(s) relacionado(s) en este documento: </td></tr>"
                 + "<tr><td colspan=3>"
                 + "<table border='1'><tr><th ><span style='font-size:10px;text-align:center;'>Cant</span></th><th ><span style='font-size:10px;text-align:center;'>Descripción</span></th><th ><span style='font-size:10px;text-align:center;'>Marca</span></th><th ><span style='font-size:10px;text-align:center;'>Modelo</span></th><th ><span style='font-size:10px;text-align:center;'>Serie</span></th><th ><span style='font-size:10px;text-align:center;'>Crit. Sel</span></th><th><span style='font-size:10px;text-align:center;'>Imagen 1</span></th><th><span style='font-size:10px;text-align:center;'>Imagen 2</span></th><th ><span style='font-size:10px;text-align:center;'>Imagen 3</span></th></tr>";
@@ -8413,14 +8256,6 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     String refarray = _objectTable.GetRow(ob1["id"].ToString());
                     JObject refobj = JsonConvert.DeserializeObject<JObject>(refarray);
                     string nombre = "";
-                    string marca = "";
-                    string modelo = "";
-                    try
-                    {
-                          marca = refobj["modelo"].ToString();
-                          modelo = refobj["modelo"].ToString();
-                    }
-                    catch { }
                     JToken tk;
                     if (!refobj.TryGetValue("name", out tk))
                     {
@@ -8428,14 +8263,10 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     }
                     try
                     {
-                        
-                            String refarray1 = _objectReferenceTable.GetRow(refobj["objectReference"].ToString());
-                            JObject refobj1 = JsonConvert.DeserializeObject<JObject>(refarray1);
-
-                            marca = refobj1["marca"].ToString();
-                            modelo = refobj1["modelo"].ToString();
                         if (refobj["name"].ToString() == "")
                         {
+                            String refarray1 = _objectReferenceTable.GetRow(refobj["objectReference"].ToString());
+                            JObject refobj1 = JsonConvert.DeserializeObject<JObject>(refarray1);
                             nombre = refobj1["name"].ToString();
                         }
                         else
@@ -8447,7 +8278,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     documento = documento + "<tr><td><span style='font-size:10px;text-align:center;'>" + refobj["quantity"] + "</span></td><td><span style='font-size:10px;text-align:center;'>" + nombre + "</span></td>";
                     try
                     {
-                        documento = documento + "<td><span style='font-size:10px;text-align:center;'>" +marca + "</span></td>";
+                        documento = documento + "<td><span style='font-size:10px;text-align:center;'>" + refobj["marca"] + "</span></td>";
                     }
                     catch
                     {
@@ -8455,7 +8286,7 @@ namespace RivkaAreas.ObjectAdmin.Controllers
                     }
                     try
                     {
-                        documento = documento + "<td><span style='font-size:10px;text-align:center;'>" + modelo+ "</span></td>";
+                        documento = documento + "<td><span style='font-size:10px;text-align:center;'>" + refobj["modelo"] + "</span></td>";
                     }
                     catch
                     {

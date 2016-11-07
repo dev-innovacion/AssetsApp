@@ -1,0 +1,938 @@
+﻿@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@{
+    string thisAction = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("action").ToLower();
+    string thisController = Html.ViewContext.Controller.ControllerContext.RouteData.GetRequiredString("controller").ToLower();
+    string thisArea = null;
+    try
+    {
+        thisArea = ViewContext.RouteData.DataTokens["area"].ToString().ToLower();
+    }
+    catch (Exception e) { }
+
+    var datos = "";
+    var dataclient = "";
+    try
+    {
+        if (Session["PermissionsClient"].ToString() != null)
+        {
+            dataclient = Session["PermissionsClient"].ToString();
+           
+        }
+        if (Session["Permissions"].ToString() != null)
+        {
+            datos = Session["Permissions"].ToString();
+        }
+        else
+        {
+            Response.Redirect("/User/login");
+        }
+        
+    }
+    catch (Exception ex)
+    {
+        if (Request.Cookies["permissions"] != null)
+        {
+
+            if (Request.Cookies["_loggeduser"] != null)
+            {
+                Session["LoggedUser"] = Request.Cookies["_loggeduser"].Value;
+            }
+            if (Request.Cookies["_id2"] != null)
+            {
+                Session["_id"] = Request.Cookies["_id2"].Value;
+            }
+            if (Request.Cookies["_picture"] != null)
+            {
+                Session["ProfilePicture"] = Request.Cookies["_picture"].Value;
+            }
+            if (Request.Cookies["permissions"] != null)
+            {
+                Session["Permissions"] = Request.Cookies["permissions"].Value;
+            }
+            if (Request.Cookies["permissionsclient"] != null)
+            {
+                Session["PermissionsClient"] = Request.Cookies["permissionsclient"].Value;
+            }
+
+            dataclient = Session["PermissionsClient"].ToString();
+            datos = Session["Permissions"].ToString();
+        }
+
+        else
+        {
+            Response.Redirect("/User/login");
+        }
+
+    }
+
+    JObject permissionsClient = JsonConvert.DeserializeObject<JObject>(dataclient);
+    JObject allp = JsonConvert.DeserializeObject<JObject>(datos);
+   
+}
+
+<!-- Inicio Menu -->
+<div id="main_navigation" class="blue">
+    <div class="inner_navigation">
+        <ul class="main">
+            @*-- Dashboard --*@
+            <li @try
+                {
+                    if (thisController == "home" && thisArea == null)
+                    {<text>class="active"</text>}
+
+                }
+                catch (Exception ex) { } >
+                <a href="/" @if (thisController == "home")
+                            {<text>id="current"</text>}><i class="icon-home"></i>Dashboard</a>
+            </li>
+
+            @*-- Usuarios --*@
+            @try
+            {
+                if (allp["users"]["grant"].Count() > 0 && permissionsClient["users"]["grant"].Count()>0)
+                {
+                    bool clientp=false;
+                    foreach (string userclientp in permissionsClient["users"]["grant"]) 
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientp = true;
+                        }
+                    }
+                        foreach (string x in allp["users"]["grant"])
+                    
+                    {
+                        if (x.Contains("r") && clientp==true)
+                        {
+                  <li><a href="#" @if (thisArea == "user")
+                                             {<text>id="current"</text>} ><i class="icon-reorder"></i>Usuarios</a>
+                    <ul class="sub_main">
+                        @try
+                        {
+                            if (allp["users"]["grant"].Count() > 0 && permissionsClient["users"]["grant"].Count() > 0)
+                            {
+                                foreach (string y in allp["users"]["grant"] )
+                                {
+                                    if (y.Contains("r") && clientp==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "user")
+                                {<text>class="active"</text>} ><a href="/User/User">Administrar Usuarios</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        @try
+                        {
+                            if (allp["profiles"]["grant"].Count() > 0 && permissionsClient["profiles"]["grant"].Count() > 0)
+                            {
+                                bool clientprofile = false;
+                                foreach (string userclientp in permissionsClient["profiles"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientprofile = true;
+                                    }
+                                }
+                                foreach (string y in allp["profiles"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientprofile==true)
+                                    {
+                            <li @if ((thisAction == "index" || thisAction == "newprofile") && thisController == "userprofile")
+                                {<text>class="active"</text>} ><a href="/User/UserProfile">Administrar Perfiles</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        @try
+                        {
+                            if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                            {
+                                bool clientcustom = false;
+                                foreach (string userclientp in permissionsClient["custom_fields"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientcustom = true;
+                                    }
+                                }
+                                foreach (string y in allp["custom_fields"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientcustom==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "customtype" && thisArea == "user")
+                                {<text>class="active "</text>} ><a href="/User/customType">Campos custom</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                    </ul>
+                </li>
+                        }
+                    }
+                    
+                }
+            }
+            catch (Exception ex) { }
+
+            @*-- Objetos --*@
+            @try
+            {
+                if (allp["objects"]["grant"].Count() > 0 && permissionsClient["objects"]["grant"].Count() > 0)
+                {
+
+                    bool cliento = false;
+                    foreach (string userclientp in permissionsClient["objects"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            cliento= true;
+                        }
+                    }
+                    foreach (string x in allp["objects"]["grant"])
+                    {
+                        if (x.Contains("r") && cliento==true)
+                        {
+                   <li>
+                    <a href="#" @if (thisArea == "objectadmin")
+                                {<text>id="current"</text>}><i class="icon-inbox"></i>Objetos</a>
+                    <ul class="sub_main">
+                        @try
+                        {
+                            if (allp["objects"]["grant"].Count() > 0 && permissionsClient["objects"]["grant"].Count() > 0)
+                            {
+                                foreach (string y in allp["objects"]["grant"])
+                                {
+                                    if (y.Contains("r") && cliento==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "objectadmin")
+                                { <text> class="active" </text> }><a href="/ObjectAdmin/ObjectAdmin">Administrar objetos</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        @try
+                        {
+                            if (allp["demand"]["grant"].Count() > 0 && permissionsClient["demand"]["grant"].Count() > 0)
+                            {
+                                bool clientd= false;
+                                foreach (string userclientp in permissionsClient["demand"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientd = true;
+                                    }
+                                }
+                                foreach (string y in allp["demand"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientd==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "demand")
+                                { <text> class="active" </text> }><a href="/ObjectAdmin/Demand">Administrar Solicitudes</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+           
+@*-- Objetos de Referencia --*@
+            @try
+            {
+                if (allp["objectsreference"]["grant"].Count() > 0 && permissionsClient["objectsreference"]["grant"].Count() > 0)
+                {
+                    bool clientobj = false;
+                    foreach (string userclientp in permissionsClient["objectsreference"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientobj= true;
+                        }
+                    }
+                    foreach (string x in allp["objectsreference"]["grant"])
+                    {
+                        if (x.Contains("r") && clientobj==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "objectsreference")
+                                {<text>id="current"</text>}><i class="icon-tasks"></i>Objetos de Referencia</a>
+                    <ul class="sub_main">
+                        @try
+                        {
+                            if (allp["objectsreference"]["grant"].Count() > 0 && permissionsClient["objectsreference"]["grant"].Count() > 0)
+                            {
+                                foreach (string y in allp["objectsreference"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientobj==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "object")
+                                {<text>class="active"</text>}><a href="/ObjectReference/Object">Administrar objetos de Referencia</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+
+
+                        @try
+                        {
+                            if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                            {
+                                 bool clientcustom = false;
+                                foreach (string userclientp in permissionsClient["custom_fields"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientcustom = true;
+                                    }
+                                }
+                                
+                                foreach (string y in allp["custom_fields"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientcustom )
+                                    {
+                            <li @if (thisAction == "index" && thisController == "customtype" && thisArea == "objectreference")
+                                {<text>class="active"</text>}><a href="/ObjectReference/customType">Campos Custom</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+                       
+@*-- Ubicaciones --*@
+            @try
+            {
+                if (allp["location"]["grant"].Count() > 0 && permissionsClient["location"]["grant"].Count() > 0)
+                {
+                    bool clientloc = false;
+                    foreach (string userclientp in permissionsClient["location"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientloc = true;
+                        }
+                    }
+                    foreach (string x in allp["location"]["grant"])
+                    {
+                        if (x.Contains("r") && clientloc==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "locations")
+                                { <text> id="current" </text> }><i class="icon-globe"></i>Ubicaciones</a>
+                    <ul class="sub_main">
+                        @try
+                        {
+                            if (allp["location"]["grant"].Count() > 0 && permissionsClient["location"]["grant"].Count() > 0)
+                            {
+                                foreach (string y in allp["location"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientloc==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "location")
+                                { <text> class="active " </text> }><a href="/Locations/Location">Administrar Ubicaciones</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        @try
+                        {
+                            if (allp["profiles"]["grant"].Count() > 0 && permissionsClient["profiles"]["grant"].Count() > 0)
+                            {
+                                bool clientp = false;
+                                foreach (string userclientp in permissionsClient["profiles"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientp = true;
+                                    }
+                                }
+                                foreach (string y in allp["profiles"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientp==true)
+                                    {
+                            <li @if ((thisAction == "index" || thisAction == "newprofile") && thisController == "locationprofile")
+                                { <text> class="active" </text> }><a href="/Locations/LocationProfile">Administrar Perfiles</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        @try
+                        {
+                            if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                            {
+                                bool clientcustom = false;
+                                foreach (string userclientp in permissionsClient["custom_fields"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientcustom = true;
+                                    }
+                                }
+                                foreach (string y in allp["custom_fields"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientcustom==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "customtype" && thisArea == "locations")
+                                { <text> class="active" </text> }><a href="/Locations/customType">Campos custom</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+
+                      @*  @try
+    {
+        if (allp["circuits"]["grant"].Count() > 0)
+        {
+            foreach (string y in allp["circuits"]["grant"])
+            {
+                if (y.Contains("r"))
+                {
+        <li @if (thisAction == "index" && thisController == "circuit" && thisArea == "locations")
+            { <text> class="active" </text> }><a href="/Locations/Circuit">Circuitos</a></li>
+                }
+            }
+        }
+    }
+    catch (Exception ex) { }*@
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+@*-- Hardware --*@
+            @try
+            {
+                if (allp["hardware"]["grant"].Count() > 0 && permissionsClient["hardware"]["grant"].Count() > 0)
+                {
+                    bool clienthw = false;
+                    foreach (string userclientp in permissionsClient["hardware"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clienthw = true;
+                        }
+                    }
+
+                    foreach (string x in allp["hardware"]["grant"])
+                    {
+                        if (x.Contains("r") && clienthw==true)
+                        {
+                            <li class="flip">
+                                <a href="#" @if (thisArea == "hardware") { <text> id="current" </text>  }><i class="icon-globe onl"></i>Hardware</a>
+                                <ul class="sub_main">
+                                    @try
+                                    {
+                                        if (allp["hardware"]["grant"].Count() > 0 && permissionsClient["hardware"]["grant"].Count() > 0)
+                                        {
+                                            foreach (string y in allp["hardware"]["grant"])
+                                            {
+                                                if (y.Contains("r") && clienthw==true)
+                                                {
+                                                    <li @if (thisAction == "index" && thisController == "hardware")
+                                                        { <text> class="active " </text>  }><a href="/Hardware/Hardware">Hardware</a></li>
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex) { }
+                                   
+                                    @try
+                                    {
+                                        if (allp["hardware"]["grant"].Count() > 0 && permissionsClient["hardware"]["grant"].Count() > 0)
+                                        {
+                                            foreach (string y in allp["hardware"]["grant"])
+                                            {
+                                                if (y.Contains("r") && clienthw==true)
+                                                {
+                                                    <li @if (thisAction == "index" && thisController == "cataloghardware") { <text> class="active " </text>   }><a href="/Hardware/CatalogHardware">Catalogo de Hardware</a></li>
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex) { }
+                                </ul>
+                            </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            
+@*-- Procesos --*@
+            @try
+            {
+                if (allp["processes"]["grant"].Count() > 0 && permissionsClient["processes"]["grant"].Count() > 0)
+                {
+                    bool clientpro = false;
+                    foreach (string userclientp in permissionsClient["processes"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientpro = true;
+                        }
+                    }
+                    foreach (string x in allp["processes"]["grant"])
+                    {
+                        if (x.Contains("r") && clientpro==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "processes")
+                                { <text> id="current" </text> }><i class="icon-random"></i>Procesos</a>
+                    <ul class="sub_main">
+                        <li @if (thisAction == "index" && thisController == "diagram")
+                            { <text> class="active" </text> }><a href="/Processes/Diagram">Diagramador de Procesos</a></li>
+                        <li @if (thisAction == "index" && thisController == "process")
+                            { <text> class="active" </text> }><a href="/Processes/Process">Lista de Procesos</a></li>
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+           
+@*-- Movimientos --*@
+
+            @try
+            {
+                if (allp["movement"]["grant"].Count() > 0 && permissionsClient["movement"]["grant"].Count() > 0)
+                {
+                    bool clientmov = false;
+                    foreach (string userclientp in permissionsClient["movement"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientmov = true;
+                        }
+                    }
+                    foreach (string x in allp["movement"]["grant"])
+                    {
+                        if (x.Contains("r") && clientmov==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "movement")
+                                { <text> id="current" </text> }><i class="icon-random"></i>Movimientos</a>
+                    <ul class="sub_main">
+                        <li @if (thisAction == "index" && thisController == "movement")
+                            { <text> class="active" </text> }><a href="/Movement/Movement">Movimientos</a></li>
+                        @try
+                        {
+                            if (allp["custom_fields"]["grant"].Count() > 0 && permissionsClient["custom_fields"]["grant"].Count() > 0)
+                            {
+                                bool clientcustom = false;
+                                foreach (string userclientp in permissionsClient["custom_fields"]["grant"])
+                                {
+                                    if (userclientp.Contains("r"))
+                                    {
+                                        clientcustom = true;
+                                    }
+                                }
+                                foreach (string y in allp["custom_fields"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientcustom==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "adjudicating" && thisArea == "movement")
+                                { <text> class="active" </text> }><a href="/Movement/Adjudicating">Configuración de Dictaminadores</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+                        
+                        <li @if (thisAction == "index" && thisController == "customtype" && thisArea == "movement") { <text> class="active" </text>  }><a href="/Movement/CustomType">Campos Custom</a></li>
+
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+
+@*-- Administracion de Reglas --*@
+   @try
+    {
+        if (allp["rules"]["grant"].Count() > 0 && permissionsClient["rules"]["grant"].Count() > 0)
+        {
+            bool clientrule = false;
+            foreach (string userclientp in permissionsClient["rules"]["grant"])
+            {
+                if (userclientp.Contains("r"))
+                {
+                    clientrule = true;
+                }
+            }
+            foreach (string x in allp["rules"]["grant"])
+            {
+                if (x.Contains("r") && clientrule==true)
+                {
+        <li>
+            <a href="#" @if (thisArea == "rules")
+                        { <text> id="current" </text> }><i class="icon-remove-sign"></i>Administración de Reglas</a>
+            <ul class="sub_main">
+                <li @if (thisController == "objectrule")
+                    { <text> class="active" </text>  }><a href="/Rule/ObjectRule">Reglas</a></li>
+
+            </ul>
+        </li>
+                }
+            }
+        }
+    }
+    catch (Exception ex) { }
+
+@*-- Inventarios --*@
+            @try
+            {
+                if (allp["inventory"]["grant"].Count() > 0 && permissionsClient["inventory"]["grant"].Count() > 0)
+                {
+                    bool clientinv = false;
+                    foreach (string userclientp in permissionsClient["inventory"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientinv = true;
+                        }
+                    }
+                    foreach (string x in allp["inventory"]["grant"])
+                    {
+                        if (x.Contains("r") && clientinv==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "inventory")
+                                { <text> id="current" </text> }><i class="icon-list"></i>Inventarios</a>
+                    <ul class="sub_main">
+                        <li @if (thisAction == "index" && thisController == "sceneinventory")
+                            { <text> class="active" </text> }><a href="/Inventory/SceneInventory/index">Administrar Inventario</a></li>
+                        <li @if (thisAction == "index" && thisController == "inventory")
+                            { <text> class="active" </text> }><a href="/Inventory/Inventory">Calendarizar Inventario</a></li>
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            
+@*-- Monitoring --*@
+            @try
+            {
+                if (allp["location"]["grant"].Count() > 0 && permissionsClient["location"]["grant"].Count()>0)
+                {
+                    bool clientloc = false;
+                    foreach (string userclientp in permissionsClient["location"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientloc = true;
+                        }
+                    }
+                    foreach (string x in allp["location"]["grant"])
+                    {
+                        if (x.Contains("r") && clientloc==true)
+                        {
+                <li>
+                    <a href="#" @if (thisArea == "monitor")
+                                { <text> id="current" </text>  }><i class="icon-globe"></i>Monitoreo</a>
+                    <ul class="sub_main">
+                        @try
+                        {
+                            if (allp["location"]["grant"].Count() > 0 && permissionsClient["location"]["grant"].Count()>0)
+                            {
+                                foreach (string y in allp["location"]["grant"])
+                                {
+                                    if (y.Contains("r") && clientloc==true)
+                                    {
+                            <li @if (thisAction == "index" && thisController == "monitor")
+                                { <text> class="active " </text>  }><a href="/Monitor/Monitor">Monitoreo</a></li>
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex) { }
+
+
+                    </ul>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+          
+          
+@*-- Configuraciones Globales --*@
+            <li>
+                <a href="#" @if (thisArea == "list")
+                            { <text> id="current" </text> }><i class="icon-cog"></i>Configuraciones Globales</a>
+                <ul class="sub_main">
+                    @*@try
+                    {
+                        if (allp["custom_fields"]["grant"].Count() > 0)
+                        {
+                            foreach (string x in allp["custom_fields"]["grant"])
+                            {
+                                if (x.Contains("r"))
+                                {
+                        <li><a href="#">Administrar Campos Custom</a></li>
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex) { }*@
+                    @try
+                    {
+                        if (allp["lists"]["grant"].Count() > 0 && permissionsClient["lists"]["grant"].Count()>0)
+                        {
+                            bool clientlist = false;
+                            foreach (string userclientp in permissionsClient["lists"]["grant"])
+                            {
+                                if (userclientp.Contains("r"))
+                                {
+                                    clientlist = true;
+                                }
+                            }
+                            foreach (string x in allp["lists"]["grant"])
+                            {
+                                if (x.Contains("r") && clientlist==true)
+                                {
+                        <li @if (thisArea == "list")
+                            { <text> class="active" </text> }><a href="/List/List/Index">Administrar Listas</a></li>
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex) { }
+                    @try
+                    {
+                        if (allp["designs"]["grant"].Count() > 0 && permissionsClient["designs"]["grant"].Count()>0)
+                        {
+                            bool clientlist = false;
+                            foreach (string userclientp in permissionsClient["lists"]["grant"])
+                            {
+                                if (userclientp.Contains("r"))
+                                {
+                                    clientlist = true;
+                                }
+                            }
+                            foreach (string x in allp["designs"]["grant"])
+                            {
+                                if (x.Contains("r") && clientlist==true)
+                                {
+                        <li class="flip" @if (thisAction == "index" && thisController == "Design")
+                                 { <text> class="active" </text>   }><a href="/Design/Design">Administrar Diseño</a></li>
+
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex) { }
+                </ul>
+            </li>
+
+            @*-- Reportes --*@
+            @try
+            {
+                if (allp["reports"]["grant"].Count() > 0 && permissionsClient["reports"]["grant"].Count()>0)
+                {
+                    bool clientrep = false;
+                    foreach (string userclientp in permissionsClient["reports"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientrep = true;
+                        }
+                    }
+                    foreach (string x in allp["reports"]["grant"])
+                    {
+                        if (x.Contains("r") && clientrep==true)
+                        {
+                <li @if (thisAction == "index" && thisController == "reports")
+                                 { <text> class="active" </text>   }><a href="/Reports/Reports" @if (thisController == "reports")
+                            {<text>id="current"</text>}><i class="icon-signal"></i>Reportes</a></li>
+
+          
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            
+@*-- Edgeware --*@
+            @try
+            {
+                if (allp["edgeware"]["grant"].Count() > 0 && permissionsClient["edgeware"]["grant"].Count()>0)
+                {
+                    bool cliented= false;
+                    foreach (string userclientp in permissionsClient["edgeware"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            cliented = true;
+                        }
+                    }
+                    foreach (string x in allp["edgeware"]["grant"])
+                    {
+                        if (x.Contains("r") && cliented==true)
+                        {
+                <li>
+                    <a href="#"><i class="icon-flag"></i>Edgeware</a>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            
+
+            @*-- Etiquetado --*@
+            @try
+            {
+                <li>
+                <a href="#" @if (thisAction == "index" && (thisController == "tags" || thisController == "labeling"))
+                            { <text> id="current" </text> }><i class="icon-tag"></i>Etiquetado</a>
+                <ul class="sub_main">
+                    <li @if (thisAction == "index" && thisController == "labeling")
+                        { <text> class="active" </text> }><a href="/Tags/Labeling">Etiquetaje</a></li>
+                    <li @if (thisAction == "index" && thisController == "tags")
+                        { <text> class="active" </text> }><a href="/Tags/Tags">Recepción de Etiquetaje</a></li>
+                </ul>
+                </li>
+            }
+            catch (Exception ex) { }
+            
+            
+
+@*-- Conexiones Externas --
+            @try
+            {
+                if (allp["conexionext"]["grant"].Count() > 0)
+                {
+                    foreach (string x in allp["conexionext"]["grant"])
+                    {
+                        if (x.Contains("r"))
+                        {
+                <li>
+                    <a href="#"><i class="icon-retweet"></i>Conexiones Externas</a>
+                </li>
+                        }
+
+                    }
+                }
+            }
+
+            catch (Exception ex) { }*@
+@*-- Tickets--*@
+            @try
+            {
+                if (allp["tickets"]["grant"].Count() > 0 && permissionsClient["tickets"]["grant"].Count() > 0)
+                {
+                    bool clientti = false;
+                    foreach (string userclientp in permissionsClient["tickets"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientti = true;
+                        }
+                    }
+                    foreach (string x in allp["tickets"]["grant"])
+                    {
+                        if (x.Contains("r") && clientti == true)
+                        {
+                <li @if (thisAction == "index" && thisController == "tickets")
+                    { <text> class="active" </text>   }><a href="/Tickets/Tickets"><i class="icon-android"></i>Tickets</a></li>
+                        }
+
+                    }
+                }
+            }
+
+            catch (Exception ex) { }
+           
+@*-- Mensajes --*@
+
+            @try
+            {
+                if (allp["messages"]["grant"].Count() > 0 && permissionsClient["messages"]["grant"].Count() > 0)
+                {
+                    bool clientmsg = false;
+                    foreach (string userclientp in permissionsClient["messages"]["grant"])
+                    {
+                        if (userclientp.Contains("r"))
+                        {
+                            clientmsg = true;
+                        }
+                    }
+                    foreach (string x in allp["messages"]["grant"])
+                    {
+                        if (x.Contains("r") && clientmsg == true)
+                        {
+                <li @if (thisAction == "index" && thisController == "message")
+                    {<text>class="active"</text>}>
+                    <a href="/Message/Message"><i class="icon-envelope"></i>Mensajes
+                    <span id="noti-pendientes">
+                        <span id="noticlass" title="Mensajes pendientes de Leer" class="">
+                            <span id="arrow-notif" class=""></span>
+                            <span id="notificationsmails" style="color: white;"></span>
+                        </span>
+                    </span>
+                    </a>
+                </li>
+                  
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+@*-- Soporte --*@
+            @try
+            {
+                if (allp["support"]["grant"].Count() > 0)
+                {
+                    foreach (string x in allp["support"]["grant"])
+                    {
+                        if (x.Contains("r"))
+                        {
+                <li>
+                    <a href="#"><i class="icon-warning-sign"></i>Soporte</a>
+                </li>
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { }
+        </ul>
+    </div>
+</div>
+<!-- Fin de Menu -->
+
+<script>
+    jQuery(document).ready(function () {
+        //jQuery("#current").addClass("subOpened");
+        //jQuery("#current").closest("li").find("ul:first").css("display","none");
+    });
+</script>

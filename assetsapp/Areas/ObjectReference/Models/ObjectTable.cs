@@ -290,7 +290,7 @@ namespace RivkaAreas.ObjectReference.Models
                 BsonJavaScript JoinFunction = new BsonJavaScript(queryFunction);
 
                 //Calling the stores Mongo Function
-                MongoConection conection = (MongoConection)Conection.getConection();
+                MongoConection conection = (MongoConection)Conection.getConection("37017");
                 BsonDocument result = conection.getDataBase().Eval(JoinFunction).AsBsonDocument;
 
                 newepc = result.ToJson();
@@ -309,7 +309,7 @@ namespace RivkaAreas.ObjectReference.Models
                 BsonJavaScript JoinFunction = new BsonJavaScript(queryFunction);
 
                 //Calling the stores Mongo Function
-                MongoConection conection = (MongoConection)Conection.getConection();
+                MongoConection conection = (MongoConection)Conection.getConection("37017");
                 result = conection.getDataBase().Eval(JoinFunction).AsString;
 
             }

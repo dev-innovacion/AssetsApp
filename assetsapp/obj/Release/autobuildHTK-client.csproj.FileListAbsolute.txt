@@ -47,3 +47,21 @@ C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\bin\RZLib.dll
 C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.dll
 C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.pdb
 C:\Users\edwin2\Desktop\respaldofull2\htks\ios3\trunk\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\autobuildHTK-client.dll.config
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\autobuildHTK-client.dll
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\autobuildHTK-client.pdb
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\itextsharp.dll
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\RazorPDF.dll
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\bin\RZLib.dll
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\obj\Release\autobuildHTK-client.dll
+C:\Users\JMCM\Dropbox\Respaldo\DEV\Desarrollo de Software\2016\rivka\trunk\obj\Release\autobuildHTK-client.pdb
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\autobuildHTK-client.dll.config
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\autobuildHTK-client.dll
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\autobuildHTK-client.pdb
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\itextsharp.dll
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\RazorPDF.dll
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\bin\RZLib.dll
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\obj\Release\autobuildHTK-client.csprojResolveAssemblyReference.cache
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\obj\Release\autobuildHTK-client.dll
+C:\Users\Eleazar\Documents\Visual Studio 2015\Projects\AssetsApp\assetsapp\obj\Release\autobuildHTK-client.pdb

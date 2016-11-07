@@ -120,8 +120,6 @@ namespace RivkaAreas.User.Controllers
             try
             {
                 JObject userdata = new JObject();
-                string host = System.Web.HttpContext.Current.Request.Url.Host;
-               
                 try
                 {
                     
@@ -132,7 +130,7 @@ namespace RivkaAreas.User.Controllers
                    string key = keysTable.SaveRow(JsonConvert.SerializeObject(data));
                    List<string> usersmail=new List<string>();
                    usersmail.Add(email);
-                   messagectrl.SendExternalMail("Sistema@sistema.com", host, usersmail, "<h3>Hola " + userdata["name"].ToString() + " " + userdata["lastname"].ToString() + ":</h3><br><h4><a href=\"http://"+host+"/User/Login/recoverpwd?key=" + key + "\">Haga click aqui, para crear un nuevo password</h4>", new JArray(), "ios:Recuperacion de Password");
+                   messagectrl.SendExternalMail("Sistema@sistema.com", "ios3.assetsapp.com", usersmail, "<h3>Hola " + userdata["name"].ToString() + " " + userdata["lastname"].ToString() + ":</h3><br><h4><a href=\"http://ios3.assetsapp.com/User/Login/recoverpwd?key=" + key + "\">Haga click aqui, para crear un nuevo password</h4>", new JArray(), "ios:Recuperacion de Password");
                         
                   
                  }

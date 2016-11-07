@@ -20,7 +20,7 @@ namespace RivkaAreas.Reports.Models
         private MongoConection conection;
         public MovementReport(string table): base("MovementProfiles")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

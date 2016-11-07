@@ -19,7 +19,7 @@ namespace RivkaAreas.Reports.Models
         private MongoCollection collection;
         private MongoConection conection;
         public  ProfileReport(string table):base("Profiles") {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

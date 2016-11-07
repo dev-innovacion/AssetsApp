@@ -4,7 +4,7 @@
 @model JArray
 
 <div class="well-content no-search">
-    <table class="table table-striped table-bordered table-hover datatable" style="background-color:white">
+    <table class="table table-striped table-bordered table-hover datatable" style="max-height:400px">
         <thead>
             <tr>
                 <th>Fecha Inicial</th>
@@ -20,22 +20,20 @@
             @foreach (JObject data in Model)
             {
                 <tr data-id="@data["_id"]">
-
-                    <td class="dateStart">
+                    
+                    <td class="dateStart"> 
                         @if (data["outDate"].ToString() == "true")
                         {
                             <label style="color:red; margin-right:5px;"> <i class="icon-warning-sign"></i></label>
                         }
-
-                        @if (data["status"].ToString() == "Completado")
-                        {
-                            <label style="color:green; margin-right:5px;"> <i class="icon-ok"></i></label>
-                        }
-                        @if (data["status"].ToString() == "Pendiente" && data["outDate"].ToString() == "false")
-                        {
-                            <label style="color:blue; margin-right:5px;"> <i class="icon-edit"></i></label>
-                        }
-                        @data["dateStart"]
+                        
+                         @if (data["status"].ToString() == "Completado"){
+                             <label style="color:green; margin-right:5px;"> <i class="icon-ok"></i></label>
+                         }
+                        @if (data["status"].ToString() == "Pendiente" && data["outDate"].ToString() == "false"){
+                             <label style="color:blue; margin-right:5px;"> <i class="icon-edit"></i></label>
+                         }
+                        @data["dateStart"] 
                     </td>
                     <td class="dateEnd">@data["dateEnd"]</td>
                     <td class="locationName">@data["locationName"]</td>
@@ -45,21 +43,21 @@
                     <td>
                         @if (data["status"].ToString() != "Completado")
                         {
-                            <div class="btn-group">
-                                <a class="btn" id="getInventoryData" href="#" onclick="getSQLinventory(this)" data-original-title="Descargar inventario" rel="tooltip" data-placement="left"><i class="icon-download-alt"></i></a>
-                                <span class=" btn btn-file" data-original-title="Subir inventario" rel="tooltip" data-placement="right">
-                                    <span class="icon-folder-open"></span>
-                                    <input name='uploads[]' class="uploadFile" id="uploadFiles" type="file" multiple />
-                                </span>
-                                @try
+                        <div class="btn-group">
+                            <a class="btn" id="getInventoryData" href="#" onclick="getSQLinventory(this)" data-original-title="Descargar inventario" rel="tooltip" data-placement="top"><i class="icon-download-alt"></i></a>
+                            <span class=" btn btn-file" data-original-title="Subir inventario" rel="tooltip" data-placement="top">
+                                <span class="icon-folder-open"></span>
+                                <input name='uploads[]' class="uploadFile" id="uploadFiles" type="file" multiple />
+                            </span>
+                            @try
+                            {
+                                if (data["Upload"].ToString() == "true")
                                 {
-                                    if (data["Upload"].ToString() == "true")
-                                    {
-                                        <a class="btn" id="checkInventoryData" href="#" onclick="checkSQLinventory(this)" data-original-title="Ver reporte" rel="tooltip" data-placement="right"><i class="icon-briefcase"></i></a>
-                                    }
+                            <a class="btn" id="checkInventoryData" href="#" onclick="checkSQLinventory(this)" data-original-title="Ver reporte" rel="tooltip" data-placement="top"><i class="icon-briefcase"></i></a>
                                 }
-                                catch (Exception e) { }
-                            </div>
+                            }
+                            catch (Exception e) { }
+                        </div>
                         }
                         else
                         {
@@ -83,16 +81,14 @@
     }
 
     jQuery(".alertDate").tooltip();
-    try {
-        jQuery(".fixedHeader").remove()
-    } catch (ex) { }
+
     try {
 
-        var table = jQuery(".table").dataTable({
+        jQuery(".table").dataTable({
             "sPaginationType": "full_numbers",
             "sDom": "<'tableHeader'<l><'clearfix'f>r>t<'tableFooter'<i><'clearfix'p>>",
             "iDisplayLength": 10,
-            "sScrollY": "250px",
+            "sScrollY": "400px",
             "aoColumnDefs": [{
                 'bSortable': false,
                 'aTargets': [0]
@@ -112,21 +108,13 @@
             }
         });
         jQuery('.dataTables_length select').chosen();
-        setTimeout(function () {
-
-            table.fnAdjustColumnSizing();
-        }, 2000);
     } catch (Exception) { console.log(); }
 
     jQuery(".uploadFile").change(function () {
-        debugger
         cant = 0;
-        var that = this;
         idInventory = jQuery(this).closest("tr").data("id");
         var fd = new FormData();
         fd.append("idInventory", idInventory);
-        fd.append("permission", 0);
-        fd.append("url", null);
 
         for (xy = 0; xy < jQuery(this)[0].files.length; xy++) {
             fd.append(jQuery(this)[0].files[xy].name, jQuery(this)[0].files[xy]);
@@ -155,75 +143,10 @@
             processData: false,
             success: function (data) {
                 _loading();
-
-                try {
-                    var result = JSON.parse(data);
-                    if (result.repeats.length == 0) {
-                        setReportSQL(idInventory);
-                        loadInventory();
-                        jQuery(that).val("");
-                    } else {
-                        var str = "Las siguientes sessiones ya se encuentran en el sistema: ";
-                        jQuery.each(result.repeats, function () {
-                            str += this + ","
-
-                        })
-                        str += " Desea sobreescribirlas?";
-                        _confirm({
-                            title: "Datos Duplicados",
-                            message: str,
-                            action: function () {
-                                cant = 0;
-                                idInventory = jQuery(that).closest("tr").data("id");
-                                var fd = new FormData();
-                                fd.append("idInventory", idInventory);
-                                fd.append("permission", 1);
-                                fd.append("url", result.url);
-                                /* for (xy = 0; xy < jQuery(that)[0].files.length; xy++) {
-                                     fd.append(jQuery(that)[0].files[xy].name, jQuery(that)[0].files[xy]);
-                                     ext = jQuery(that)[0].files[xy].name;
-                                     ext = ext.split('.').pop(-1);
-                                     //check ".ext"
-                                     if (ext != "rar" && ext != "zip" && ext != "sdf") {
-                                         _alert("error", "Formato de archivo invalido!");
-                                         return false;
-                                     }
-                                     //check only one compresss
-                                     if (ext == "rar" || ext == "zip") cant++;
-                                     if (cant > 1) {
-                                         _alert("error", 'No se permiten más de un archivo! (".rar" o ".zip")');
-                                         cant = 0;
-                                         return false;
-                                     }
-                                 }*/
-                                jQuery.ajax({
-                                    url: "/Inventory/SceneInventory/saveFiles",
-                                    type: "POST",
-                                    data: fd,
-                                    contentType: false,
-                                    processData: false,
-                                    success: function (data) {
-                                        _loading();
-                                        jQuery(this).val("");
-
-                                        _alert("success", "Subido Correctamente");
-
-
-                                        setReportSQL(idInventory);
-                                        jQuery(that).val("");
-                                    },
-                                    error: function () {
-                                        _loading();
-                                        _alert("error", "Ha ocurrido un error");
-                                    }
-                                });
-                            }
-                        });
-                    }
-                } catch (ex) { }
+                jQuery(this).val("");
                 _alert("success", "Subido Correctamente");
-
-
+                setReportSQL(idInventory);
+                loadInventory();
             },
             error: function () {
                 _loading();

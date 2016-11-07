@@ -18,7 +18,7 @@ namespace RivkaAreas.User.Models
         private MongoConection conection;
 
         public ProfileTable(string table = "Profiles"):base("Profiles") {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

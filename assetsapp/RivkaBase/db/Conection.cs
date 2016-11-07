@@ -19,6 +19,7 @@ namespace Rivka.Db
         protected String user;
         protected String password;
         protected String database;
+        protected String port;
 
         /// <summary>
         ///     This method allows to get the database conection
@@ -41,6 +42,22 @@ namespace Rivka.Db
             switch (dbType) { 
                 case "MongoDB":
                     return new Rivka.Db.MongoDb.MongoConection( dbConf );
+            }
+            return null;
+        }
+        public static Conection getConection(string port, Dictionary<string, string> dbConf = null)
+        {
+
+            if (dbConf == null)
+            {
+                dbConf = RivkaConf.Conection.DataBaseConfig.getDataBaseConfig(); //getting the system database configuration
+            }
+            string dbType = dbConf["type"]; //getting the database type
+
+            switch (dbType)
+            {
+                case "MongoDB":
+                    return new Rivka.Db.MongoDb.MongoConection(port, dbConf);
             }
             return null;
         }

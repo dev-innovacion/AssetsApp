@@ -20,7 +20,7 @@ namespace Rivka.Db.MongoDb
         private MongoServer conection;
         private MongoDatabase mongoDB;
         private MongoCollection mongoColection;
-
+        private string port;
 
         public MongoConection( Dictionary<string,string> dbConfig )
         {
@@ -29,6 +29,15 @@ namespace Rivka.Db.MongoDb
             user = dbConfig["user"];
             password = dbConfig["password"];
             database = dbConfig["database"];
+        }
+        public MongoConection(string _port, Dictionary<string, string> dbConfig)
+        {
+            //LAN
+            host = dbConfig["host"];
+            user = dbConfig["user"];
+            password = dbConfig["password"];
+            database = dbConfig["database"];
+            port = _port;
         }
 
         /// <summary>
@@ -46,6 +55,10 @@ namespace Rivka.Db.MongoDb
             { //does the conection exist already?
 
                 String conectionString = "mongodb://" + user + ":" + password + "@" + host + "/";
+                if (!string.IsNullOrEmpty(port))
+                {
+                    conectionString = "mongodb://" + user + ":" + password + "@" + host + ":" + port + "/";
+                }
                 if (!authAgainstAdmin)
                 {
                     conectionString += database;

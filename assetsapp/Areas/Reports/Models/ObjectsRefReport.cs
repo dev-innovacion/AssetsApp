@@ -21,7 +21,7 @@ namespace RivkaAreas.Reports.Models
         public ObjectsRefReport(string table)
             : base("ReferenceObjects")
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection(table);
         }
 

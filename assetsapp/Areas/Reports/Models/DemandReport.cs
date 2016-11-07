@@ -29,9 +29,9 @@ namespace RivkaAreas.Reports.Models
 
         
         public  DemandReport(string table):base("Demand") {
-            conection = (MongoConection)Conection.getConection();
-            conection1 = (MongoConection)Conection.getConection();
-            conection2 = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
+            conection1 = (MongoConection)Conection.getConection("37017");
+            conection2 = (MongoConection)Conection.getConection("37017");
             
             collection = conection.getCollection(table);
           

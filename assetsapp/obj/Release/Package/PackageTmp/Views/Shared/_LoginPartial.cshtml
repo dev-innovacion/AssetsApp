@@ -1,0 +1,271 @@
+﻿@{
+    string userPattern = "([a-zA-Z0-9-_.]){4,}";
+    string emailPattern = "[A-Za-z0-9-_.]+@[A-Za-z0-9-.]+\\.[a-zA-Z]+";
+    string namePattern = "[A-ZÁÉÍÓÚÑa-záéíóúñ]+(\\s[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,2}";
+    string lastNamePattern = "[A-ZÁÉÍÓÚÑa-záéíóúñ]+(\\s[A-ZÁÉÍÓÚÑa-záéíóúñ]+){0,4}";
+    string passwordPattern = ".{6,}";
+    }
+
+
+<li class="dropdown">
+    <a href="#">
+        @if (Session["ProfilePicture"] == null)
+        {
+            @(new HtmlString("<img src='/Content/Images/imgPerfil/avatar_06.png' alt='User image' class='avatar' style='padding-top:10px;'>"))
+        }
+        else
+        {
+            @(new HtmlString("<img src='" + @Url.Content(Session["ProfilePicture"].ToString()) + "' alt='User image' class='avatar'>"))
+
+        }
+        @if (Session["LoggedUser"] != null)
+        {@Session["LoggedUser"].ToString()}<i class="icon-angle-down"></i>
+    </a>
+    <ul>
+        <li><a class="widgetclient" style="color:white" href="#" id="myAccount"><i class="icon-cog"></i>Mi Cuenta</a></li>
+    </ul>
+</li>
+<li>
+    <a href="#" style="display:none"><i class="icon-question-sign"></i><span class="hidden-768 hidden-480">Ayuda</span></a>
+</li>
+<li>
+    <a href="/Login/Logout/"><i class="icon-signout"></i><span class="hidden-768 hidden-480">Salir</span></a>
+</li>
+
+@* Modal My Account *@
+<div id="myaccount_admin_panel" class="modal hide fade" tabindex="-1" data-backdrop="static">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="cancel_buttonx"><i class="icon-remove" style="margin-top: 10px; margin-right: 10px"></i></button>
+        <h3 class="modal-header-text">Mi cuenta</h3>
+    </div>
+    <div class="modal-header">
+        <div class="profileSelector">
+            <label class="lanelMargen">Puesto: </label>
+            <select id="myAccountProfileSelect" disabled>
+            </select>
+        </div>
+    </div>
+        <div class="modal-body">
+
+            <div class="navbar-inner">
+                <ul class="nav nav-tabs" id="myAccountabHeader1">
+                    <li class="active" id="myAccountstaticFormHeader"><a href="#myAccountstaticFieldsSection" data-toggle="tab">Inf. General</a></li>
+                </ul>
+            </div>
+            <div class="tab-content" id="myAccounttabContent1">
+                <div class="tab-pane active staticFieldsSection perfilMargen" id="myAccountstaticFieldsSection">
+
+                    <table width="100%">
+                        <tr>
+                            <td width="50%">
+                                <label>Nombre: </label>
+                                <div class="staticField">
+                                    <input id="myAccountName" type="text" pattern=@namePattern placeholder="Nombre(s)" data-original-title="El nombre sólo puede contener caracteres alfabéticos (Máximo 3 nombres)." rel="tooltip" data-placement="right" disabled/>
+                                </div>
+                            </td>
+                            <td rowspan="2" width="50%" style="text-align: center">
+                                <img style="max-height: 200px;" id="myAccountImg_pre" src="~/Content/Images/imgPerfil/avatar_06.png">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Apellido: </label>
+                                <div class="staticField">
+                                    <input type="text" id="myAccountLastname" pattern=@lastNamePattern placeholder="Apellido(s)" data-original-title="El apellido sólo puede contener caracteres alfabético (Máximo 5 apellidos)." rel="tooltip" data-placement="right" disabled/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>E-mail: </label>
+                                <div class="staticField">
+                                    <input type="text" id="myAccountEmail" pattern=@emailPattern  placeholder="nombre@dominio.com" data-original-title="Debe ser un correo electrónico válido." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                            <td>
+                                <!--<span class="btn btn-file">
+                                    <span class="fileupload-new">Foto de Usuario</span>
+                                    <input type="file" id="myAccountFile" value="Default" />
+                                </span>-->
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>ID Usuario: </label>
+                                <div class="staticField">
+                                    <input id="myAccountUser"type="text"pattern=@userPattern placeholder="Nombre de usuario" data-original-title="El nombre de usuario sólo puede contener caracteres alfanuméricos y los caracteres (-, _, .)." rel="tooltip" data-placement="right" disabled/>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Contrase&ntilde;a: </label>
+                                <div class="staticField">
+                                    <input type="password" id="myAccountPwd" pattern=@passwordPattern placeholder="Contraseña" data-original-title="Mínimo seis caracteres." rel="tooltip" data-placement="right" />
+                                </div>
+
+                            </td>
+                            <td>
+                                <label>Confirmar Contrase&ntilde;a: </label>
+                                <div class="staticField">
+                                    <input type="password" id="myAccountPwdConfirm" pattern=@passwordPattern placeholder="Contraseña" data-original-title="Debe coincidir." rel="tooltip" data-placement="right" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Jefe Inmediato: </label>
+                                <div class="staticField">
+                                    <select id="myAccountBoss" style="width: 90%;" disabled>
+                                    </select>
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <label for="userKey">Firma Electrónica</label>
+                                <div class="staticField" width="100%">
+                                    <input type="text" id="myAccountUserKey" disabled="disabled" />
+                                    <button type="button" class="btn btn dark_green fileinput-button" data-original-title="Generar Firma" rel="tooltip" data-placement="top" disabled>
+                                        <i class="icon-cog icon-white"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span width="80%" id="final_msg" class="error_msg"></span>
+            <input value="Guardar" class="btn dark_green" type="submit" id="saveMyAccount_button">
+            <input value="Cancelar" class="btn grey" type="button" id="cancelMyAccount_button">
+        </div>
+</div>
+
+<script>
+    jQuery(document).ready(function ($) {
+        var oldEmail = "";
+        jQuery('a[id="myAccount"]').click(function (event) {
+            event.preventDefault();
+            userID = "thisUser";
+            jQuery.ajax({
+                url: "/User/User/getMyAccount",
+                type: "POST",
+                data: { userID: userID },
+                beforeSend: _loading(),
+                success: function (data) {
+                    
+                    if (data != null && data != "" && data != "[]") {
+                        data = JSON.parse(data);
+                        jQuery("#myAccountstaticFieldsSection").nextAll().remove();
+                        jQuery("#myAccountstaticFormHeader").nextAll().remove();
+                        jQuery(".modal-header-text").html("Mi Cuenta");
+                        jQuery("#myAccountUser").val(data["user"]);
+                        jQuery("#myAccountName").val(data["name"]);
+                        jQuery("#myAccountLastname").val(data["lastname"]);
+                        jQuery("#myAccountBoss").append("<option>" + data["boss"] + "</option>");
+                        jQuery("#myAccountProfileSelect").append("<option>" + data["puesto"] + "</option>");
+                        jQuery("#myAccountEmail").val(data["email"]);
+                        jQuery("#myAccountUserKey").val(data["key"]);
+
+                        if (data["imagen"] != "null") {
+                            jQuery("#myAccountImg_pre").attr("src", data["imagen"]);
+                        }
+
+                        oldEmail = data["email"];
+
+                        jQuery("#myaccount_admin_panel").modal("show");
+                    } else {
+                        _alert("error", "Ocurrio un error");
+                    }
+                    _loading();
+                },
+                error: function () {
+                    _loading();
+                    _alert("error", "Ocurrio un error");
+                }
+            });
+
+        });
+
+        jQuery('#saveMyAccount_button').click(function (event) {
+            event.preventDefault();
+            //Check Sintaxis
+            if (jQuery("#myAccountPwd").val() != "" && jQuery("#myAccountPwdConfirm").val() != "") {
+                if (!jQuery("#myAccountPwd").val().match(new RegExp(jQuery("#myAccountPwd").attr("pattern"))) ||
+                    !jQuery("#myAccountPwdConfirm").val().match(new RegExp(jQuery("#myAccountPwdConfirm").attr("pattern")))) {
+                    _alert("error", "La contraseña debe ser mínimo de 6 caracteres.")
+                    return false;
+                }
+                //Validate pass are the same and sintaxis
+                if (jQuery("#myAccountPwdConfirm").val() != jQuery("#myAccountPwdConfirm").val()) {
+                    _alert("error", "Las contraseñas deben coincidir");
+                    return false;
+                }
+            }
+            //Validate email format
+            if (jQuery("#myAccountEmail").val() != "") {
+                if (!jQuery("#myAccountEmail").val().match(new RegExp(jQuery("#myAccountEmail").attr("pattern")))) {
+                    _alert("error", "Correo incorrecto!");
+                    return false;
+                }
+            }
+
+            if (jQuery("#myAccountEmail").val() != "" && jQuery("#myAccountEmail").val() != oldEmail) {
+                jQuery.ajax({
+                    url: "/User/User/emailExists",
+                    type: "POST",
+                    data: { email: jQuery("#myAccountEmail").val() },
+                    beforeSend: _loading(),
+                    success: function (data) {
+                        if (data == "true") {
+                            _alert("error", "El correo ya existe");
+                        } else {
+                            saveChanges();
+                        }
+                        _loading();
+                    },
+                    error: function () {
+                        _loading();
+                        _alert("error", "Ocurrio un error");
+                    }
+                });
+            } else {
+                saveChanges();
+            }
+        });
+
+        jQuery('#cancelMyAccount_button').click(function (event) {
+            event.preventDefault();
+            jQuery("#myaccount_admin_panel").modal("hide");
+        });
+    });
+
+    function saveChanges() {
+        jQuery.ajax({
+            url: "/User/User/updateMyAccount",
+            type: "POST",
+            data: { email: jQuery("#myAccountEmail").val(), password: jQuery("#myAccountPwd").val() },
+            beforeSend: _loading(),
+            success: function (data) {
+                if (data == "success") {
+                    _alert("success", "Guardado Correctamente!");
+                } else {
+                    _alert("error", "Ocurrio un error");
+                }
+                jQuery("#myaccount_admin_panel").modal("hide");
+                _loading();
+            },
+            error: function () {
+                _loading();
+                _alert("error", "Ocurrio un error");
+            }
+        });
+
+    }
+
+
+</script>

@@ -27,7 +27,7 @@ namespace RivkaAreas.List.Models
         /// </param>
         public ListTable()
         {
-            conection = (MongoConection)Conection.getConection();
+            conection = (MongoConection)Conection.getConection("37017");
             collection = conection.getCollection("Lists");
         }
 
